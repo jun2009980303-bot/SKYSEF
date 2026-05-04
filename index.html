@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>智慧農場 - 動態履歷與編輯系統</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@900&family=Noto+Sans+TC:wght@900&display=swap');
+
+:root {
+--text-green: #1b4d36;
+--panel-bg: rgba(255, 255, 255, 0.95);
+--border-white: 6px solid #ffffff;
+--accent-green: #42a95d;
+--accent-orange: #ff9800;
+}
+
+body, html {
+margin: 0; padding: 0; font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+background: linear-gradient(to bottom, #d4f0fd 0%, #e1f5fe 20%, #c8e6c9 40%, #a5d6a7 100%);
+background-attachment: fixed; height: 100vh; overflow: hidden;
+}
+
+.view-screen { display: none; height: 100vh; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+.view-screen.active { display: block; animation: slideInRight 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+
+.container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
+.panel { background: #ffffffdd; border: var(--border-white); border-radius: 30px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+.panel-title { font-size: 18px; font-weight: 900; margin-bottom: 15px; color: var(--text-green); display: flex; justify-content: space-between; align-items: center; }
+
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+label { font-size: 11px; font-weight: bold; margin-bottom: 4px; display: block; color: #555; }
+input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 14px; box-sizing: border-box; }
+
+.btn-main { width: 100%; background: var(--accent-green); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s; }
+.btn-secondary { width: 100%; background: #2c3e50; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; margin-top: 5px; }
+.btn-qr { width: 100%; background: #ff9800; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
+
+.farmer-log-item { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.btn-edit { background: #03a9f4; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; margin-right: 5px; }
+.btn-delete { background: #ff5252; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; }
+
+.consumer-header { text-align: center; background: #fff; padding: 20px; border-radius: 30px; border: var(--border-white); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.daily-card { background: linear-gradient(135deg, #fff 0%, #f1f8e9 100%); border: 3px solid var(--accent-green); border-radius: 25px; padding: 20px; position: relative; overflow: hidden; }
+.daily-badge { position: absolute; top: 0; right: 0; background: var(--accent-orange); color: white; padding: 5px 15px; border-radius: 0 0 0 20px; font-size: 12px; font-weight: 900; }
+.log-item { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; border-left: 8px solid var(--accent-green); }
+.log-tag { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 5px; font-size: 11px; margin-right: 5px; font-weight: 900; }
+
+.btn-back { position: fixed; bottom: 20px; right: 20px; background: #ff5252; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; }
+</style>
+</head>
+<body>
+
+<div id="viewFarmer" class="view-screen active">
+<div class="container">
+<header style="text-align:center; margin-top:10px;">
+<div id="farmerBadgeDisplay" style="font-size:12px; font-weight:900; color:var(--text-green); background:#fff; display:inline-block; padding:3px 15px; border-radius:20px;">載入中...</div>
+<h2 style="margin:5px 0;">👨‍🌾 農場後台管理系統</h2>
+</header>
+
+<div class="panel" style="background: rgba(234, 248, 244, 0.9);">
+<div class="panel-title" style="font-size: 16px;">🏠 農場基本資料設定</div>
+<div class="input-row">
+<div>
+<label>農場地點 (產地)</label>
+<input type="text" id="settingLocation" placeholder="例如: 南投埔里">
+</div>
+<div>
+<label>農夫姓名 (生產者)</label>
+<input type="text" id="settingFarmer" placeholder="例如: 謝易均">
+</div>
+</div>
+<button class="btn-secondary" onclick="saveProfile()">更新農場資訊</button>
+</div>
+
+<div class="panel" id="inputSection">
+<div class="panel-title" id="inputTitle">📝 新增今日觀測日誌</div>
+<div class="input-row">
+<div>
+<label>作物種類</label>
+<input type="text" id="pType" placeholder="如: 筊白筍">
+</div>
+<div>
+<label>批次編號</label>
+<input type="text" id="pName" placeholder="如: 2026-A">
+</div>
+</div>
+<div class="input-row">
+<div>
+<label>空氣溫度 (°C)</label>
+<input type="number" id="temp" placeholder="氣溫">
+</div>
+<div>
+<label>空氣濕度 (%)</label>
+<input type="number" id="hum" placeholder="濕度">
+</div>
+</div>
+<div style="margin-bottom:10px;">
+<label>土壤 pH 值</label>
+<input type="number" id="ph" placeholder="pH 值" step="0.1">
+</div>
+<label>農事筆記</label>
+<textarea id="note" placeholder="紀錄作業內容 (例如: 已施放有機肥)..."></textarea>
+
+<button id="btnSave" class="btn-main" onclick="saveData()">💾 儲存並發布至生產履歷</button>
+<button id="btnCancel" class="btn-secondary" style="display:none; background:#999;" onclick="cancelEdit()">❌ 取消修改</button>
+</div>
+
+<div class="panel">
+<div class="panel-title">
+<span>🛠️ 歷史紀錄管理</span>
+<span style="font-size:12px; color:#ff5252;">僅農夫可見</span>
+</div>
+<div id="farmerLogList"></div>
+</div>
+
+<button class="btn-qr" onclick="switchView('viewConsumer')">
+<span style="font-size:24px;">📱</span> 模擬消費者掃描 QR Code 畫面
+</button>
+</div>
+</div>
+
+
+<div id="viewConsumer" class="view-screen">
+<div class="container">
+
+<div class="consumer-header">
+<div style="font-size:30px; margin-bottom:5px;">🥬</div>
+<h2 style="margin:0; color:var(--text-green);">透明生產履歷</h2>
+<div style="font-size:13px; color:#666; margin-top:8px; background:#f9f9f9; padding:8px; border-radius:10px; display:inline-block;">
+📍 產地：<b id="displayLocation" style="color:var(--text-green);">南投埔里</b> |
+👨‍🌾 生產者：<b id="displayFarmer" style="color:var(--text-green);">謝易均</b>
+</div>
+</div>
+
+<div class="daily-card">
+<div class="daily-badge">今日小知識</div>
+<h3 id="wikiTitle" style="color:var(--text-green); margin-top:5px; margin-bottom:8px;">載入中...</h3>
+<div id="wikiText" style="font-size:14px; color:#444; line-height:1.6;">正在為您挑選植物知識...</div>
+<button onclick="generateRandomWiki()" style="background:none; border:none; color:var(--accent-green); font-weight:900; font-size:12px; cursor:pointer; padding:0; margin-top:10px;">↻ 換一個知識</button>
+</div>
+
+<div class="panel">
+<div class="panel-title">📈 生長環境監測數據</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">優良的生長曲線是品質的保證。</div>
+<div style="background:#fff; height:180px; border-radius:15px; border:1px solid #eee; padding:10px;">
+<canvas id="lineChart"></canvas>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">📜 完整農事歷程</div>
+<div id="resumeList"></div>
+</div>
+
+</div>
+
+<button class="btn-back" onclick="switchView('viewFarmer')">🔙 返回農夫後台</button>
+</div>
+
+
+<script>
+const consumerWikiDB = {
+"筊白筍": "埔里名產「美人腿」！含有豐富纖維質與維生素，熱量低，是健康料理的絕佳選擇。",
+"百香果": "埔里大坪頂特產！果汁被譽為「果汁之王」，富含維他命C，表皮變皺時甜度最高。",
+"青江菜": "又稱湯匙菜。含有豐富的鈣質與維生素A，消費者烹調時建議快炒以保留清脆口感。",
+"番茄": "富含滿滿的茄紅素。選購時應挑選果實飽滿、色澤均勻且蒂頭翠綠者。",
+"玉米": "含有豐富葉黃素與玉米黃素，對眼睛保健極佳。購買後建議盡快食用以保甜度。",
+"九層塔": "強大的天然抗氧化食材。買回家後建議不要冷藏，插在常溫水瓶中可延長保鮮期。",
+"敏豆": "也就是四季豆。含有豐富的維生素 B 群，烹調前務必完全煮熟。",
+"苦瓜": "能退火、降血糖。表皮顆粒越粗、縫隙越寬的苦瓜，通常苦味會比較淡。",
+"地瓜葉": "平民蔬菜之王！不需過多農藥，含有大量葉綠素與鐵質，是天然補血食材。"
+};
+
+let logs = JSON.parse(localStorage.getItem('puli_dynamic_resume')) || [];
+let farmProfile = JSON.parse(localStorage.getItem('puli_farm_profile')) || { location: '南投埔里', farmer: '謝易均' };
+let lineChart;
+let editingIndex = -1; // 追蹤目前正在修改哪一筆資料 (-1 代表新增模式)
+
+function initProfile() {
+document.getElementById('settingLocation').value = farmProfile.location;
+document.getElementById('settingFarmer').value = farmProfile.farmer;
+updateProfileDisplay();
+renderFarmerLogs();
+}
+
+function saveProfile() {
+farmProfile.location = document.getElementById('settingLocation').value || '未設定產地';
+farmProfile.farmer = document.getElementById('settingFarmer').value || '匿名農夫';
+localStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
+updateProfileDisplay();
+alert("農場基本資訊已更新成功！");
+}
+
+function updateProfileDisplay() {
+document.getElementById('farmerBadgeDisplay').innerText = `👨‍🌾 ${farmProfile.farmer} (${farmProfile.location})`;
+document.getElementById('displayLocation').innerText = farmProfile.location;
+document.getElementById('displayFarmer').innerText = farmProfile.farmer;
+}
+
+function switchView(viewId) {
+document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
+document.getElementById(viewId).classList.add('active');
+
+if(viewId === 'viewConsumer') {
+initChart();
+renderResume();
+generateRandomWiki();
+}
+}
+
+function generateRandomWiki() {
+const keys = Object.keys(consumerWikiDB);
+const randomKey = keys[Math.floor(Math.random() * keys.length)];
+document.getElementById('wikiTitle').innerText = randomKey;
+document.getElementById('wikiText').innerText = consumerWikiDB[randomKey];
+}
+
+// --- 進入修改模式 ---
+function editLog(index) {
+editingIndex = index;
+const log = logs[index];
+
+// 把資料倒回輸入框
+document.getElementById('pType').value = log.type;
+document.getElementById('pName').value = log.name;
+document.getElementById('temp').value = log.temp;
+document.getElementById('hum').value = log.hum;
+document.getElementById('ph').value = log.ph !== "--" ? log.ph : "";
+document.getElementById('note').value = log.note;
+
+// 改變按鈕樣式與文字，提醒農夫現在在「修改中」
+document.getElementById('inputTitle').innerText = "✏️ 修改觀測日誌";
+document.getElementById('btnSave').innerText = "💾 儲存修改並更新履歷";
+document.getElementById('btnSave').style.backgroundColor = "var(--accent-orange)";
+document.getElementById('btnCancel').style.display = "block";
+
+// 自動捲動到最上面方便修改
+document.getElementById('viewFarmer').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// --- 取消修改 ---
+function cancelEdit() {
+editingIndex = -1;
+clearForm();
+resetFormUI();
+}
+
+// --- 儲存或更新數據 ---
+function saveData() {
+const typeVal = document.getElementById('pType').value || "農場作物";
+const newLog = {
+date: editingIndex > -1 ? logs[editingIndex].date : new Date().toLocaleString('zh-TW', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}),
+type: typeVal,
+name: document.getElementById('pName').value || "當季批次",
+temp: parseFloat(document.getElementById('temp').value) || 0,
+hum: parseFloat(document.getElementById('hum').value) || 0,
+ph: document.getElementById('ph').value || "--",
+note: document.getElementById('note').value || "例行性巡視，生長狀況良好。"
+};
+
+if (editingIndex > -1) {
+// 修改舊資料
+logs[editingIndex] = newLog;
+editingIndex = -1; // 退出修改模式
+alert("該筆紀錄已成功修正！");
+} else {
+// 新增資料
+logs.unshift(newLog);
+alert("紀錄已成功發佈！掃描 QR Code 即可看到最新履歷。");
+}
+
+localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+clearForm();
+resetFormUI();
+renderFarmerLogs();
+}
+
+function clearForm() {
+document.getElementById('temp').value = '';
+document.getElementById('hum').value = '';
+document.getElementById('ph').value = '';
+document.getElementById('note').value = '';
+}
+
+function resetFormUI() {
+document.getElementById('inputTitle').innerText = "📝 新增今日觀測日誌";
+document.getElementById('btnSave').innerText = "💾 儲存並發布至生產履歷";
+document.getElementById('btnSave').style.backgroundColor = "var(--accent-green)";
+document.getElementById('btnCancel').style.display = "none";
+}
+
+// --- 刪除紀錄 ---
+function deleteLog(index) {
+if(confirm("確定要刪除這筆紀錄嗎？此動作無法復原。")) {
+if(editingIndex === index) cancelEdit(); // 如果正在編輯這筆，強制退出編輯模式
+logs.splice(index, 1);
+localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+renderFarmerLogs();
+}
+}
+
+function renderFarmerLogs() {
+const list = document.getElementById('farmerLogList');
+if(logs.length === 0) {
+list.innerHTML = "<p style='text-align:center; color:#999; font-size:13px;'>目前尚無紀錄，請在上方新增。</p>";
+return;
+}
+list.innerHTML = logs.map((l, index) => `
+<div class="farmer-log-item">
+<div>
+<div style="font-weight:900; color:var(--text-green); font-size:13px;">${l.date}</div>
+<div style="font-size:12px; color:#666;">${l.type} (#${l.name}) - 🌡️${l.temp}°C / 💧${l.hum}%</div>
+</div>
+<div>
+<button class="btn-edit" onclick="editLog(${index})">修改</button>
+<button class="btn-delete" onclick="deleteLog(${index})">刪除</button>
+</div>
+</div>
+`).join('');
+}
+
+function renderResume() {
+const list = document.getElementById('resumeList');
+if(logs.length === 0) {
+list.innerHTML = "<p style='text-align:center; color:#999;'>目前尚未有種植紀錄上鏈。</p>";
+return;
+}
+list.innerHTML = logs.map(l => `
+<div class="log-item">
+<div style="font-weight:900; font-size:14px; margin-bottom:8px; color:var(--text-green);">
+⏰ ${l.date} <span style="float:right; color:var(--accent-green);">#${l.type}</span>
+</div>
+<div style="margin-bottom:8px;">
+<span class="log-tag">🌡️ ${l.temp}°C</span>
+<span class="log-tag">💧 濕度 ${l.hum}%</span>
+<span class="log-tag">🧪 pH ${l.ph}</span>
+</div>
+<div style="font-size:13px; color:#555; background:#f9f9f9; padding:10px; border-radius:10px;">
+<b>🌱 農事筆記：</b>${l.note}
+</div>
+</div>
+`).join('');
+}
+
+function initChart() {
+if(lineChart) lineChart.destroy();
+const ctx = document.getElementById('lineChart').getContext('2d');
+const chartData = logs.slice(0, 6).reverse();
+
+lineChart = new Chart(ctx, {
+type: 'line',
+data: {
+labels: chartData.map(l => l.date.split(' ')[0]),
+datasets: [
+{ label: '溫度', data: chartData.map(l => l.temp), borderColor: '#ff9800', tension: 0.3 },
+{ label: '濕度', data: chartData.map(l => l.hum), borderColor: '#03a9f4', tension: 0.3 }
+]
+},
+options: { responsive: true, maintainAspectRatio: false }
+});
+}
+
+window.onload = initProfile;
+</script>
+</body>
+</html>
