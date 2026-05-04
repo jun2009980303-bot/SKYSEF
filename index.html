@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>智慧農場 - 動態履歷與編輯系統</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@900&family=Noto+Sans+TC:wght@900&display=swap');
 
@@ -23,7 +24,7 @@ background-attachment: fixed; height: 100vh; overflow: hidden;
 }
 
 .view-screen { display: none; height: 100vh; overflow-y: auto; padding: 20px; box-sizing: border-box; }
-.view-screen.active { display: block; animation: slideInRight 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.view-screen.active { display: block; }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 
 .container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
@@ -47,6 +48,25 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .daily-badge { position: absolute; top: 0; right: 0; background: var(--accent-orange); color: white; padding: 5px 15px; border-radius: 0 0 0 20px; font-size: 12px; font-weight: 900; }
 .log-item { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; border-left: 8px solid var(--accent-green); }
 .log-tag { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 5px; font-size: 11px; margin-right: 5px; font-weight: 900; }
+
+.lottery-panel { background: linear-gradient(145deg, #fff 0%, #f8f8ff 100%); border: 1px solid #dce7f2; border-radius: 25px; padding: 18px; box-shadow: inset 0 1px 5px rgba(0,0,0,0.05); }
+.lottery-result { background: #f1f8ff; border-radius: 18px; padding: 14px; color: #33475b; margin-top: 12px; font-size: 14px; min-height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; }
+.lottery-note { font-size: 12px; color: #666; margin-top: 10px; line-height: 1.5; }
+.gacha-machine { display: grid; gap: 14px; }
+.gacha-shell { background: #ffffff; border: 2px solid #d7e2ef; border-radius: 28px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); position: relative; }
+.gacha-header { display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 900; color: #2f5f86; }
+.gacha-window { background: radial-gradient(circle at 50% 40%, #ffffff 0%, #f3f8ff 40%, #dbeaf8 100%); border: 2px solid #c1d8f0; border-radius: 24px; min-height: 140px; display: flex; align-items: center; justify-content: center; position: relative; }
+.gacha-window::before { content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 60%; height: 18px; border-radius: 10px; background: rgba(255,255,255,0.7); }
+.gacha-ball { width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff 0%, #fddcc8 40%, #ffb74d 100%); box-shadow: inset 0 -6px 16px rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.08); display: grid; place-items: center; font-size: 28px; color: #5d3c1b; font-weight: 900; transition: transform 0.2s ease; }
+.gacha-ball.spin { animation: gacha-spin 0.8s ease-in-out infinite; }
+@keyframes gacha-spin { 0% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(18deg); } 100% { transform: translateY(0) rotate(-6deg); } }
+.gacha-lever { background: #f7f7f7; border: 2px solid #dce4eb; border-radius: 18px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+.gacha-lever div { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #556a7a; }
+.gacha-lever span { width: 32px; height: 32px; background: #ffb74d; border-radius: 12px; display: grid; place-items: center; color: white; font-size: 18px; box-shadow: 0 4px 8px rgba(255,183,77,0.25); }
+.gacha-button { width: 100%; margin-top: 0; }
+.qr-panel { background: linear-gradient(145deg, #fff 0%, #fff9f0 100%); border: 1px solid #f5d6b4; border-radius: 25px; padding: 18px; box-shadow: inset 0 1px 5px rgba(0,0,0,0.05); }
+.qr-code-box { background: #ffffff; border: 2px dashed #ffb74d; border-radius: 20px; min-height: 180px; display: flex; align-items: center; justify-content: center; color: #8d6e63; font-weight: 900; font-size: 14px; text-align: center; padding: 20px; }
+.qr-code-box span { display: block; line-height: 1.6; }
 
 .btn-back { position: fixed; bottom: 20px; right: 20px; background: #ff5252; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; }
 </style>
@@ -116,9 +136,44 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div id="farmerLogList"></div>
 </div>
 
-<button class="btn-qr" onclick="switchView('viewConsumer')">
-<span style="font-size:24px;">📱</span> 模擬消費者掃描 QR Code 畫面
-</button>
+<div class="panel qr-panel">
+<div class="panel-title">📱 消費者 QR Code 顯示區</div>
+<div class="qr-code-box" id="farmerQrCode">
+<div style="margin-bottom:10px;">
+<button class="btn-secondary" onclick="generateConsumerQR()">生成消費者 QR Code</button>
+</div>
+<div id="qrCodeDisplay" style="display:none; text-align:center;">
+<p style="font-size:12px; color:#666; margin-bottom:5px;">掃描下方 QR Code 進入消費者頁面</p>
+<div id="qrCodeCanvas"></div>
+<p style="font-size:10px; color:#999; margin-top:5px;">或複製連結：<span id="consumerLink" style="word-break:break-all;"></span></p>
+</div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:10px;">按下按鈕生成 QR Code，讓消費者掃描後直接進入生產履歷頁面。</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">🎁 消費者獎品連結</div>
+<div style="font-size:13px; color:#666; margin-bottom:12px;">此連結將引導消費者前往生產履歷頁面，獎品內容可在該頁中展示。</div>
+<a class="btn-secondary" href="?view=consumer">前往消費者生產履歷</a>
+</div>
+
+<div class="panel lottery-panel">
+<div class="panel-title">🎰 扭蛋機抽獎區</div>
+<div class="gacha-machine">
+<div class="gacha-shell">
+<div class="gacha-header">🎡 轉動扭蛋機，抽取神秘角色</div>
+<div class="gacha-window">
+<div id="gachaBall" class="gacha-ball">?</div>
+</div>
+<div class="gacha-lever"><div><span>⇪</span>拉桿</div><div>請按下按鈕啟動</div></div>
+</div>
+<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">轉動扭蛋機</button>
+<div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
+<div class="lottery-note">角色約 50 位，後續會補上完整角色名單。</div>
+</div>
+
+<a class="btn-qr" href="?view=consumer">模擬消費者掃描 QR Code 畫面</a>
+</div>
 </div>
 </div>
 
@@ -143,6 +198,12 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 <div class="panel">
+<div class="panel-title">🎁 消費者獎品連結</div>
+<div style="font-size:13px; color:#666; margin-bottom:12px;">農夫可分享此獎品連結給消費者。</div>
+<button class="btn-qr" onclick="alert('獎品連結已複製到剪貼簿！')">複製獎品連結</button>
+</div>
+
+<div class="panel">
 <div class="panel-title">📈 生長環境監測數據</div>
 <div style="font-size:12px; color:#666; margin-bottom:10px;">優良的生長曲線是品質的保證。</div>
 <div style="background:#fff; height:180px; border-radius:15px; border:1px solid #eee; padding:10px;">
@@ -152,14 +213,13 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
 <div class="panel">
 <div class="panel-title">📜 完整農事歷程</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">此頁僅顯示消費者生產履歷，不含扭蛋抽獎功能。</div>
 <div id="resumeList"></div>
 </div>
 
+<a class="btn-back" href="?view=farmer">🔙 返回農夫後台</a>
 </div>
-
-<button class="btn-back" onclick="switchView('viewFarmer')">🔙 返回農夫後台</button>
 </div>
-
 
 <script>
 const consumerWikiDB = {
@@ -178,12 +238,81 @@ let logs = JSON.parse(localStorage.getItem('puli_dynamic_resume')) || [];
 let farmProfile = JSON.parse(localStorage.getItem('puli_farm_profile')) || { location: '南投埔里', farmer: '謝易均' };
 let lineChart;
 let editingIndex = -1; // 追蹤目前正在修改哪一筆資料 (-1 代表新增模式)
+const characterPool = ['角色1', '角色2', '角色3', '角色4', '角色5']; // 測試角色，後續補上 50 個
+let isGachaSpinning = false;
+
+function generateConsumerQR() {
+  const qrDisplay = document.getElementById('qrCodeDisplay');
+  const qrCanvas = document.getElementById('qrCodeCanvas');
+  const consumerLink = document.getElementById('consumerLink');
+
+  // 生成消費者頁面的連結（假設部署後的 URL）
+  const baseUrl = window.location.origin + window.location.pathname;
+  const consumerUrl = baseUrl + '?view=consumer';
+
+  consumerLink.textContent = consumerUrl;
+
+  // 清除之前的 QR Code
+  qrCanvas.innerHTML = '';
+
+  try {
+    // 生成 QR Code
+    QRCode.toCanvas(qrCanvas, consumerUrl, {
+      width: 150,
+      height: 150,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    }, function (error) {
+      if (error) {
+        console.error(error);
+        qrCanvas.innerHTML = '<p style="color:red;">生成 QR Code 失敗</p>';
+      } else {
+        qrDisplay.style.display = 'block';
+      }
+    });
+  } catch (error) {
+    console.error('QRCode error:', error);
+    qrCanvas.innerHTML = '<p style="color:red;">QR Code 庫載入失敗</p>';
+    qrDisplay.style.display = 'block';
+  }
+}
+
+function drawLotteryCharacter() {
+  const result = document.getElementById('lotteryResult');
+  const button = document.getElementById('gachaButton');
+  const ball = document.getElementById('gachaBall');
+
+  if (characterPool.length === 0) {
+    result.innerText = "目前尚未有角色可抽，後續將新增約 50 個角色。";
+    ball.innerText = "?";
+    return;
+  }
+  if (isGachaSpinning) return;
+
+  isGachaSpinning = true;
+  button.disabled = true;
+  button.innerText = '轉動中...';
+  result.innerText = '扭蛋機正在轉動，請稍後...';
+  ball.classList.add('spin');
+
+  setTimeout(() => {
+    ball.classList.remove('spin');
+    const randomName = characterPool[Math.floor(Math.random() * characterPool.length)];
+    ball.innerText = randomName.charAt(0);
+    result.innerText = `恭喜你抽中：${randomName}！`;
+    button.disabled = false;
+    button.innerText = '再轉一次';
+    isGachaSpinning = false;
+  }, 1800);
+}
 
 function initProfile() {
 document.getElementById('settingLocation').value = farmProfile.location;
 document.getElementById('settingFarmer').value = farmProfile.farmer;
 updateProfileDisplay();
 renderFarmerLogs();
+// farmerQrCode 現在有按鈕生成，不需要預設內容
 }
 
 function saveProfile() {
@@ -201,14 +330,19 @@ document.getElementById('displayFarmer').innerText = farmProfile.farmer;
 }
 
 function switchView(viewId) {
-document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
-document.getElementById(viewId).classList.add('active');
+  const targetView = document.getElementById(viewId);
+  if (!targetView) {
+    console.error('找不到 viewId：', viewId);
+    return;
+  }
+  document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
+  targetView.classList.add('active');
 
-if(viewId === 'viewConsumer') {
-initChart();
-renderResume();
-generateRandomWiki();
-}
+  if (viewId === 'viewConsumer') {
+    initChart();
+    renderResume();
+    generateRandomWiki();
+  }
 }
 
 function generateRandomWiki() {
@@ -350,20 +484,49 @@ if(lineChart) lineChart.destroy();
 const ctx = document.getElementById('lineChart').getContext('2d');
 const chartData = logs.slice(0, 6).reverse();
 
-lineChart = new Chart(ctx, {
-type: 'line',
-data: {
-labels: chartData.map(l => l.date.split(' ')[0]),
-datasets: [
-{ label: '溫度', data: chartData.map(l => l.temp), borderColor: '#ff9800', tension: 0.3 },
-{ label: '濕度', data: chartData.map(l => l.hum), borderColor: '#03a9f4', tension: 0.3 }
-]
-},
-options: { responsive: true, maintainAspectRatio: false }
-});
+if(chartData.length === 0) {
+  // 如果沒有資料，顯示提示
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.fillStyle = '#666';
+  ctx.font = '14px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('目前沒有監測數據', ctx.canvas.width / 2, ctx.canvas.height / 2);
+  return;
 }
 
-window.onload = initProfile;
+try {
+  lineChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+  labels: chartData.map(l => l.date.split(' ')[0]),
+  datasets: [
+  { label: '溫度', data: chartData.map(l => l.temp), borderColor: '#ff9800', tension: 0.3 },
+  { label: '濕度', data: chartData.map(l => l.hum), borderColor: '#03a9f4', tension: 0.3 }
+  ]
+  },
+  options: { responsive: true, maintainAspectRatio: false }
+  });
+} catch (error) {
+  console.error('Chart.js error:', error);
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.fillStyle = '#666';
+  ctx.font = '14px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('圖表載入失敗', ctx.canvas.width / 2, ctx.canvas.height / 2);
+}
+}
+
+window.onload = function() {
+  initProfile();
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewParam = urlParams.get('view');
+  const hash = window.location.hash.replace('#', '');
+  if (viewParam === 'consumer' || hash === 'consumer') {
+    switchView('viewConsumer');
+  } else if (viewParam === 'farmer' || hash === 'farmer') {
+    switchView('viewFarmer');
+  }
+};
 </script>
 </body>
 </html>
