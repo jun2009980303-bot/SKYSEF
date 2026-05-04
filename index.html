@@ -67,6 +67,10 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .qr-panel { background: linear-gradient(145deg, #fff 0%, #fff9f0 100%); border: 1px solid #f5d6b4; border-radius: 25px; padding: 18px; box-shadow: inset 0 1px 5px rgba(0,0,0,0.05); }
 .qr-code-box { background: #ffffff; border: 2px dashed #ffb74d; border-radius: 20px; min-height: 180px; display: flex; align-items: center; justify-content: center; color: #8d6e63; font-weight: 900; font-size: 14px; text-align: center; padding: 20px; }
 .qr-code-box span { display: block; line-height: 1.6; }
+.photo-panel { background: linear-gradient(145deg, #fff 0%, #f5fffe 100%); border: 1px solid #c8e6c9; border-radius: 25px; padding: 18px; box-shadow: inset 0 1px 5px rgba(0,0,0,0.02); }
+.photo-box { background: #ffffff; border: 2px dashed #4caf50; border-radius: 20px; min-height: 150px; display: flex; align-items: center; justify-content: center; color: #558b2f; font-weight: 900; text-align: center; padding: 15px; position: relative; overflow: hidden; }
+.photo-box img { max-width: 100%; max-height: 180px; border-radius: 15px; }
+.photo-upload-input { display: none; }
 
 .btn-back { position: fixed; bottom: 20px; right: 20px; background: #ff5252; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; }
 </style>
@@ -124,6 +128,14 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <label>農事筆記</label>
 <textarea id="note" placeholder="紀錄作業內容 (例如: 已施放有機肥)..."></textarea>
 
+<div style="margin-top:15px; margin-bottom:15px;">
+<label>🌱 植物照片</label>
+<input type="file" id="photoUpload" class="photo-upload-input" accept="image/*" onchange="uploadPlantPhoto()">
+<div id="photoDisplayFarmer" class="photo-box" onclick="document.getElementById('photoUpload').click();" style="cursor: pointer;">
+<span>點擊上傳或拖入植物照片</span>
+</div>
+</div>
+
 <button id="btnSave" class="btn-main" onclick="saveData()">💾 儲存並發布至生產履歷</button>
 <button id="btnCancel" class="btn-secondary" style="display:none; background:#999;" onclick="cancelEdit()">❌ 取消修改</button>
 </div>
@@ -151,12 +163,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div style="font-size:12px; color:#666; margin-top:10px;">按下按鈕生成 QR Code，讓消費者掃描後直接進入生產履歷頁面。</div>
 </div>
 
-<div class="panel">
-<div class="panel-title">🎁 消費者獎品連結</div>
-<div style="font-size:13px; color:#666; margin-bottom:12px;">此連結將引導消費者前往生產履歷頁面，獎品內容可在該頁中展示。</div>
-<a class="btn-secondary" href="?view=consumer">前往消費者生產履歷</a>
-</div>
-
 <div class="panel lottery-panel">
 <div class="panel-title">🎰 扭蛋機抽獎區</div>
 <div class="gacha-machine">
@@ -169,7 +175,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 <button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">轉動扭蛋機</button>
 <div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
-<div class="lottery-note">角色約 50 位，後續會補上完整角色名單。</div>
 </div>
 
 <a class="btn-qr" href="?view=consumer">模擬消費者掃描 QR Code 畫面</a>
@@ -197,6 +202,13 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <button onclick="generateRandomWiki()" style="background:none; border:none; color:var(--accent-green); font-weight:900; font-size:12px; cursor:pointer; padding:0; margin-top:10px;">↻ 換一個知識</button>
 </div>
 
+<div class="panel photo-panel">
+<div class="panel-title">🌱 植物照片</div>
+<div id="photoDisplayConsumer" class="photo-box">
+<span>植物照片</span>
+</div>
+</div>
+
 <div class="panel">
 <div class="panel-title">🎁 消費者獎品連結</div>
 <div style="font-size:13px; color:#666; margin-bottom:12px;">農夫可分享此獎品連結給消費者。</div>
@@ -213,7 +225,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
 <div class="panel">
 <div class="panel-title">📜 完整農事歷程</div>
-<div style="font-size:12px; color:#666; margin-bottom:10px;">此頁僅顯示消費者生產履歷，不含扭蛋抽獎功能。</div>
 <div id="resumeList"></div>
 </div>
 
