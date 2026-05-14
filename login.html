@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SKYSER 農場後台 - 登入</title>
+<meta name="description" content="SKYSER 智慧農場管理系統 - 農夫專屬後台登入頁面" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+<link rel="stylesheet" href="css/login.css" />
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-logo">
+    <div class="logo-badge">
+      <div class="logo-icon">🌿</div>
+    </div>
+    <h1>SKYSER</h1>
+    <p>智慧農場透明履歷系統｜農夫後台</p>
+  </div>
+
+  <form id="loginForm" onsubmit="handleLogin(event)">
+    <div class="login-field">
+      <label class="login-label" for="loginEmail">電子郵件</label>
+      <input
+        type="email"
+        id="loginEmail"
+        class="login-input"
+        placeholder="farmer@example.com"
+        autocomplete="username"
+        required
+      />
+    </div>
+
+    <div class="login-field">
+      <label class="login-label" for="loginPassword">密碼</label>
+      <input
+        type="password"
+        id="loginPassword"
+        class="login-input"
+        placeholder="請輸入密碼"
+        autocomplete="current-password"
+        required
+      />
+    </div>
+
+    <div class="login-error" id="loginError"></div>
+
+    <button type="submit" class="login-btn" id="loginBtn">
+      <span id="loginBtnText">🌱 登入農場後台</span>
+    </button>
+  </form>
+
+  <div class="login-footer">
+    <p>消費者查看履歷請掃描農產品 QR Code</p>
+    <p style="margin-top:6px;">© 2026 SKYSER 智慧農場系統</p>
+  </div>
+</div>
+
+<!-- Firebase SDK (Compat 版本，方便整合) -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+
+<script>
+// ============================================================
+// 初始化 Firebase
+// ============================================================
+let app, auth;
+
+function initFirebase() {
+  try {
+    if (!firebase.apps.length) {
+      app = firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
+    } else {
+      app = firebase.apps[0];
+    }
+    auth = firebase.auth();
+    window.SKYSER_AUTH = auth;
+
+    // 若已登入，直接跳轉後台
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        window.location.href = 'admin.html';
+      }
+    });
+  } catch (e) {
+    console.warn('[SKYSER] Firebase 未設定，使用本地測試模式', e.message);
+    window.SKYSER_DEV_MODE = true;
+  }
+}
+
+// ============================================================
+// 登入邏輯
+// ============================================================
+async function handleLogin(e) {
+  e.preventDefault();
+
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn      = document.getElementById('loginBtn');
+  const btnText  = document.getElementById('loginBtnText');
+  const errBox   = document.getElementById('loginError');
+
+  // UI: 載入中
+  btn.disabled = true;
+  btnText.innerHTML = '<div class="spinner"></div> 驗證中...';
+  errBox.classList.remove('show');
+
+  // ---- 開發模式（Firebase 未設定時）----
+  if (window.SKYSER_DEV_MODE) {
+    await sleep(1000);
+    if (email === 'demo@skyser.farm' && password === 'demo1234') {
+      localStorage.setItem('skyser_dev_user', JSON.stringify({ email, name: '測試農夫', farmId: 'demo-farm' }));
+      window.location.href = 'admin.html';
+    } else {
+      showError('帳號或密碼錯誤（測試帳號: demo@skyser.farm / demo1234）');
+      resetBtn();
+    }
+    return;
+  }
+
+  // ---- 正式模式（Firebase Auth）----
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged 會自動跳轉
+  } catch (err) {
+    const msg = getFirebaseErrorMsg(err.code);
+    showError(msg);
+    resetBtn();
+  }
+}
+
+function showError(msg) {
+  const errBox = document.getElementById('loginError');
+  errBox.textContent = '⚠️ ' + msg;
+  errBox.classList.add('show');
+}
+
+function resetBtn() {
+  const btn    = document.getElementById('loginBtn');
+  const btnText = document.getElementById('loginBtnText');
+  btn.disabled = false;
+  btnText.innerHTML = '🌱 登入農場後台';
+}
+
+function getFirebaseErrorMsg(code) {
+  const msgs = {
+    'auth/invalid-email':          '電子郵件格式錯誤',
+    'auth/user-not-found':         '找不到此帳號，請確認 Email',
+    'auth/wrong-password':         '密碼錯誤，請再試一次',
+    'auth/too-many-requests':      '嘗試次數過多，請稍後再試',
+    'auth/network-request-failed': '網路連線失敗，請檢查網路',
+    'auth/invalid-credential':     '帳號或密碼不正確',
+  };
+  return msgs[code] || `登入失敗 (${code})`;
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ============================================================
+// 啟動
+// ============================================================
+initFirebase();
+</script>
+</body>
+</html>
