@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SKYSER 農夫後台</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
+<link rel="stylesheet" href="css/admin.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Noto Sans TC',sans-serif;background:#0d1117;color:#e6edf3;display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+#sidebar{width:240px;background:#161b22;border-right:1px solid #30363d;display:flex;flex-direction:column;flex-shrink:0;transition:.3s}
+.sidebar-logo{padding:20px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #30363d}
+.sidebar-logo .logo-icon{font-size:24px}
+.sidebar-logo .logo-text{font-size:15px;font-weight:700;color:#58a6ff}
+.sidebar-logo .logo-sub{font-size:11px;color:#8b949e;margin-top:2px}
+#farmBadge{font-size:12px;color:#3fb950;padding:0 16px 12px;font-weight:600}
+nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;color:#8b949e;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:.2s}
+.nav-item:hover{color:#e6edf3;background:#1f2937}
+.nav-item.active{color:#58a6ff;background:#1f2d40;border-left-color:#58a6ff}
+.nav-item .icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:12px 16px;border-top:1px solid #30363d}
+#userEmail{font-size:11px;color:#8b949e;display:block;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-logout{width:100%;background:#21262d;color:#f85149;border:1px solid #30363d;padding:8px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:.2s}
+.btn-logout:hover{background:#f85149;color:#fff}
+
+/* Main */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;align-items:center;gap:12px}
+.menu-toggle{background:none;border:none;color:#8b949e;font-size:20px;cursor:pointer;display:none}
+.topbar-title{font-size:15px;font-weight:700;color:#e6edf3}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* Sections */
+.section{display:none}.section.active{display:block}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-title{font-size:18px;font-weight:700}
+.btn-primary{background:#238636;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;transition:.2s}
+.btn-primary:hover{background:#2ea043}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px}
+.stat-val{font-size:32px;font-weight:700;color:#58a6ff}
+.stat-label{font-size:12px;color:#8b949e;margin-top:4px}
+
+/* Cards */
+.card-item{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.card-emoji{font-size:28px;flex-shrink:0}
+.card-info{flex:1;min-width:0}
+.card-title{font-size:14px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-meta{font-size:12px;color:#8b949e}
+.card-note{font-size:12px;color:#8b949e;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.log-card{align-items:flex-start}
+
+/* Badges */
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;background:#21262d;color:#8b949e;font-weight:500}
+.badge-green{background:#1a3a2a;color:#3fb950}
+.badge-grey{background:#21262d;color:#6e7681}
+
+/* Buttons small */
+.btn-sm{font-size:11px;padding:5px 10px;border:none;border-radius:5px;cursor:pointer;font-weight:600;transition:.2s}
+.btn-edit{background:#1f4068;color:#58a6ff}.btn-edit:hover{background:#58a6ff;color:#fff}
+.btn-del{background:#3d1f1f;color:#f85149}.btn-del:hover{background:#f85149;color:#fff}
+.btn-qr{background:#2d2a1f;color:#e3b341}.btn-qr:hover{background:#e3b341;color:#000}
+.btn-warn{background:#3d2a1f;color:#e3b341}.btn-warn:hover{background:#e3b341;color:#000}
+.btn-ok{background:#1a3a2a;color:#3fb950}.btn-ok:hover{background:#3fb950;color:#000}
+
+/* Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:12px;color:#8b949e;font-weight:500}
+.form-input{background:#0d1117;border:1px solid #30363d;color:#e6edf3;padding:8px 10px;border-radius:6px;font-size:13px;outline:none;transition:.2s}
+.form-input:focus{border-color:#58a6ff}
+select.form-input option{background:#0d1117}
+textarea.form-input{resize:vertical;min-height:80px}
+
+/* Filter bar */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.filter-bar select{background:#0d1117;border:1px solid #30363d;color:#e6edf3;padding:7px 10px;border-radius:6px;font-size:13px}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal{background:#161b22;border:1px solid #30363d;border-radius:12px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+.modal-header{padding:16px 20px;border-bottom:1px solid #30363d;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:700}
+.modal-close{background:none;border:none;color:#8b949e;font-size:20px;cursor:pointer}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid #30363d;display:flex;justify-content:flex-end;gap:8px}
+.btn-cancel{background:#21262d;color:#e6edf3;border:1px solid #30363d;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+
+/* QR Modal */
+#qrModal .modal{max-width:360px;text-align:center}
+#qrCanvas{display:flex;justify-content:center;margin:16px 0}
+#qrUrl{font-size:11px;color:#8b949e;word-break:break-all;background:#0d1117;padding:8px;border-radius:6px;display:block;margin-bottom:12px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:#238636;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:9999;transform:translateY(8px)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.error{background:#da3633}
+
+/* State text */
+.loading-text,.empty-text,.error-text{text-align:center;padding:24px;color:#8b949e;font-size:13px}
+.error-text{color:#f85149}
+
+/* Settings card */
+.settings-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin-bottom:16px}
+.settings-card h3{font-size:14px;font-weight:600;margin-bottom:16px;color:#8b949e}
+
+@media(max-width:768px){
+  #sidebar{position:fixed;left:-240px;top:0;height:100%;z-index:100}
+  #sidebar.open{left:0}
+  .menu-toggle{display:block}
+  .form-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌿</div>
+    <div>
+      <div class="logo-text">SKYSER</div>
+      <div class="logo-sub">智慧農場管理系統</div>
+    </div>
+  </div>
+  <div id="farmBadge">載入中...</div>
+  <nav>
+    <div class="nav-item active" data-sec="dashboard" onclick="showSection('dashboard')"><span class="icon">📊</span>儀表板</div>
+    <div class="nav-item" data-sec="batches"   onclick="showSection('batches')">  <span class="icon">🌾</span>批次管理</div>
+    <div class="nav-item" data-sec="logs"      onclick="showSection('logs')">     <span class="icon">📝</span>農事日誌</div>
+    <div class="nav-item" data-sec="gacha"     onclick="showSection('gacha')">    <span class="icon">🎰</span>扭蛋角色</div>
+    <div class="nav-item" data-sec="wiki"      onclick="showSection('wiki')">     <span class="icon">📚</span>Wiki 知識庫</div>
+    <div class="nav-item" data-sec="settings"  onclick="showSection('settings')"> <span class="icon">⚙️</span>農場設定</div>
+  </nav>
+  <div class="sidebar-footer">
+    <span id="userEmail">載入中...</span>
+    <button class="btn-logout" onclick="logout()">登出</button>
+  </div>
+</aside>
+
+<!-- Main -->
+<div id="main">
+  <div class="topbar">
+    <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <span class="topbar-title">🌱 SKYSER 農夫後台</span>
+  </div>
+  <div class="content">
+
+    <!-- Dashboard -->
+    <div id="sec-dashboard" class="section active">
+      <div class="section-header"><span class="section-title">📊 儀表板</span></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="statBatches">--</div><div class="stat-label">批次總數</div></div>
+        <div class="stat-card"><div class="stat-val" id="statLogs">--</div><div class="stat-label">日誌總筆數</div></div>
+        <div class="stat-card"><div class="stat-val" id="statToday">--</div><div class="stat-label">今日日誌</div></div>
+        <div class="stat-card"><div class="stat-val" id="statChars">--</div><div class="stat-label">扭蛋角色數</div></div>
+      </div>
+      <div class="settings-card">
+        <h3>🚀 快速操作</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-primary" onclick="showSection('batches');openBatchModal('')">➕ 新增批次</button>
+          <button class="btn-primary" onclick="showSection('logs');openLogModal('')">📝 新增日誌</button>
+          <button class="btn-primary" onclick="showSection('gacha');openGachaModal('')">🎰 新增角色</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batches -->
+    <div id="sec-batches" class="section">
+      <div class="section-header">
+        <span class="section-title">🌾 批次管理</span>
+        <button class="btn-primary" onclick="openBatchModal('')">➕ 新增批次</button>
+      </div>
+      <div id="batchList"><p class="loading-text">載入中...</p></div>
+    </div>
+
+    <!-- Logs -->
+    <div id="sec-logs" class="section">
+      <div class="section-header">
+        <span class="section-title">📝 農事日誌</span>
+        <button class="btn-primary" onclick="openLogModal('')">➕ 新增日誌</button>
+      </div>
+      <div class="filter-bar">
+        <label style="font-size:13px;color:#8b949e">篩選批次：</label>
+        <select id="logBatchFilter" onchange="logFilterBatchId=this.value;loadLogs()">
+          <option value="">全部批次</option>
+        </select>
+      </div>
+      <div id="logList"><p class="loading-text">載入中...</p></div>
+    </div>
+
+    <!-- Gacha -->
+    <div id="sec-gacha" class="section">
+      <div class="section-header">
+        <span class="section-title">🎰 扭蛋角色管理</span>
+        <button class="btn-primary" onclick="openGachaModal('')">➕ 新增角色</button>
+      </div>
+      <div id="gachaList"><p class="loading-text">載入中...</p></div>
+    </div>
+
+    <!-- Wiki -->
+    <div id="sec-wiki" class="section">
+      <div class="section-header">
+        <span class="section-title">📚 Wiki 知識庫</span>
+        <button class="btn-primary" onclick="openWikiModal('')">➕ 新增條目</button>
+      </div>
+      <div id="wikiList"><p class="loading-text">載入中...</p></div>
+    </div>
+
+    <!-- Settings -->
+    <div id="sec-settings" class="section">
+      <div class="section-header"><span class="section-title">⚙️ 農場設定</span></div>
+      <div class="settings-card">
+        <h3>農場基本資料</h3>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">農場名稱</label><input id="farmName" class="form-input" placeholder="例：埔里山泉農場"/></div>
+          <div class="form-group"><label class="form-label">農夫姓名</label><input id="farmerName" class="form-input" placeholder="例：謝易均"/></div>
+          <div class="form-group"><label class="form-label">產地地點</label><input id="location" class="form-input" placeholder="例：南投埔里"/></div>
+          <div class="form-group"><label class="form-label">聯絡電話</label><input id="phone" class="form-input" placeholder="0912-345-678"/></div>
+        </div>
+        <button id="btnSaveFarm" class="btn-primary" style="margin-top:16px" onclick="saveFarmSettings()">💾 儲存設定</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Batch Modal -->
+<div id="batchModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="batchModalTitle">新增批次</span>
+      <button class="modal-close" onclick="closeModal('batchModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">作物種類</label><input id="bCropType" class="form-input" placeholder="例：筊白筍"/></div>
+        <div class="form-group"><label class="form-label">批次編號</label><input id="bBatchCode" class="form-input" placeholder="例：2026-A"/></div>
+        <div class="form-group"><label class="form-label">狀態</label>
+          <select id="bStatus" class="form-input">
+            <option value="growing">🌱 生長中</option>
+            <option value="harvested">🌾 已收成</option>
+            <option value="sold">🛒 已售出</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">種植日期</label><input id="bPlantDate" type="date" class="form-input"/></div>
+        <div class="form-group"><label class="form-label">預計收成日</label><input id="bHarvestDate" type="date" class="form-input"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('batchModal')">取消</button>
+      <button class="btn-primary" onclick="saveBatch()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Log Modal -->
+<div id="logModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="logModalTitle">新增日誌</span>
+      <button class="modal-close" onclick="closeModal('logModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">所屬批次</label>
+          <select id="lBatchId" class="form-input"><option value="">選擇批次</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">記錄日期</label><input id="lLogDate" type="date" class="form-input"/></div>
+        <div class="form-group"><label class="form-label">天氣</label>
+          <select id="lWeather" class="form-input">
+            <option value="">選擇天氣</option>
+            <option value="晴">☀️ 晴</option>
+            <option value="陰">☁️ 陰</option>
+            <option value="雨">🌧️ 雨</option>
+            <option value="多雲">⛅ 多雲</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">空氣溫度 (°C)</label><input id="lAirTemp" type="number" class="form-input" step="0.1"/></div>
+        <div class="form-group"><label class="form-label">空氣濕度 (%)</label><input id="lAirHumidity" type="number" class="form-input" step="0.1"/></div>
+        <div class="form-group"><label class="form-label">土壤 pH</label><input id="lSoilPH" type="number" class="form-input" step="0.1"/></div>
+        <div class="form-group"><label class="form-label">土壤含水量 (%)</label><input id="lSoilMoisture" type="number" class="form-input" step="0.1"/></div>
+        <div class="form-group"><label class="form-label">農藥使用</label>
+          <select id="lPesticide" class="form-input">
+            <option value="無">無</option>
+            <option value="有機">有機</option>
+            <option value="化學">化學</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">施肥紀錄</label><input id="lFertilizer" class="form-input" placeholder="例：有機堆肥"/></div>
+        <div class="form-group full"><label class="form-label">農事筆記</label><textarea id="lNote" class="form-input" placeholder="今日作業內容..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('logModal')">取消</button>
+      <button class="btn-primary" onclick="saveLog()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Gacha Modal -->
+<div id="gachaModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="gachaModalTitle">新增角色</span>
+      <button class="modal-close" onclick="closeModal('gachaModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">角色名稱</label><input id="gName" class="form-input" placeholder="例：山泉精靈"/></div>
+        <div class="form-group"><label class="form-label">表情符號</label><input id="gEmoji" class="form-input" placeholder="例：🧚"/></div>
+        <div class="form-group"><label class="form-label">稀有度</label>
+          <select id="gRarity" class="form-input">
+            <option value="common">⚪ 普通</option>
+            <option value="rare">🔵 稀有</option>
+            <option value="epic">🟣 史詩</option>
+            <option value="legendary">🟡 傳說</option>
+          </select>
+        </div>
+        <div class="form-group full"><label class="form-label">角色背景故事</label><textarea id="gDesc" class="form-input" placeholder="角色的故事..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('gachaModal')">取消</button>
+      <button class="btn-primary" onclick="saveGachaChar()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Wiki Modal -->
+<div id="wikiModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="wikiModalTitle">新增知識條目</span>
+      <button class="modal-close" onclick="closeModal('wikiModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">作物名稱</label><input id="wCropName" class="form-input" placeholder="例：筊白筍"/></div>
+        <div class="form-group full"><label class="form-label">消費者簡介</label><textarea id="wSummary" class="form-input" placeholder="消費者看到的簡介..."></textarea></div>
+        <div class="form-group full"><label class="form-label">選購 / 保存小技巧</label><textarea id="wTips" class="form-input" placeholder="如何挑選、保存..."></textarea></div>
+        <div class="form-group full"><label class="form-label">營養成分說明</label><textarea id="wNutrition" class="form-input" placeholder="營養素..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('wikiModal')">取消</button>
+      <button class="btn-primary" onclick="saveWiki()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div id="qrModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📱 批次 QR Code</span>
+      <button class="modal-close" onclick="closeModal('qrModal')">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <p style="font-size:13px;color:#8b949e;margin-bottom:8px" id="qrTitle"></p>
+      <div id="qrCanvas"></div>
+      <code id="qrUrl" style="font-size:11px;color:#8b949e;word-break:break-all;background:#0d1117;padding:8px;border-radius:6px;display:block;margin-bottom:12px;text-align:left"></code>
+      <button class="btn-primary" onclick="downloadQR()">⬇️ 下載 QR Code PNG</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Firebase SDKs (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
