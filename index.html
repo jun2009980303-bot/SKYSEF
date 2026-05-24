@@ -310,7 +310,7 @@ function drawLotteryCharacter() {
   setTimeout(() => {
     ball.classList.remove('spin');
     const randomName = characterPool[Math.floor(Math.random() * characterPool.length)];
-    ball.innerHTML='<img scr="${randomCharacter.img}"alt="${randomCharacter.name}"style="width:80px;height:80px;object-fit:contain;">';
+    ball.innerHTML='<img scr="${randomCharacter.img}"alt="${randomCharacter.name}"style="width:180px;height:180px;object-fit:contain;">';
     result.innerText = `恭喜你抽中：${randomCharacter.Name}！`;
     button.disabled = false;
     button.innerText = '再轉一次';
