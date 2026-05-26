@@ -359,4 +359,4 @@ service cloud.firestore {
 
 ---
 
-**SKYSER 專案組 — 致力於打造透明、互信的農業未來** 🌱
+**SKYSEF 專案組 — 致力於打造透明、互信的農業未來** 🌱
