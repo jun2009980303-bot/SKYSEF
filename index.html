@@ -249,16 +249,43 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 <div id="viewFarmer" class="view-screen">
-<div class="container" style="align-items:center;">
-<div style="text-align:center; margin-top:60px;">
-  <div style="font-size:80px; line-height:1; margin-bottom:20px;">🌿</div>
-  <h2 style="color:var(--text-green); margin:0 0 10px; font-size:26px;">SKYSEF 智慧農場</h2>
-  <p style="color:#666; font-size:14px; margin:0 0 30px; line-height:1.8;">農夫後台管理已升級至專屬系統<br>請登入以管理農場資料</p>
+<div class="container">
+
+<div style="text-align:center; padding:24px 0 8px;">
+  <h2 style="margin:0 0 6px; font-size:28px; letter-spacing:1px;">SKYSEF 智慧農場</h2>
+  <p style="color:rgba(255,255,255,0.6); font-size:13px; margin:0;">農夫專屬管理介面</p>
 </div>
-<div class="panel" style="padding:24px; text-align:center; max-width:320px; width:100%;">
-  <a class="btn-main" href="login.html" style="display:block; text-decoration:none; margin-bottom:14px;">👨‍🌾 農夫後台登入</a>
-  <a class="btn-qr" href="?view=consumer" style="display:flex; text-decoration:none;">🥬 查看消費者頁面</a>
+
+<div class="panel">
+  <div class="panel-title">今日植物拍照</div>
+  <input type="file" id="farmerPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFarmerPhoto(event)">
+  <div id="farmerPhotoPreview" onclick="document.getElementById('farmerPhotoInput').click()" style="min-height:200px;border-radius:18px;border:2px dashed rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:10px;transition:background 0.2s;">
+    <div style="font-size:48px;opacity:0.7;">📷</div>
+    <div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊拍攝或上傳植物照片</div>
+    <div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>
+  </div>
+  <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="margin-top:14px;">📷 開啟相機 / 上傳照片</button>
 </div>
+
+<div class="panel">
+  <div class="panel-title">快速農事記錄</div>
+  <div style="margin-bottom:10px;">
+    <label style="color:rgba(255,255,255,0.65);font-size:12px;">今日作物</label>
+    <input type="text" id="quickCrop" placeholder="例如：筊白筍、番茄" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;">
+  </div>
+  <div style="margin-bottom:10px;">
+    <label style="color:rgba(255,255,255,0.65);font-size:12px;">農事筆記</label>
+    <textarea id="quickNote" placeholder="今日農場觀察..." rows="3" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;resize:none;width:100%;padding:12px;box-sizing:border-box;font-family:inherit;font-size:14px;"></textarea>
+  </div>
+  <button class="btn-main" onclick="saveQuickLog()">💾 儲存今日紀錄</button>
+</div>
+
+<div class="panel" style="text-align:center;">
+  <div style="color:rgba(255,255,255,0.45);font-size:12px;margin-bottom:16px;">需要完整後台管理？</div>
+  <a class="btn-main" href="admin.html" style="display:block;text-decoration:none;margin-bottom:12px;">🔧 進入農夫後台管理</a>
+  <a href="?view=consumer" style="color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;display:block;margin-top:4px;">查看消費者頁面 →</a>
+</div>
+
 </div>
 </div>
 
@@ -609,6 +636,37 @@ alert("農場基本資訊已更新成功！");
 function updateProfileDisplay() {
 document.getElementById('displayLocation').innerText = farmProfile.location;
 document.getElementById('displayFarmer').innerText = farmProfile.farmer;
+}
+
+function handleFarmerPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    const preview = document.getElementById('farmerPhotoPreview');
+    preview.innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;">`;
+    preview.style.padding = '0';
+    preview.style.border = 'none';
+    const consumerBox = document.getElementById('photoDisplayConsumer');
+    if (consumerBox) consumerBox.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    localStorage.setItem('puli_plant_photo', dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveQuickLog() {
+  const crop = document.getElementById('quickCrop').value.trim() || '農場作物';
+  const note = document.getElementById('quickNote').value.trim() || '例行性巡視，生長狀況良好。';
+  const newLog = {
+    date: new Date().toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    type: crop, name: '今日批次', temp: 0, hum: 0, ph: '--', note: note
+  };
+  logs.unshift(newLog);
+  localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+  document.getElementById('quickCrop').value = '';
+  document.getElementById('quickNote').value = '';
+  alert('紀錄已儲存！消費者頁面已更新。');
 }
 
 function switchView(viewId) {
