@@ -257,17 +257,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 <div class="panel">
-  <div class="panel-title">今日植物拍照</div>
-  <input type="file" id="farmerPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFarmerPhoto(event)">
-  <div id="farmerPhotoPreview" onclick="document.getElementById('farmerPhotoInput').click()" style="min-height:200px;border-radius:18px;border:2px dashed rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:10px;transition:background 0.2s;">
-    <div style="font-size:48px;opacity:0.7;">📷</div>
-    <div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊拍攝或上傳植物照片</div>
-    <div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>
-  </div>
-  <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="margin-top:14px;">📷 開啟相機 / 上傳照片</button>
-</div>
-
-<div class="panel">
   <div class="panel-title">快速農事記錄</div>
   <div style="margin-bottom:10px;">
     <label style="color:rgba(255,255,255,0.65);font-size:12px;">今日作物</label>
@@ -278,6 +267,17 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
     <textarea id="quickNote" placeholder="今日農場觀察..." rows="3" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;resize:none;width:100%;padding:12px;box-sizing:border-box;font-family:inherit;font-size:14px;"></textarea>
   </div>
   <button class="btn-main" onclick="saveQuickLog()">💾 儲存今日紀錄</button>
+</div>
+
+<div class="panel">
+  <div class="panel-title">今日植物拍照</div>
+  <input type="file" id="farmerPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFarmerPhoto(event)">
+  <div id="farmerPhotoPreview" onclick="document.getElementById('farmerPhotoInput').click()" style="min-height:200px;border-radius:18px;border:2px dashed rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:10px;transition:background 0.2s;">
+    <div style="font-size:48px;opacity:0.7;">📷</div>
+    <div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊拍攝或上傳植物照片</div>
+    <div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>
+  </div>
+  <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="margin-top:14px;">📷 開啟相機 / 上傳照片</button>
 </div>
 
 <div class="panel" style="text-align:center;">
