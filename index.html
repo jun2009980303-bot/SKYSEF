@@ -6,6 +6,9 @@
 <title>智慧農場 - 動態履歷與編輯系統</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@900&family=Noto+Sans+TC:wght@900&display=swap');
 
@@ -142,180 +145,22 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   </div>
 </div>
 
-<div id="viewFarmer" class="view-screen active">
-<div class="container">
-<header style="text-align:center; margin-top:10px;">
-<div id="farmerBadgeDisplay" style="font-size:12px; font-weight:900; color:var(--text-green); background:#fff; display:inline-block; padding:3px 15px; border-radius:20px;">載入中...</div>
-<h2 style="margin:5px 0;">👨‍🌾 農場後台管理系統</h2>
-</header>
-
-<div class="panel" style="background: rgba(234, 248, 244, 0.9);">
-<div class="panel-title" style="font-size: 16px;">🏠 農場基本資料設定</div>
-<div class="input-row">
-<div>
-<label>農場地點 (產地)</label>
-<input type="text" id="settingLocation" placeholder="例如: 南投埔里">
+<div id="viewFarmer" class="view-screen">
+<div class="container" style="align-items:center;">
+<div style="text-align:center; margin-top:60px;">
+  <div style="font-size:80px; line-height:1; margin-bottom:20px;">🌿</div>
+  <h2 style="color:var(--text-green); margin:0 0 10px; font-size:26px;">SKYSEF 智慧農場</h2>
+  <p style="color:#666; font-size:14px; margin:0 0 30px; line-height:1.8;">農夫後台管理已升級至專屬系統<br>請登入以管理農場資料</p>
 </div>
-<div>
-<label>農夫姓名 (生產者)</label>
-<input type="text" id="settingFarmer" placeholder="例如: 謝易均">
+<div class="panel" style="padding:24px; text-align:center; max-width:320px; width:100%;">
+  <a class="btn-main" href="login.html" style="display:block; text-decoration:none; margin-bottom:14px;">👨‍🌾 農夫後台登入</a>
+  <a class="btn-qr" href="?view=consumer" style="display:flex; text-decoration:none;">🥬 查看消費者頁面</a>
 </div>
-</div>
-<button class="btn-secondary" onclick="saveProfile()">更新農場資訊</button>
-</div>
-
-<div class="panel" id="inputSection">
-<div class="panel-title" id="inputTitle">📝 新增今日觀測日誌</div>
-<div class="input-row">
-<div>
-<label>作物種類</label>
-<input type="text" id="pType" placeholder="如: 筊白筍">
-</div>
-<div>
-<label>批次編號</label>
-<input type="text" id="pName" placeholder="如: 2026-A">
-</div>
-</div>
-<div class="input-row">
-<div>
-<label>空氣溫度 (°C)</label>
-<input type="number" id="temp" placeholder="氣溫">
-</div>
-<div>
-<label>空氣濕度 (%)</label>
-<input type="number" id="hum" placeholder="濕度">
-</div>
-</div>
-<div style="margin-bottom:10px;">
-<label>土壤 pH 值</label>
-<input type="number" id="ph" placeholder="pH 值" step="0.1">
-</div>
-<label>農事筆記</label>
-<textarea id="note" placeholder="紀錄作業內容 (例如: 已施放有機肥)..."></textarea>
-
-<div style="margin-top:15px; margin-bottom:15px;">
-<label>🌱 植物照片</label>
-<input type="file" id="photoUpload" class="photo-upload-input" accept="image/*" onchange="uploadPlantPhoto()">
-<div id="photoDisplayFarmer" class="photo-box" onclick="document.getElementById('photoUpload').click();" style="cursor: pointer;">
-<span>點擊上傳或拖入植物照片</span>
-</div>
-</div>
-
-<button id="btnSave" class="btn-main" onclick="saveData()">💾 儲存並發布至生產履歷</button>
-<button id="btnCancel" class="btn-secondary" style="display:none; background:#999;" onclick="cancelEdit()">❌ 取消修改</button>
-</div>
-
-<div class="panel">
-<div class="panel-title">
-<span>🛠️ 歷史紀錄管理</span>
-<span style="font-size:12px; color:#ff5252;">僅農夫可見</span>
-</div>
-<div id="farmerLogList"></div>
-</div>
-
-<div class="panel qr-panel">
-<div class="panel-title">📱 消費者 QR Code 顯示區</div>
-<div class="qr-code-box" id="farmerQrCode">
-<div style="margin-bottom:10px;">
-<button class="btn-secondary" onclick="generateConsumerQR()">生成消費者 QR Code</button>
-</div>
-<div id="qrCodeDisplay" style="display:none; text-align:center;">
-<p style="font-size:12px; color:#666; margin-bottom:5px;">掃描下方 QR Code 進入消費者頁面</p>
-<div id="qrCodeCanvas"></div>
-<p style="font-size:10px; color:#999; margin-top:5px;">或複製連結：<span id="consumerLink" style="word-break:break-all;"></span></p>
-</div>
-</div>
-<div style="font-size:12px; color:#666; margin-top:10px;">按下按鈕生成 QR Code，讓消費者掃描後直接進入生產履歷頁面。</div>
-</div>
-
-<div class="panel lottery-panel">
-<div class="panel-title">🎰 扭蛋機抽獎區</div>
-
-<svg class="gacha-svg-machine" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="domeGrad" cx="38%" cy="32%" r="65%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
-      <stop offset="70%" stop-color="#bbdefb" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#90caf9" stop-opacity="0.35"/>
-    </radialGradient>
-    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff7043"/>
-      <stop offset="50%" stop-color="#ff9800"/>
-      <stop offset="100%" stop-color="#e64a19"/>
-    </linearGradient>
-    <linearGradient id="baseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#607d8b"/>
-      <stop offset="100%" stop-color="#37474f"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Machine base -->
-  <rect x="25" y="228" width="190" height="72" rx="20" fill="url(#baseGrad)"/>
-  <rect x="38" y="238" width="90" height="9" rx="4" fill="rgba(255,255,255,0.12)"/>
-  <!-- Output tray opening -->
-  <rect x="68" y="268" width="104" height="22" rx="10" fill="#37474f"/>
-  <rect x="74" y="272" width="92" height="14" rx="7" fill="#263238"/>
-
-  <!-- Machine body -->
-  <rect x="18" y="138" width="204" height="100" rx="22" fill="url(#bodyGrad)"/>
-  <rect x="30" y="150" width="90" height="13" rx="6" fill="rgba(255,255,255,0.28)"/>
-  <text x="120" y="198" text-anchor="middle" fill="white" font-size="24" font-weight="900" font-family="Arial Black, Arial" opacity="0.95">GACHA</text>
-  <text x="120" y="218" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="11" font-family="Arial">✦ 扭蛋機 ✦</text>
-
-  <!-- Lever -->
-  <rect x="208" y="152" width="20" height="54" rx="10" fill="#546e7a"/>
-  <circle cx="218" cy="152" r="13" fill="#ff5252"/>
-  <circle cx="218" cy="152" r="8" fill="#ff8a80"/>
-
-  <!-- Coin slot panel -->
-  <rect x="82" y="248" width="76" height="14" rx="7" fill="#455a64"/>
-  <rect x="108" y="246" width="24" height="4" rx="2" fill="#90a4ae"/>
-
-  <!-- Neck ring -->
-  <rect x="52" y="122" width="136" height="24" rx="12" fill="#546e7a"/>
-  <rect x="58" y="127" width="124" height="14" rx="7" fill="#37474f"/>
-
-  <!-- Glass dome -->
-  <ellipse cx="120" cy="72" rx="88" ry="72" fill="url(#domeGrad)" stroke="#90caf9" stroke-width="2.5"/>
-  <ellipse cx="88" cy="42" rx="30" ry="22" fill="rgba(255,255,255,0.55)" transform="rotate(-22 88 42)"/>
-
-  <!-- Animated balls (shown during idle/spin) -->
-  <circle id="ball1" cx="88" cy="78" r="24" fill="#ef5350" opacity="0.92"/>
-  <circle id="ball2" cx="152" cy="68" r="24" fill="#42a5f5" opacity="0.92"/>
-  <circle id="ball3" cx="120" cy="100" r="24" fill="#66bb6a" opacity="0.92"/>
-  <circle id="ball1shine" cx="80" cy="70" r="8" fill="rgba(255,255,255,0.65)"/>
-  <circle id="ball2shine" cx="144" cy="60" r="8" fill="rgba(255,255,255,0.65)"/>
-  <circle id="ball3shine" cx="112" cy="92" r="8" fill="rgba(255,255,255,0.65)"/>
-
-  <!-- Result overlay (shown after draw) -->
-  <circle id="resultCircle" cx="120" cy="78" r="62" fill="white" stroke="#42a95d" stroke-width="3" opacity="0"/>
-  <image id="resultImg" x="72" y="30" width="96" height="96" opacity="0"/>
-  <text id="resultQuestion" x="120" y="88" text-anchor="middle" fill="#b0bec5" font-size="44" font-family="Arial" opacity="1">?</text>
-</svg>
-
-<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">🎰 轉動扭蛋機</button>
-<div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
-
-<a class="btn-qr" href="?view=consumer" style="margin-top:12px;">模擬消費者掃描 QR Code 畫面</a>
-</div>
-
-<div class="panel">
-<div class="panel-title">🖼️ 我的角色圖鑑 <span id="galleryCount" style="font-size:13px; font-weight:normal; color:#999;"></span></div>
-<div class="gallery-tabs">
-  <button class="gallery-tab active" data-series="全部" onclick="switchGalleryTab(this)">全部</button>
-  <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">🦁 野生動物</button>
-  <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">🍎 台灣農產</button>
-  <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">🎩 農村配件</button>
-  <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">🪣 農耕農具</button>
-</div>
-<div id="galleryGrid" class="gallery-grid"></div>
-</div>
-
 </div>
 </div>
 
 
-<div id="viewConsumer" class="view-screen">
+<div id="viewConsumer" class="view-screen active">
 <div class="container">
 
 <div class="consumer-header">
@@ -360,7 +205,72 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div id="resumeList"></div>
 </div>
 
-<a class="btn-back" href="?view=farmer">🔙 返回農夫後台</a>
+
+<div class="panel lottery-panel">
+<div class="panel-title">🎰 農場扭蛋機</div>
+
+<svg class="gacha-svg-machine" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="domeGrad" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="70%" stop-color="#bbdefb" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#90caf9" stop-opacity="0.35"/>
+    </radialGradient>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7043"/>
+      <stop offset="50%" stop-color="#ff9800"/>
+      <stop offset="100%" stop-color="#e64a19"/>
+    </linearGradient>
+    <linearGradient id="baseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#607d8b"/>
+      <stop offset="100%" stop-color="#37474f"/>
+    </linearGradient>
+  </defs>
+  <rect x="25" y="228" width="190" height="72" rx="20" fill="url(#baseGrad)"/>
+  <rect x="38" y="238" width="90" height="9" rx="4" fill="rgba(255,255,255,0.12)"/>
+  <rect x="68" y="268" width="104" height="22" rx="10" fill="#37474f"/>
+  <rect x="74" y="272" width="92" height="14" rx="7" fill="#263238"/>
+  <rect x="18" y="138" width="204" height="100" rx="22" fill="url(#bodyGrad)"/>
+  <rect x="30" y="150" width="90" height="13" rx="6" fill="rgba(255,255,255,0.28)"/>
+  <text x="120" y="198" text-anchor="middle" fill="white" font-size="24" font-weight="900" font-family="Arial Black, Arial" opacity="0.95">GACHA</text>
+  <text x="120" y="218" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="11" font-family="Arial">✦ 扭蛋機 ✦</text>
+  <rect x="208" y="152" width="20" height="54" rx="10" fill="#546e7a"/>
+  <circle cx="218" cy="152" r="13" fill="#ff5252"/>
+  <circle cx="218" cy="152" r="8" fill="#ff8a80"/>
+  <rect x="82" y="248" width="76" height="14" rx="7" fill="#455a64"/>
+  <rect x="108" y="246" width="24" height="4" rx="2" fill="#90a4ae"/>
+  <rect x="52" y="122" width="136" height="24" rx="12" fill="#546e7a"/>
+  <rect x="58" y="127" width="124" height="14" rx="7" fill="#37474f"/>
+  <ellipse cx="120" cy="72" rx="88" ry="72" fill="url(#domeGrad)" stroke="#90caf9" stroke-width="2.5"/>
+  <ellipse cx="88" cy="42" rx="30" ry="22" fill="rgba(255,255,255,0.55)" transform="rotate(-22 88 42)"/>
+  <circle id="ball1" cx="88" cy="78" r="24" fill="#ef5350" opacity="0.92"/>
+  <circle id="ball2" cx="152" cy="68" r="24" fill="#42a5f5" opacity="0.92"/>
+  <circle id="ball3" cx="120" cy="100" r="24" fill="#66bb6a" opacity="0.92"/>
+  <circle id="ball1shine" cx="80" cy="70" r="8" fill="rgba(255,255,255,0.65)"/>
+  <circle id="ball2shine" cx="144" cy="60" r="8" fill="rgba(255,255,255,0.65)"/>
+  <circle id="ball3shine" cx="112" cy="92" r="8" fill="rgba(255,255,255,0.65)"/>
+  <circle id="resultCircle" cx="120" cy="78" r="62" fill="white" stroke="#42a95d" stroke-width="3" opacity="0"/>
+  <image id="resultImg" x="72" y="30" width="96" height="96" opacity="0"/>
+  <text id="resultQuestion" x="120" y="88" text-anchor="middle" fill="#b0bec5" font-size="44" font-family="Arial" opacity="1">?</text>
+</svg>
+
+<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">🎰 轉動扭蛋機</button>
+<div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">🖼️ 我的角色圖鑑 <span id="galleryCount" style="font-size:13px; font-weight:normal; color:#999;"></span></div>
+<div class="gallery-tabs">
+  <button class="gallery-tab active" data-series="全部" onclick="switchGalleryTab(this)">全部</button>
+  <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">🦁 野生動物</button>
+  <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">🍎 台灣農產</button>
+  <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">🎩 農村配件</button>
+  <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">🪣 農耕農具</button>
+</div>
+<div id="galleryGrid" class="gallery-grid"></div>
+</div>
+
+<a class="btn-back" href="login.html">👨‍🌾 農夫登入</a>
 </div>
 </div>
 
@@ -599,7 +509,6 @@ alert("農場基本資訊已更新成功！");
 }
 
 function updateProfileDisplay() {
-document.getElementById('farmerBadgeDisplay').innerText = `👨‍🌾 ${farmProfile.farmer} (${farmProfile.location})`;
 document.getElementById('displayLocation').innerText = farmProfile.location;
 document.getElementById('displayFarmer').innerText = farmProfile.farmer;
 }
@@ -887,12 +796,64 @@ function toggleMusicPlayer() {
   }
 }
 
+
+// ── Firebase 整合 ─────────────────────────────────────────
+let _fbDb = null;
+(function initFirebase() {
+  try {
+    if (window.SKYSER_FIREBASE_CONFIG && firebase) {
+      if (!firebase.apps.length) firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
+      _fbDb = firebase.firestore();
+      window.SKYSER_DB = _fbDb;
+      loadFarmDataFromFirebase();
+    }
+  } catch(e) { /* Firebase not available, use localStorage */ }
+})();
+
+async function loadFarmDataFromFirebase() {
+  if (!_fbDb) return;
+  try {
+    // Load farm profile
+    const profileSnap = await _fbDb.collection('settings').doc('profile').get();
+    if (profileSnap.exists) {
+      const p = profileSnap.data();
+      if (p.location) { farmProfile.location = p.location; }
+      if (p.farmer)   { farmProfile.farmer   = p.farmer;   }
+      updateProfileDisplay();
+    }
+    // Load farm logs
+    const logsSnap = await _fbDb.collection('logs').orderBy('timestamp', 'desc').limit(20).get();
+    if (!logsSnap.empty) {
+      logs = logsSnap.docs.map(d => {
+        const data = d.data();
+        return {
+          date: data.date || new Date(data.timestamp?.toDate?.() || Date.now()).toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+          type: data.type || data.cropType || '未知作物',
+          name: data.name || data.batchId || '批次',
+          temp: data.temp || 0,
+          hum:  data.hum  || 0,
+          ph:   data.ph   || '--',
+          note: data.note || ''
+        };
+      });
+      renderResume();
+      initChart();
+    }
+    // Load plant photo
+    const photoSnap = await _fbDb.collection('settings').doc('photo').get();
+    if (photoSnap.exists && photoSnap.data().url) {
+      const url = photoSnap.data().url;
+      document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${url}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    }
+  } catch(e) { console.log('Firebase load failed, using local data:', e.message); }
+}
+// ──────────────────────────────────────────────────────────
+
 window.onload = function() {
-  initProfile();
+  updateProfileDisplay();
   renderGallery();
   const savedPhoto = localStorage.getItem('puli_plant_photo');
   if (savedPhoto) {
-    document.getElementById('photoDisplayFarmer').innerHTML = `<img src="${savedPhoto}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
     document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${savedPhoto}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
   }
   initMusicPlayer();
@@ -903,6 +864,8 @@ window.onload = function() {
     switchView('viewConsumer');
   } else if (viewParam === 'farmer' || hash === 'farmer') {
     switchView('viewFarmer');
+  } else {
+    switchView('viewConsumer');
   }
 };
 </script>
