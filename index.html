@@ -49,21 +49,29 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .log-item { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; border-left: 8px solid var(--accent-green); }
 .log-tag { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 5px; font-size: 11px; margin-right: 5px; font-weight: 900; }
 
-.lottery-panel { background: linear-gradient(145deg, #fff 0%, #f8f8ff 100%); border: 1px solid #dce7f2; border-radius: 25px; padding: 18px; box-shadow: inset 0 1px 5px rgba(0,0,0,0.05); }
-.lottery-result { background: #f1f8ff; border-radius: 18px; padding: 14px; color: #33475b; margin-top: 12px; font-size: 14px; min-height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; }
-.lottery-note { font-size: 12px; color: #666; margin-top: 10px; line-height: 1.5; }
-.gacha-machine { display: grid; gap: 14px; }
-.gacha-shell { background: #ffffff; border: 2px solid #d7e2ef; border-radius: 28px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); position: relative; }
-.gacha-header { display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 900; color: #2f5f86; }
-.gacha-window { background: radial-gradient(circle at 50% 40%, #ffffff 0%, #f3f8ff 40%, #dbeaf8 100%); border: 2px solid #c1d8f0; border-radius: 24px; min-height: 140px; display: flex; align-items: center; justify-content: center; position: relative; }
-.gacha-window::before { content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 60%; height: 18px; border-radius: 10px; background: rgba(255,255,255,0.7); }
-.gacha-ball { width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff 0%, #fddcc8 40%, #ffb74d 100%); box-shadow: inset 0 -6px 16px rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.08); display: grid; place-items: center; font-size: 28px; color: #5d3c1b; font-weight: 900; transition: transform 0.2s ease; }
-.gacha-ball.spin { animation: gacha-spin 0.8s ease-in-out infinite; }
-@keyframes gacha-spin { 0% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(18deg); } 100% { transform: translateY(0) rotate(-6deg); } }
-.gacha-lever { background: #f7f7f7; border: 2px solid #dce4eb; border-radius: 18px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
-.gacha-lever div { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #556a7a; }
-.gacha-lever span { width: 32px; height: 32px; background: #ffb74d; border-radius: 12px; display: grid; place-items: center; color: white; font-size: 18px; box-shadow: 0 4px 8px rgba(255,183,77,0.25); }
-.gacha-button { width: 100%; margin-top: 0; }
+.lottery-panel { background: linear-gradient(145deg, #fff5f0 0%, #fff 100%); border: 2px solid #ffcc80; border-radius: 25px; padding: 18px; box-shadow: 0 4px 20px rgba(255,152,0,0.1); }
+.lottery-result { background: linear-gradient(135deg, #e8f5e9, #f1f8ff); border-radius: 18px; padding: 14px; color: #33475b; margin-top: 12px; font-size: 14px; min-height: 50px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 900; border: 1px solid #c8e6c9; }
+.gacha-svg-machine { width: 100%; max-width: 260px; margin: 0 auto; display: block; filter: drop-shadow(0 10px 24px rgba(0,0,0,0.18)); }
+.gacha-button { width: 100%; margin-top: 16px; background: linear-gradient(135deg, #ff9800, #f44336); box-shadow: 0 6px 18px rgba(255,152,0,0.4); font-size: 18px; letter-spacing: 1px; }
+.gacha-button:active { transform: scale(0.97); }
+.gacha-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+.gacha-modal-overlay.active { display: flex; }
+.gacha-modal-card { background: linear-gradient(145deg, #fff 0%, #f0faff 100%); border-radius: 28px; padding: 30px 24px 24px; text-align: center; max-width: 300px; width: 88%; position: relative; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,152,0,0.3); }
+@keyframes popIn { from { transform: scale(0.4) rotate(-8deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+.gacha-modal-close { position: absolute; top: 12px; right: 12px; background: #eee; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #666; transition: 0.2s; }
+.gacha-modal-close:hover { background: #ff5252; color: white; }
+.gacha-modal-rarity { font-size: 16px; font-weight: 900; color: #ff9800; margin-bottom: 14px; letter-spacing: 3px; text-shadow: 0 0 12px rgba(255,152,0,0.4); }
+.gacha-modal-img { width: 160px; height: 160px; object-fit: contain; border-radius: 20px; background: #f0f9f4; box-shadow: 0 6px 20px rgba(0,0,0,0.12); border: 3px solid #fff; }
+.gacha-modal-name { font-size: 22px; font-weight: 900; color: #1b4d36; margin: 14px 0 20px; }
+.btn-add-gallery { background: linear-gradient(135deg, #42a95d, #1b5e20); color: white; border: none; padding: 13px 28px; border-radius: 50px; font-weight: 900; font-size: 15px; cursor: pointer; box-shadow: 0 4px 14px rgba(66,169,93,0.4); width: 100%; transition: 0.2s; }
+.btn-add-gallery:hover { transform: scale(1.03); }
+.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+.gallery-item { background: #f8fffe; border: 2px solid #c8e6c9; border-radius: 14px; padding: 8px 4px 6px; text-align: center; position: relative; transition: 0.2s; }
+.gallery-item:hover { transform: scale(1.05); border-color: #42a95d; }
+.gallery-item img { width: 52px; height: 52px; object-fit: contain; border-radius: 8px; }
+.gallery-item-name { font-size: 10px; font-weight: 900; color: #2e7d32; margin-top: 4px; line-height: 1.2; word-break: break-all; }
+.gallery-item-del { position: absolute; top: -6px; right: -6px; background: #ff5252; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.gallery-empty { text-align: center; color: #aaa; font-size: 13px; padding: 20px; grid-column: 1/-1; }
 .qr-panel { background: linear-gradient(145deg, #fff 0%, #fff9f0 100%); border: 1px solid #f5d6b4; border-radius: 25px; padding: 18px; box-shadow: inset 0 1px 5px rgba(0,0,0,0.05); }
 .qr-code-box { background: #ffffff; border: 2px dashed #ffb74d; border-radius: 20px; min-height: 180px; display: flex; align-items: center; justify-content: center; color: #8d6e63; font-weight: 900; font-size: 14px; text-align: center; padding: 20px; }
 .qr-code-box span { display: block; line-height: 1.6; }
@@ -165,20 +173,80 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
 <div class="panel lottery-panel">
 <div class="panel-title">🎰 扭蛋機抽獎區</div>
-<div class="gacha-machine">
-<div class="gacha-shell">
-<div class="gacha-header">🎡 轉動扭蛋機，抽取神秘角色</div>
-<div class="gacha-window">
-<div id="gachaBall" class="gacha-ball">?</div>
-</div>
-<div class="gacha-lever"><div><span>⇪</span>拉桿</div><div>請按下按鈕啟動</div></div>
-</div>
-<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">轉動扭蛋機</button>
+
+<svg class="gacha-svg-machine" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="domeGrad" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="70%" stop-color="#bbdefb" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#90caf9" stop-opacity="0.35"/>
+    </radialGradient>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7043"/>
+      <stop offset="50%" stop-color="#ff9800"/>
+      <stop offset="100%" stop-color="#e64a19"/>
+    </linearGradient>
+    <linearGradient id="baseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#607d8b"/>
+      <stop offset="100%" stop-color="#37474f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Machine base -->
+  <rect x="25" y="228" width="190" height="72" rx="20" fill="url(#baseGrad)"/>
+  <rect x="38" y="238" width="90" height="9" rx="4" fill="rgba(255,255,255,0.12)"/>
+  <!-- Output tray opening -->
+  <rect x="68" y="268" width="104" height="22" rx="10" fill="#37474f"/>
+  <rect x="74" y="272" width="92" height="14" rx="7" fill="#263238"/>
+
+  <!-- Machine body -->
+  <rect x="18" y="138" width="204" height="100" rx="22" fill="url(#bodyGrad)"/>
+  <rect x="30" y="150" width="90" height="13" rx="6" fill="rgba(255,255,255,0.28)"/>
+  <text x="120" y="198" text-anchor="middle" fill="white" font-size="24" font-weight="900" font-family="Arial Black, Arial" opacity="0.95">GACHA</text>
+  <text x="120" y="218" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="11" font-family="Arial">✦ 扭蛋機 ✦</text>
+
+  <!-- Lever -->
+  <rect x="208" y="152" width="20" height="54" rx="10" fill="#546e7a"/>
+  <circle cx="218" cy="152" r="13" fill="#ff5252"/>
+  <circle cx="218" cy="152" r="8" fill="#ff8a80"/>
+
+  <!-- Coin slot panel -->
+  <rect x="82" y="248" width="76" height="14" rx="7" fill="#455a64"/>
+  <rect x="108" y="246" width="24" height="4" rx="2" fill="#90a4ae"/>
+
+  <!-- Neck ring -->
+  <rect x="52" y="122" width="136" height="24" rx="12" fill="#546e7a"/>
+  <rect x="58" y="127" width="124" height="14" rx="7" fill="#37474f"/>
+
+  <!-- Glass dome -->
+  <ellipse cx="120" cy="72" rx="88" ry="72" fill="url(#domeGrad)" stroke="#90caf9" stroke-width="2.5"/>
+  <ellipse cx="88" cy="42" rx="30" ry="22" fill="rgba(255,255,255,0.55)" transform="rotate(-22 88 42)"/>
+
+  <!-- Animated balls (shown during idle/spin) -->
+  <circle id="ball1" cx="88" cy="78" r="24" fill="#ef5350" opacity="0.92"/>
+  <circle id="ball2" cx="152" cy="68" r="24" fill="#42a5f5" opacity="0.92"/>
+  <circle id="ball3" cx="120" cy="100" r="24" fill="#66bb6a" opacity="0.92"/>
+  <circle id="ball1shine" cx="80" cy="70" r="8" fill="rgba(255,255,255,0.65)"/>
+  <circle id="ball2shine" cx="144" cy="60" r="8" fill="rgba(255,255,255,0.65)"/>
+  <circle id="ball3shine" cx="112" cy="92" r="8" fill="rgba(255,255,255,0.65)"/>
+
+  <!-- Result overlay (shown after draw) -->
+  <circle id="resultCircle" cx="120" cy="78" r="62" fill="white" stroke="#42a95d" stroke-width="3" opacity="0"/>
+  <image id="resultImg" x="72" y="30" width="96" height="96" opacity="0"/>
+  <text id="resultQuestion" x="120" y="88" text-anchor="middle" fill="#b0bec5" font-size="44" font-family="Arial" opacity="1">?</text>
+</svg>
+
+<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">🎰 轉動扭蛋機</button>
 <div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
+
+<a class="btn-qr" href="?view=consumer" style="margin-top:12px;">模擬消費者掃描 QR Code 畫面</a>
 </div>
 
-<a class="btn-qr" href="?view=consumer">模擬消費者掃描 QR Code 畫面</a>
+<div class="panel">
+<div class="panel-title">🖼️ 我的角色圖鑑 <span id="galleryCount" style="font-size:13px; font-weight:normal; color:#999;"></span></div>
+<div id="galleryGrid" class="gallery-grid"></div>
 </div>
+
 </div>
 </div>
 
@@ -230,6 +298,16 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
 <a class="btn-back" href="?view=farmer">🔙 返回農夫後台</a>
 </div>
+</div>
+
+<div class="gacha-modal-overlay" id="gachaModal" onclick="closeGachaModal()">
+  <div class="gacha-modal-card" onclick="event.stopPropagation()">
+    <button class="gacha-modal-close" onclick="closeGachaModal()">✕</button>
+    <div class="gacha-modal-rarity">✨ 恭喜獲得 ✨</div>
+    <img class="gacha-modal-img" id="gachaModalImg" src="" alt="">
+    <div class="gacha-modal-name" id="gachaModalName"></div>
+    <button class="btn-add-gallery" onclick="addToGallery()">＋ 加入圖鑑</button>
+  </div>
 </div>
 
 <script>
@@ -290,32 +368,107 @@ function generateConsumerQR() {
 }
 
 function drawLotteryCharacter() {
-  const result = document.getElementById('lotteryResult');
-  const button = document.getElementById('gachaButton');
-  const ball = document.getElementById('gachaBall');
-
   if (characterPool.length === 0) {
-    result.innerText = "目前尚未有角色可抽，後續將新增約 50 個角色。";
-    ball.innerText = "?";
+    document.getElementById('lotteryResult').innerText = "目前尚未有角色可抽。";
     return;
   }
   if (isGachaSpinning) return;
 
   isGachaSpinning = true;
+  const button = document.getElementById('gachaButton');
+  const result = document.getElementById('lotteryResult');
   button.disabled = true;
-  button.innerText = '轉動中...';
+  button.innerText = '⏳ 轉動中...';
   result.innerText = '扭蛋機正在轉動，請稍後...';
-  ball.classList.add('spin');
+
+  // Reset SVG state
+  document.getElementById('resultCircle').setAttribute('opacity', '0');
+  document.getElementById('resultImg').setAttribute('opacity', '0');
+  document.getElementById('resultQuestion').setAttribute('opacity', '0');
+
+  const balls = [
+    { el: document.getElementById('ball1'), shine: document.getElementById('ball1shine'), bx: 88, by: 78 },
+    { el: document.getElementById('ball2'), shine: document.getElementById('ball2shine'), bx: 152, by: 68 },
+    { el: document.getElementById('ball3'), shine: document.getElementById('ball3shine'), bx: 120, by: 100 },
+  ];
+  balls.forEach(b => { b.el.setAttribute('opacity', '0.92'); b.shine.setAttribute('opacity', '1'); });
+
+  let t = 0;
+  const spinInterval = setInterval(() => {
+    t += 0.18;
+    balls.forEach((b, i) => {
+      const dx = Math.sin(t + i * 2.1) * 26;
+      const dy = Math.cos(t * 1.4 + i * 1.6) * 18;
+      b.el.setAttribute('cx', b.bx + dx);
+      b.el.setAttribute('cy', b.by + dy);
+      b.shine.setAttribute('cx', b.bx + dx - 8);
+      b.shine.setAttribute('cy', b.by + dy - 8);
+    });
+  }, 30);
 
   setTimeout(() => {
-    ball.classList.remove('spin');
+    clearInterval(spinInterval);
+    balls.forEach(b => { b.el.setAttribute('opacity', '0'); b.shine.setAttribute('opacity', '0'); });
+
     const randomCharacter = characterPool[Math.floor(Math.random() * characterPool.length)];
-    ball.innerHTML = `<img src="${randomCharacter.img}" alt="${randomCharacter.name}" style="width:90px;height:90px;object-fit:contain;border-radius:50%;">`;
-    result.innerText = `恭喜你抽中：${randomCharacter.name}！`;
+    window._lastGachaChar = randomCharacter;
+
+    document.getElementById('resultCircle').setAttribute('opacity', '1');
+    const imgEl = document.getElementById('resultImg');
+    imgEl.setAttribute('href', randomCharacter.img);
+    imgEl.setAttribute('opacity', '1');
+
+    result.innerText = `🎉 恭喜抽中：${randomCharacter.name}！`;
     button.disabled = false;
-    button.innerText = '再轉一次';
+    button.innerText = '🎰 再轉一次';
     isGachaSpinning = false;
+
+    setTimeout(() => showGachaModal(randomCharacter), 350);
   }, 1800);
+}
+
+function showGachaModal(char) {
+  document.getElementById('gachaModalImg').src = char.img;
+  document.getElementById('gachaModalImg').alt = char.name;
+  document.getElementById('gachaModalName').innerText = char.name;
+  document.getElementById('gachaModal').classList.add('active');
+}
+
+function closeGachaModal() {
+  document.getElementById('gachaModal').classList.remove('active');
+}
+
+let gallery = JSON.parse(localStorage.getItem('skysef_gallery') || '[]');
+
+function addToGallery() {
+  if (!window._lastGachaChar) return;
+  gallery.push({ name: window._lastGachaChar.name, img: window._lastGachaChar.img });
+  localStorage.setItem('skysef_gallery', JSON.stringify(gallery));
+  renderGallery();
+  closeGachaModal();
+}
+
+function removeFromGallery(index) {
+  gallery.splice(index, 1);
+  localStorage.setItem('skysef_gallery', JSON.stringify(gallery));
+  renderGallery();
+}
+
+function renderGallery() {
+  const grid = document.getElementById('galleryGrid');
+  const count = document.getElementById('galleryCount');
+  count.innerText = gallery.length > 0 ? `(${gallery.length} 個)` : '';
+  if (gallery.length === 0) {
+    grid.innerHTML = '<div class="gallery-empty">尚未收集任何角色，快去抽扭蛋吧！🎰</div>';
+    return;
+  }
+  grid.innerHTML = gallery.map((item, i) => `
+    <div class="gallery-item">
+      <button class="gallery-item-del" onclick="removeFromGallery(${i})">✕</button>
+      <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.fontSize='32px'">
+      <div class="gallery-item-name">${item.name}</div>
+    </div>
+  `).join('');
 }
 
 function initProfile() {
@@ -561,6 +714,7 @@ function initMusicPlayer() {
 
 window.onload = function() {
   initProfile();
+  renderGallery();
   const savedPhoto = localStorage.getItem('puli_plant_photo');
   if (savedPhoto) {
     document.getElementById('photoDisplayFarmer').innerHTML = `<img src="${savedPhoto}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
