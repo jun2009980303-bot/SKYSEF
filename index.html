@@ -139,15 +139,90 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .music-ctrl-btn.play { background: var(--accent-green); width: 32px; height: 32px; font-size: 14px; }
 .music-progress { width: 100%; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-top: 6px; cursor: pointer; display: none; }
 .music-progress-fill { height: 100%; background: var(--accent-green); border-radius: 2px; width: 0%; transition: width 0.5s linear; pointer-events: none; }
-/* Glassmorphism global text overrides */
-.view-screen h2, .view-screen h3 { color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-.view-screen p, .view-screen div:not(.btn-main):not(.btn-secondary):not(.btn-qr):not(.btn-back) { color: rgba(255,255,255,0.9); }
-#displayLocation, #displayFarmer { color: #c8ffd4 !important; font-weight: 900; }
-.consumer-header div { background: rgba(255,255,255,0.15) !important; color: rgba(255,255,255,0.85) !important; }
-.daily-badge { background: rgba(255,152,0,0.85) !important; backdrop-filter: blur(6px); }
-#wikiTitle { color: #c8ffd4 !important; }
-#wikiText { color: rgba(255,255,255,0.88) !important; }
-.log-item div { color: rgba(255,255,255,0.9) !important; }
+/* ── Typography & Colour System ── */
+
+/* Page titles */
+.view-screen h2 {
+  color: #ffffff;
+  font-size: 26px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.55), 0 0 30px rgba(80,220,120,0.2);
+}
+.view-screen h3 {
+  color: #e0fff0;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.45);
+}
+
+/* Panel titles */
+.panel-title {
+  color: #a8ffcc !important;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5) !important;
+  font-size: 16px !important;
+}
+
+/* Body text — readable off-white */
+.view-screen p,
+.view-screen label,
+.view-screen span:not(.daily-badge):not(.log-tag),
+.view-screen div:not([class*="btn"]):not(.daily-badge) {
+  color: rgba(230,255,238,0.92);
+}
+
+/* Farm location / farmer name */
+#displayLocation, #displayFarmer {
+  color: #57ff99 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* Consumer header info bar */
+.consumer-header > div:last-child {
+  background: rgba(0,0,0,0.22) !important;
+  color: rgba(220,255,230,0.9) !important;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+/* Wiki */
+#wikiTitle { color: #7effa0 !important; font-size: 20px !important; text-shadow: 0 1px 5px rgba(0,0,0,0.4); }
+#wikiText  { color: rgba(220,255,232,0.92) !important; line-height: 1.75; }
+
+/* Today badge */
+.daily-badge {
+  background: linear-gradient(135deg,#ff9800,#e65100) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(230,81,0,0.4);
+}
+
+/* Refresh wiki link */
+.daily-card button { color: #7effa0 !important; font-weight: 900 !important; }
+
+/* Log items */
+.log-item { border-left-color: #57ff99 !important; }
+.log-item > div:first-child { color: #7effa0 !important; font-weight: 900 !important; }
+.log-tag {
+  background: rgba(60,180,90,0.35) !important;
+  color: #b6ffcb !important;
+  border: 1px solid rgba(100,220,130,0.45) !important;
+  font-weight: 900 !important;
+}
+
+/* Gallery series header */
+.gallery-series-header { color: #7effa0 !important; border-bottom-color: rgba(100,220,130,0.3) !important; }
+
+/* Gallery empty */
+.gallery-empty { color: rgba(200,255,215,0.6) !important; }
+
+/* Gallery item name */
+.gallery-item-name { color: #c8ffd4 !important; font-weight: 900 !important; }
+
+/* Lottery result */
+.lottery-result { color: #d0ffe0 !important; }
+
+/* Photo box placeholder */
+.photo-box span { color: rgba(180,255,200,0.75) !important; }
 
 </style>
 </head>
