@@ -249,7 +249,7 @@ let logs = JSON.parse(localStorage.getItem('puli_dynamic_resume')) || [];
 let farmProfile = JSON.parse(localStorage.getItem('puli_farm_profile')) || { location: '南投埔里', farmer: '謝易均' };
 let lineChart;
 let editingIndex = -1; // 追蹤目前正在修改哪一筆資料 (-1 代表新增模式)
-const characterPool = [{name:'台灣藍雀',img:'23EEC178-39A9-4A48-97BE-1AEB61D38CE2.png'},{name:'萃谷行者',img:'48126012-0218-4921-95D8-69E75F449F24.png'},{name:'台灣獼猴',img:'61044CDA-1270-471D-8262-758DD9B2216F.png'},{name:'台北樹蛙',img:'8D6376E4-362C-47A9-8401-5FA052E44C78.png'},{name:'熱果旅姬',img:'D47D5B04-2461-486D-AADA-73801B4CDC6B.png'},{name:'石虎',img:'D6BEB18A-63E7-458D-A53E-AA14B7B4D205.png'},{name:'帝雉',img:'E447FA80-4F1D-46C8-98DE-4D035C4C52B6.png'},{name:'鳳梨',img:'IMG_3286.png'},{name:'釋迦',img:'IMG_3287.png'},{name:'芒果',img:'IMG_3288.png'},{name:'蓮霧',img:'IMG_3289.png'},{name:'梨子',img:'IMG_3290.png'},{name:'火龍果',img:'IMG_3291.png'},{name:'香蕉',img:'IMG_3292.png'},{name:'草莓',img:'IMG_3293.png'},{name:'洋蔥',img:'IMG_3294.png'},{name:'蒜頭',img:'IMG_3295.png'},{name:'蔥',img:'IMG_3296.png'},{name:'地瓜',img:'IMG_3297.png'},{name:'木瓜',img:'IMG_3298.png'},{name:'洛神花',img:'IMG_3299.png'},{name:'茶葉',img:'IMG_3301.png'},{name:'復古眼鏡',img:'IMG_3312.png'},{name:'漁夫帽',img:IMG_3324.png},{name:'太陽眼鏡',img:IMG_3325.png},{name:'金絲眼鏡',img:IMG_3326.png},{name:'澆水壺',img:IMG_3327.png},{name:'復古澆水壺',img:IMG_3328.png},{name:'圓胖澆水壺',img:IMG_3329.png},{name:'帆布袋',img:IMG_3330.png}]; // 測試角色，後續補上 50 個
+const characterPool = [{name:'台灣藍雀',img:'23EEC178-39A9-4A48-97BE-1AEB61D38CE2.png'},{name:'萃谷行者',img:'48126012-0218-4921-95D8-69E75F449F24.png'},{name:'台灣獼猴',img:'61044CDA-1270-471D-8262-758DD9B2216F.png'},{name:'台北樹蛙',img:'8D6376E4-362C-47A9-8401-5FA052E44C78.png'},{name:'熱果旅姬',img:'D47D5B04-2461-486D-AADA-73801B4CDC6B.png'},{name:'石虎',img:'D6BEB18A-63E7-458D-A53E-AA14B7B4D205.png'},{name:'帝雉',img:'E447FA80-4F1D-46C8-98DE-4D035C4C52B6.png'},{name:'鳳梨',img:'IMG_3286.png'},{name:'釋迦',img:'IMG_3287.png'},{name:'芒果',img:'IMG_3288.png'},{name:'蓮霧',img:'IMG_3289.png'},{name:'梨子',img:'IMG_3290.png'},{name:'火龍果',img:'IMG_3291.png'},{name:'香蕉',img:'IMG_3292.png'},{name:'草莓',img:'IMG_3293.png'},{name:'洋蔥',img:'IMG_3294.png'},{name:'蒜頭',img:'IMG_3295.png'},{name:'蔥',img:'IMG_3296.png'},{name:'地瓜',img:'IMG_3297.png'},{name:'木瓜',img:'IMG_3298.png'},{name:'洛神花',img:'IMG_3299.png'},{name:'茶葉',img:'IMG_3301.png'},{name:'復古眼鏡',img:'IMG_3312.png'},{name:'漁夫帽',img:'IMG_3324.png'},{name:'太陽眼鏡',img:'IMG_3325.png'},{name:'金絲眼鏡',img:'IMG_3326.png'},{name:'澆水壺',img:'IMG_3327.png'},{name:'復古澆水壺',img:'IMG_3328.png'},{name:'圓胖澆水壺',img:'IMG_3329.png'},{name:'帆布袋',img:'IMG_3330.png'}]; // 測試角色，後續補上 50 個
 let isGachaSpinning = false;
 
 function generateConsumerQR() {
@@ -309,9 +309,9 @@ function drawLotteryCharacter() {
 
   setTimeout(() => {
     ball.classList.remove('spin');
-    const randomName = characterPool[Math.floor(Math.random() * characterPool.length)];
-    ball.innerHTML='<img scr="${randomCharacter.img}"alt="${randomCharacter.name}"style="width:180px;height:180px;object-fit:contain;">';
-    result.innerText = `恭喜你抽中：${randomCharacter.Name}！`;
+    const randomCharacter = characterPool[Math.floor(Math.random() * characterPool.length)];
+    ball.innerHTML = `<img src="${randomCharacter.img}" alt="${randomCharacter.name}" style="width:90px;height:90px;object-fit:contain;border-radius:50%;">`;
+    result.innerText = `恭喜你抽中：${randomCharacter.name}！`;
     button.disabled = false;
     button.innerText = '再轉一次';
     isGachaSpinning = false;
@@ -527,8 +527,46 @@ try {
 }
 }
 
+function uploadPlantPhoto() {
+  const file = document.getElementById('photoUpload').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    document.getElementById('photoDisplayFarmer').innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    localStorage.setItem('puli_plant_photo', dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function initMusicPlayer() {
+  const tracks = [
+    '01-Bilateral-Tranquility-Variation-1.mp3',
+    '04-Bilateral-Stillness (1).mp3',
+    '05-Bilateral-Eternal.mp3',
+    'DeeperMeaning.mp3'
+  ];
+  let currentTrack = 0;
+  const audio = new Audio(tracks[currentTrack]);
+  audio.volume = 0.3;
+  audio.loop = false;
+  audio.addEventListener('ended', () => {
+    currentTrack = (currentTrack + 1) % tracks.length;
+    audio.src = tracks[currentTrack];
+    audio.play().catch(() => {});
+  });
+  audio.play().catch(() => {});
+}
+
 window.onload = function() {
   initProfile();
+  const savedPhoto = localStorage.getItem('puli_plant_photo');
+  if (savedPhoto) {
+    document.getElementById('photoDisplayFarmer').innerHTML = `<img src="${savedPhoto}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${savedPhoto}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+  }
+  initMusicPlayer();
   const urlParams = new URLSearchParams(window.location.search);
   const viewParam = urlParams.get('view');
   const hash = window.location.hash.replace('#', '');
