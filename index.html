@@ -421,25 +421,17 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <button onclick="generateRandomWiki()" style="background:none; border:none; color:var(--accent-green); font-weight:900; font-size:12px; cursor:pointer; padding:0; margin-top:10px;">↻ 換一個知識</button>
 </div>
 
-<div class="panel photo-panel">
-<div class="panel-title">植物照片</div>
-<div id="photoDisplayConsumer" class="photo-box">
-<span>植物照片</span>
-</div>
-</div>
-
-
 <div class="panel">
 <div class="panel-title">生長環境監測數據</div>
-<div style="font-size:12px; color:#666; margin-bottom:10px;">優良的生長曲線是品質的保證。</div>
-<div style="background:#fff; height:180px; border-radius:15px; border:1px solid #eee; padding:10px;">
+<div style="font-size:12px; color:rgba(255,255,255,0.55); margin-bottom:10px;">優良的生長曲線是品質的保證。</div>
+<div style="background:rgba(255,255,255,0.08); height:180px; border-radius:15px; border:1px solid rgba(255,255,255,0.15); padding:10px;">
 <canvas id="lineChart"></canvas>
 </div>
 </div>
 
 <div class="panel">
-<div class="panel-title">完整農事歷程</div>
-<div id="resumeList"></div>
+<div class="panel-title">每日記錄</div>
+<div id="dailyTimeline"></div>
 </div>
 
 
@@ -700,11 +692,57 @@ function handleFarmerPhoto(event) {
     preview.innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;">`;
     preview.style.padding = '0';
     preview.style.border = 'none';
-    const consumerBox = document.getElementById('photoDisplayConsumer');
-    if (consumerBox) consumerBox.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
     localStorage.setItem('puli_plant_photo', dataUrl);
+    const dateKey = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+    let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+    const existing = dailyPhotos.findIndex(p => p.date === dateKey);
+    if (existing >= 0) dailyPhotos[existing].img = dataUrl;
+    else dailyPhotos.unshift({ date: dateKey, img: dataUrl });
+    localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
+    renderDailyTimeline();
   };
   reader.readAsDataURL(file);
+}
+
+function renderDailyTimeline() {
+  const el = document.getElementById('dailyTimeline');
+  if (!el) return;
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  const photoMap = {};
+  dailyPhotos.forEach(p => photoMap[p.date] = p.img);
+
+  if (logs.length === 0 && dailyPhotos.length === 0) {
+    el.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.45);font-size:13px;padding:16px 0;">尚無每日記錄。</p>';
+    return;
+  }
+
+  const allDates = new Set([
+    ...logs.map(l => l.date ? l.date.split(' ')[0] : ''),
+    ...dailyPhotos.map(p => p.date)
+  ]);
+  const sorted = [...allDates].filter(Boolean).sort((a,b) => b.localeCompare(a));
+
+  el.innerHTML = sorted.map(date => {
+    const dayLogs = logs.filter(l => l.date && l.date.startsWith(date));
+    const photo = photoMap[date];
+    return `<div style="margin-bottom:20px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);">
+      ${photo ? `<img src="${photo}" style="width:100%;max-height:220px;object-fit:cover;display:block;">` : ''}
+      <div style="padding:12px 14px;">
+        <div style="font-size:13px;font-weight:900;color:rgba(255,255,255,0.7);margin-bottom:10px;">${date}</div>
+        ${dayLogs.length === 0 ? '<div style="color:rgba(255,255,255,0.35);font-size:12px;">當日無農事紀錄</div>' :
+          dayLogs.map(l => `
+            <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:13px;font-weight:900;color:#ffe97a;margin-bottom:5px;">${l.type || '農場作物'} ${l.name !== '今日批次' ? '· '+l.name : ''}</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+                ${l.temp ? `<span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:2px 8px;font-size:11px;">溫度 ${l.temp}°C</span>` : ''}
+                ${l.hum ? `<span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:2px 8px;font-size:11px;">濕度 ${l.hum}%</span>` : ''}
+                ${l.ph && l.ph !== '--' ? `<span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:2px 8px;font-size:11px;">pH ${l.ph}</span>` : ''}
+              </div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;">${l.note || ''}</div>
+            </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function saveFarmProfile() {
@@ -752,7 +790,7 @@ function switchView(viewId) {
 
   if (viewId === 'viewConsumer') {
     initChart();
-    renderResume();
+    renderDailyTimeline();
     generateRandomWiki();
   }
 }
@@ -1064,7 +1102,7 @@ async function loadFarmDataFromFirebase() {
           note: data.note || ''
         };
       });
-      renderResume();
+      renderDailyTimeline();
       initChart();
     }
     // Load plant photo
@@ -1080,10 +1118,7 @@ async function loadFarmDataFromFirebase() {
 window.onload = function() {
   updateProfileDisplay();
   renderGallery();
-  const savedPhoto = localStorage.getItem('puli_plant_photo');
-  if (savedPhoto) {
-    document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${savedPhoto}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
-  }
+  renderDailyTimeline();
   initMusicPlayer();
   const urlParams = new URLSearchParams(window.location.search);
   const viewParam = urlParams.get('view');
