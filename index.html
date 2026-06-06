@@ -280,60 +280,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="margin-top:14px;">📷 開啟相機 / 上傳照片</button>
 </div>
 
-<div class="panel" style="text-align:center;">
-  <div style="color:rgba(255,255,255,0.45);font-size:12px;margin-bottom:16px;">需要完整後台管理？</div>
-  <a class="btn-main" href="admin.html" style="display:block;text-decoration:none;margin-bottom:12px;">🔧 進入農夫後台管理</a>
-  <a href="?view=consumer" style="color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;display:block;margin-top:4px;">查看消費者頁面 →</a>
-</div>
-
-</div>
-</div>
-
-
-<div id="viewConsumer" class="view-screen">
-<div class="container">
-
-<div style="text-align:right; margin-bottom:8px;">
-  <a href="?view=farmer" style="color:rgba(255,255,255,0.6);font-size:12px;text-decoration:none;background:rgba(255,255,255,0.1);padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);">👨‍🌾 農夫模式</a>
-</div>
-<div class="consumer-header">
-<div style="font-size:30px; margin-bottom:5px;">🥬</div>
-<h2 style="margin:0; color:var(--text-green);">透明生產履歷</h2>
-<div style="font-size:13px; color:#666; margin-top:8px; background:#f9f9f9; padding:8px; border-radius:10px; display:inline-block;">
-📍 產地：<b id="displayLocation" style="color:var(--text-green);">南投埔里</b> |
-👨‍🌾 生產者：<b id="displayFarmer" style="color:var(--text-green);">謝易均</b>
-</div>
-</div>
-
-<div class="daily-card">
-<div class="daily-badge">今日小知識</div>
-<h3 id="wikiTitle" style="color:var(--text-green); margin-top:5px; margin-bottom:8px;">載入中...</h3>
-<div id="wikiText" style="font-size:14px; color:#444; line-height:1.6;">正在為您挑選植物知識...</div>
-<button onclick="generateRandomWiki()" style="background:none; border:none; color:var(--accent-green); font-weight:900; font-size:12px; cursor:pointer; padding:0; margin-top:10px;">↻ 換一個知識</button>
-</div>
-
-<div class="panel photo-panel">
-<div class="panel-title">🌱 植物照片</div>
-<div id="photoDisplayConsumer" class="photo-box">
-<span>植物照片</span>
-</div>
-</div>
-
-
-<div class="panel">
-<div class="panel-title">📈 生長環境監測數據</div>
-<div style="font-size:12px; color:#666; margin-bottom:10px;">優良的生長曲線是品質的保證。</div>
-<div style="background:#fff; height:180px; border-radius:15px; border:1px solid #eee; padding:10px;">
-<canvas id="lineChart"></canvas>
-</div>
-</div>
-
-<div class="panel">
-<div class="panel-title">📜 完整農事歷程</div>
-<div id="resumeList"></div>
-</div>
-
-
 <div class="panel lottery-panel">
 <div class="panel-title">🎰 農場扭蛋機</div>
 
@@ -397,6 +343,60 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 <div id="galleryGrid" class="gallery-grid"></div>
 </div>
+
+<div class="panel" style="text-align:center;">
+  <div style="color:rgba(255,255,255,0.45);font-size:12px;margin-bottom:16px;">需要完整後台管理？</div>
+  <a class="btn-main" href="admin.html" style="display:block;text-decoration:none;margin-bottom:12px;">🔧 進入農夫後台管理</a>
+  <a href="?view=consumer" style="color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;display:block;margin-top:4px;">查看消費者頁面 →</a>
+</div>
+
+</div>
+</div>
+
+
+<div id="viewConsumer" class="view-screen">
+<div class="container">
+
+<div style="text-align:right; margin-bottom:8px;">
+  <a href="?view=farmer" style="color:rgba(255,255,255,0.6);font-size:12px;text-decoration:none;background:rgba(255,255,255,0.1);padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);">👨‍🌾 農夫模式</a>
+</div>
+<div class="consumer-header">
+<div style="font-size:30px; margin-bottom:5px;">🥬</div>
+<h2 style="margin:0; color:var(--text-green);">透明生產履歷</h2>
+<div style="font-size:13px; color:#666; margin-top:8px; background:#f9f9f9; padding:8px; border-radius:10px; display:inline-block;">
+📍 產地：<b id="displayLocation" style="color:var(--text-green);">南投埔里</b> |
+👨‍🌾 生產者：<b id="displayFarmer" style="color:var(--text-green);">謝易均</b>
+</div>
+</div>
+
+<div class="daily-card">
+<div class="daily-badge">今日小知識</div>
+<h3 id="wikiTitle" style="color:var(--text-green); margin-top:5px; margin-bottom:8px;">載入中...</h3>
+<div id="wikiText" style="font-size:14px; color:#444; line-height:1.6;">正在為您挑選植物知識...</div>
+<button onclick="generateRandomWiki()" style="background:none; border:none; color:var(--accent-green); font-weight:900; font-size:12px; cursor:pointer; padding:0; margin-top:10px;">↻ 換一個知識</button>
+</div>
+
+<div class="panel photo-panel">
+<div class="panel-title">🌱 植物照片</div>
+<div id="photoDisplayConsumer" class="photo-box">
+<span>植物照片</span>
+</div>
+</div>
+
+
+<div class="panel">
+<div class="panel-title">📈 生長環境監測數據</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">優良的生長曲線是品質的保證。</div>
+<div style="background:#fff; height:180px; border-radius:15px; border:1px solid #eee; padding:10px;">
+<canvas id="lineChart"></canvas>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">📜 完整農事歷程</div>
+<div id="resumeList"></div>
+</div>
+
 
 <div style="position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:100;">
   <a class="btn-back" href="?view=farmer" style="font-size:13px;padding:9px 18px;">👨‍🌾 農夫頁面</a>
