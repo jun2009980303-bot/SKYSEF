@@ -248,7 +248,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   </div>
 </div>
 
-<div id="viewFarmer" class="view-screen">
+<div id="viewFarmer" class="view-screen active">
 <div class="container">
 
 <div style="text-align:center; padding:24px 0 8px;">
@@ -290,7 +290,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 
-<div id="viewConsumer" class="view-screen active">
+<div id="viewConsumer" class="view-screen">
 <div class="container">
 
 <div style="text-align:right; margin-bottom:8px;">
@@ -1026,7 +1026,7 @@ window.onload = function() {
   } else if (viewParam === 'farmer' || hash === 'farmer') {
     switchView('viewFarmer');
   } else {
-    switchView('viewConsumer');
+    switchView('viewFarmer');
   }
 };
 </script>
