@@ -257,16 +257,51 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 <div class="panel">
-  <div class="panel-title">快速農事記錄</div>
-  <div style="margin-bottom:10px;">
-    <label style="color:rgba(255,255,255,0.65);font-size:12px;">今日作物</label>
-    <input type="text" id="quickCrop" placeholder="例如：筊白筍、番茄" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;">
+  <div class="panel-title">農場基本資料設定</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+    <div>
+      <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">農場地點（產地）</label>
+      <input type="text" id="farmLocationInput" placeholder="例：南投埔里" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
+    <div>
+      <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">農夫姓名（生產者）</label>
+      <input type="text" id="farmerNameInput" placeholder="例：謝易均" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
+  </div>
+  <button class="btn-main" onclick="saveFarmProfile()">更新農場資訊</button>
+</div>
+
+<div class="panel">
+  <div class="panel-title">新增今日觀測日誌</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+    <div>
+      <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">作物種類</label>
+      <input type="text" id="quickCrop" placeholder="如：筊白筍" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
+    <div>
+      <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">批次編號</label>
+      <input type="text" id="quickBatch" placeholder="如：2026-A" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+    <div>
+      <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">空氣溫度 (°C)</label>
+      <input type="number" id="quickTemp" placeholder="氣溫" step="0.1" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
+    <div>
+      <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">空氣濕度 (%)</label>
+      <input type="number" id="quickHum" placeholder="濕度" step="0.1" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
   </div>
   <div style="margin-bottom:10px;">
-    <label style="color:rgba(255,255,255,0.65);font-size:12px;">農事筆記</label>
-    <textarea id="quickNote" placeholder="今日農場觀察..." rows="3" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;resize:none;width:100%;padding:12px;box-sizing:border-box;font-family:inherit;font-size:14px;"></textarea>
+    <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">土壤 pH 值</label>
+    <input type="number" id="quickPH" placeholder="pH 值" step="0.1" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;">
   </div>
-  <button class="btn-main" onclick="saveQuickLog()">儲存今日紀錄</button>
+  <div style="margin-bottom:14px;">
+    <label style="color:rgba(255,255,255,0.65);font-size:12px;display:block;margin-bottom:5px;">農事筆記</label>
+    <textarea id="quickNote" placeholder="紀錄作業內容（例如：已施放有機肥）..." rows="3" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;resize:none;width:100%;padding:12px;box-sizing:border-box;font-family:inherit;font-size:14px;"></textarea>
+  </div>
+  <button class="btn-main" onclick="saveQuickLog()">儲存並發布至生產履歷</button>
 </div>
 
 <div class="panel">
@@ -655,8 +690,14 @@ alert("農場基本資訊已更新成功！");
 }
 
 function updateProfileDisplay() {
-document.getElementById('displayLocation').innerText = farmProfile.location;
-document.getElementById('displayFarmer').innerText = farmProfile.farmer;
+  const dl = document.getElementById('displayLocation');
+  const df = document.getElementById('displayFarmer');
+  if (dl) dl.innerText = farmProfile.location;
+  if (df) df.innerText = farmProfile.farmer;
+  const li = document.getElementById('farmLocationInput');
+  const fi = document.getElementById('farmerNameInput');
+  if (li) li.value = farmProfile.location;
+  if (fi) fi.value = farmProfile.farmer;
 }
 
 function handleFarmerPhoto(event) {
@@ -676,17 +717,37 @@ function handleFarmerPhoto(event) {
   reader.readAsDataURL(file);
 }
 
+function saveFarmProfile() {
+  const loc = document.getElementById('farmLocationInput').value.trim();
+  const name = document.getElementById('farmerNameInput').value.trim();
+  if (!loc && !name) { alert('請至少填入一項資料。'); return; }
+  if (loc) farmProfile.location = loc;
+  if (name) farmProfile.farmer = name;
+  localStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
+  const dl = document.getElementById('displayLocation');
+  const df = document.getElementById('displayFarmer');
+  if (dl) dl.innerText = farmProfile.location;
+  if (df) df.innerText = farmProfile.farmer;
+  alert('農場資訊已更新！');
+}
+
 function saveQuickLog() {
   const crop = document.getElementById('quickCrop').value.trim() || '農場作物';
+  const batch = document.getElementById('quickBatch') ? document.getElementById('quickBatch').value.trim() : '';
+  const temp = parseFloat(document.getElementById('quickTemp') ? document.getElementById('quickTemp').value : '') || 0;
+  const hum = parseFloat(document.getElementById('quickHum') ? document.getElementById('quickHum').value : '') || 0;
+  const ph = document.getElementById('quickPH') ? (document.getElementById('quickPH').value.trim() || '--') : '--';
   const note = document.getElementById('quickNote').value.trim() || '例行性巡視，生長狀況良好。';
   const newLog = {
     date: new Date().toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
-    type: crop, name: '今日批次', temp: 0, hum: 0, ph: '--', note: note
+    type: crop, name: batch || '今日批次', temp, hum, ph, note
   };
   logs.unshift(newLog);
   localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
-  document.getElementById('quickCrop').value = '';
-  document.getElementById('quickNote').value = '';
+  ['quickCrop','quickBatch','quickTemp','quickHum','quickPH','quickNote'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   alert('紀錄已儲存！消費者頁面已更新。');
 }
 
