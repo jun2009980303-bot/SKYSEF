@@ -310,6 +310,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   </div>
   <div style="display:flex;gap:10px;margin-top:14px;" id="photoButtons">
     <button class="btn-main" id="photoUploadBtn" onclick="document.getElementById('farmerPhotoInput').click()" style="flex:1;">開啟相機 / 上傳照片</button>
+    <button id="photoDeleteBtn" onclick="deleteFarmerPhoto()" style="display:none;flex:0 0 auto;background:rgba(255,80,80,0.25);border:1px solid rgba(255,100,100,0.4);color:#fff;border-radius:18px;padding:15px 18px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit;">刪除</button>
   </div>
 </div>
 
@@ -697,6 +698,8 @@ function handleFarmerPhoto(event) {
     localStorage.setItem('puli_plant_photo', dataUrl);
     const uploadBtn = document.getElementById('photoUploadBtn');
     if (uploadBtn) uploadBtn.innerText = '更改照片';
+    const deleteBtn = document.getElementById('photoDeleteBtn');
+    if (deleteBtn) deleteBtn.style.display = '';
     const dateKey = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
     let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
     const existing = dailyPhotos.findIndex(p => p.date === dateKey);
@@ -762,6 +765,22 @@ function renderDailyTimeline() {
       </div>
     </div>`;
   }).join('');
+}
+
+function deleteFarmerPhoto() {
+  if (!confirm('確定刪除今日照片？')) return;
+  localStorage.removeItem('puli_plant_photo');
+  const today = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+  let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  dailyPhotos = dailyPhotos.filter(p => p.date !== today);
+  localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
+  const preview = document.getElementById('farmerPhotoPreview');
+  preview.innerHTML = `<div style="font-size:48px;opacity:0.7;">📷</div><div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊拍攝或上傳植物照片</div><div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>`;
+  preview.style.padding = '';
+  preview.style.border = '';
+  document.getElementById('photoUploadBtn').innerText = '開啟相機 / 上傳照片';
+  document.getElementById('photoDeleteBtn').style.display = 'none';
+  renderDailyTimeline();
 }
 
 function saveFarmProfile() {
@@ -1152,6 +1171,8 @@ window.onload = function() {
     }
     const uploadBtn = document.getElementById('photoUploadBtn');
     if (uploadBtn) uploadBtn.innerText = '更改照片';
+    const deleteBtn = document.getElementById('photoDeleteBtn');
+    if (deleteBtn) deleteBtn.style.display = '';
   }
   initMusicPlayer();
   const urlParams = new URLSearchParams(window.location.search);
