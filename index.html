@@ -266,7 +266,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
     <label style="color:rgba(255,255,255,0.65);font-size:12px;">農事筆記</label>
     <textarea id="quickNote" placeholder="今日農場觀察..." rows="3" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:12px;resize:none;width:100%;padding:12px;box-sizing:border-box;font-family:inherit;font-size:14px;"></textarea>
   </div>
-  <button class="btn-main" onclick="saveQuickLog()">💾 儲存今日紀錄</button>
+  <button class="btn-main" onclick="saveQuickLog()">儲存今日紀錄</button>
 </div>
 
 <div class="panel">
@@ -277,11 +277,11 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
     <div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊拍攝或上傳植物照片</div>
     <div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>
   </div>
-  <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="margin-top:14px;">📷 開啟相機 / 上傳照片</button>
+  <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="margin-top:14px;">開啟相機 / 上傳照片</button>
 </div>
 
 <div class="panel lottery-panel">
-<div class="panel-title">🎰 農場扭蛋機</div>
+<div class="panel-title">農場扭蛋機</div>
 
 <svg class="gacha-svg-machine" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -328,25 +328,25 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   <text id="resultQuestion" x="120" y="88" text-anchor="middle" fill="#b0bec5" font-size="44" font-family="Arial" opacity="1">?</text>
 </svg>
 
-<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">🎰 轉動扭蛋機</button>
+<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">轉動扭蛋機</button>
 <div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
 </div>
 
 <div class="panel">
-<div class="panel-title">🖼️ 我的角色圖鑑 <span id="galleryCount" style="font-size:13px; font-weight:normal; color:#999;"></span></div>
+<div class="panel-title">我的角色圖鑑 <span id="galleryCount" style="font-size:13px; font-weight:normal; color:#999;"></span></div>
 <div class="gallery-tabs">
   <button class="gallery-tab active" data-series="全部" onclick="switchGalleryTab(this)">全部</button>
-  <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">🦁 野生動物</button>
-  <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">🍎 台灣農產</button>
-  <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">🎩 農村配件</button>
-  <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">🪣 農耕農具</button>
+  <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">野生動物</button>
+  <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">台灣農產</button>
+  <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">農村配件</button>
+  <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">農耕農具</button>
 </div>
 <div id="galleryGrid" class="gallery-grid"></div>
 </div>
 
 <div class="panel" style="text-align:center;">
   <div style="color:rgba(255,255,255,0.45);font-size:12px;margin-bottom:16px;">需要完整後台管理？</div>
-  <a class="btn-main" href="admin.html" style="display:block;text-decoration:none;margin-bottom:12px;">🔧 進入農夫後台管理</a>
+  <a class="btn-main" href="admin.html" style="display:block;text-decoration:none;margin-bottom:12px;">進入農夫後台管理</a>
   <a href="?view=consumer" style="color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;display:block;margin-top:4px;">查看消費者頁面 →</a>
 </div>
 
@@ -358,7 +358,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div class="container">
 
 <div style="text-align:right; margin-bottom:8px;">
-  <a href="?view=farmer" style="color:rgba(255,255,255,0.6);font-size:12px;text-decoration:none;background:rgba(255,255,255,0.1);padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);">👨‍🌾 農夫模式</a>
+  <a href="?view=farmer" style="color:rgba(255,255,255,0.6);font-size:12px;text-decoration:none;background:rgba(255,255,255,0.1);padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);">農夫模式</a>
 </div>
 <div class="consumer-header">
 <div style="font-size:30px; margin-bottom:5px;">🥬</div>
@@ -377,7 +377,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 <div class="panel photo-panel">
-<div class="panel-title">🌱 植物照片</div>
+<div class="panel-title">植物照片</div>
 <div id="photoDisplayConsumer" class="photo-box">
 <span>植物照片</span>
 </div>
@@ -385,7 +385,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
 
 <div class="panel">
-<div class="panel-title">📈 生長環境監測數據</div>
+<div class="panel-title">生長環境監測數據</div>
 <div style="font-size:12px; color:#666; margin-bottom:10px;">優良的生長曲線是品質的保證。</div>
 <div style="background:#fff; height:180px; border-radius:15px; border:1px solid #eee; padding:10px;">
 <canvas id="lineChart"></canvas>
@@ -393,13 +393,13 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 <div class="panel">
-<div class="panel-title">📜 完整農事歷程</div>
+<div class="panel-title">完整農事歷程</div>
 <div id="resumeList"></div>
 </div>
 
 
 <div style="position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:100;">
-  <a class="btn-back" href="?view=farmer" style="font-size:13px;padding:9px 18px;">👨‍🌾 農夫頁面</a>
+  <a class="btn-back" href="?view=farmer" style="font-size:13px;padding:9px 18px;">農夫頁面</a>
 </div>
 </div>
 </div>
@@ -407,10 +407,10 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div class="gacha-modal-overlay" id="gachaModal" onclick="closeGachaModal()">
   <div class="gacha-modal-card" onclick="event.stopPropagation()">
     <button class="gacha-modal-close" onclick="closeGachaModal()">✕</button>
-    <div class="gacha-modal-rarity">✨ 恭喜獲得 ✨</div>
+    <div class="gacha-modal-rarity">恭喜獲得</div>
     <img class="gacha-modal-img" id="gachaModalImg" src="" alt="">
     <div class="gacha-modal-name" id="gachaModalName"></div>
-    <button class="btn-add-gallery" onclick="addToGallery()">＋ 加入圖鑑</button>
+    <button class="btn-add-gallery" onclick="addToGallery()">加入圖鑑</button>
   </div>
 </div>
 
@@ -553,7 +553,7 @@ const seriesMap = {
   '澆水壺':'農耕農具','復古澆水壺':'農耕農具','圓胖澆水壺':'農耕農具','帆布袋':'農耕農具',
 };
 const SERIES_ORDER = ['野生動物','台灣農產','農村配件','農耕農具'];
-const SERIES_LABELS = {'野生動物':'🦁 野生動物','台灣農產':'🍎 台灣農產','農村配件':'🎩 農村配件','農耕農具':'🪣 農耕農具'};
+const SERIES_LABELS = {'野生動物':'野生動物','台灣農產':'台灣農產','農村配件':'農村配件','農耕農具':'農耕農具'};
 let currentGalleryTab = '全部';
 
 let gallery = JSON.parse(localStorage.getItem('skysef_gallery') || '[]');
@@ -818,7 +818,7 @@ list.innerHTML = logs.map(l => `
 <span class="log-tag">🧪 pH ${l.ph}</span>
 </div>
 <div style="font-size:13px; color:#555; background:#f9f9f9; padding:10px; border-radius:10px;">
-<b>🌱 農事筆記：</b>${l.note}
+<b>農事筆記：</b>${l.note}
 </div>
 </div>
 `).join('');
