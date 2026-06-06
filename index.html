@@ -91,10 +91,19 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .gacha-button:active { transform: scale(0.96); animation: none; }
 .gacha-button:disabled { animation: none; opacity: 0.7; }
 @keyframes gachaPulse { 0%,100% { box-shadow: 0 6px 22px rgba(244,67,54,0.45); } 50% { box-shadow: 0 8px 30px rgba(244,67,54,0.7); } }
+.gacha-svg-machine.spinning { animation: machineShake 0.22s ease-in-out infinite; filter: drop-shadow(0 10px 24px rgba(0,0,0,0.18)) drop-shadow(0 0 24px rgba(255,180,0,0.6)); }
+@keyframes machineShake { 0%,100%{transform:translateX(0) rotate(0deg)} 20%{transform:translateX(-5px) rotate(-1.2deg)} 40%{transform:translateX(5px) rotate(1.2deg)} 60%{transform:translateX(-3px) rotate(-0.6deg)} 80%{transform:translateX(3px) rotate(0.6deg)} }
+.gacha-spark { position:fixed; pointer-events:none; z-index:998; font-size:22px; line-height:1; animation:sparkFloat 1.1s ease-out forwards; }
+@keyframes sparkFloat { 0%{transform:translateY(0) scale(1) rotate(0deg);opacity:1} 60%{opacity:1} 100%{transform:translateY(-150px) scale(0.1) rotate(200deg);opacity:0} }
+.gacha-flash { position:fixed; inset:0; background:white; z-index:997; pointer-events:none; animation:flashFade 0.5s ease-out forwards; }
+@keyframes flashFade { 0%{opacity:0.9} 100%{opacity:0} }
+.confetti-dot { position:absolute; border-radius:3px; animation:confettiDrop var(--dur,1.6s) ease-out forwards; animation-delay:var(--delay,0s); pointer-events:none; }
+@keyframes confettiDrop { 0%{transform:translateY(0) rotate(0deg) scale(1);opacity:1} 80%{opacity:0.7} 100%{transform:translateY(250px) rotate(720deg) scale(0.5);opacity:0} }
+@keyframes rainbowBorder { 0%,100%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #ff6b6b,0 0 22px rgba(255,107,107,0.45)} 25%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #ffd93d,0 0 22px rgba(255,217,61,0.45)} 50%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #6bcb77,0 0 22px rgba(107,203,119,0.45)} 75%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #4d96ff,0 0 22px rgba(77,150,255,0.45)} }
 .gacha-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
 .gacha-modal-overlay.active { display: flex; }
-.gacha-modal-card { background: linear-gradient(145deg, #fff 0%, #f0faff 100%); border-radius: 28px; padding: 30px 24px 24px; text-align: center; max-width: 300px; width: 88%; position: relative; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,152,0,0.3); }
-@keyframes popIn { from { transform: scale(0.4) rotate(-8deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+.gacha-modal-card { background: linear-gradient(145deg, #fff 0%, #f0faff 100%); border-radius: 28px; padding: 30px 24px 24px; text-align: center; max-width: 300px; width: 88%; position: relative; overflow: hidden; animation: popIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,152,0,0.3); }
+@keyframes popIn { from { transform: scale(0.3) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
 .gacha-modal-close { position: absolute; top: 12px; right: 12px; background: #eee; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #666; transition: 0.2s; }
 .gacha-modal-close:hover { background: #ff5252; color: white; }
 .gacha-modal-rarity { font-size: 16px; font-weight: 900; color: #ff9800; margin-bottom: 14px; letter-spacing: 3px; text-shadow: 0 0 12px rgba(255,152,0,0.4); }
@@ -529,6 +538,38 @@ function generateConsumerQR() {
   }
 }
 
+function spawnSparkle(cx, cy) {
+  const glyphs = ['✨','⭐','🌟','💫','🎉','🎊','⚡','🌈'];
+  const el = document.createElement('div');
+  el.className = 'gacha-spark';
+  el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+  el.style.left = (cx + (Math.random()-0.5)*130) + 'px';
+  el.style.top  = (cy + (Math.random()-0.5)*70) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+function screenFlash() {
+  const el = document.createElement('div');
+  el.className = 'gacha-flash';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 600);
+}
+
+function launchConfetti() {
+  const card = document.querySelector('.gacha-modal-card');
+  card.querySelectorAll('.confetti-dot').forEach(d => d.remove());
+  const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff9ff3','#ffa502','#ff6348','#7bed9f'];
+  for (let i = 0; i < 32; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'confetti-dot';
+    const w = 5 + Math.random()*8;
+    dot.style.cssText = `width:${w}px;height:${w}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;top:0;--dur:${1.2+Math.random()*1.1}s;--delay:${Math.random()*0.5}s`;
+    card.appendChild(dot);
+    setTimeout(() => dot.remove(), 3000);
+  }
+}
+
 function drawLotteryCharacter() {
   if (characterPool.length === 0) {
     document.getElementById('lotteryResult').innerText = "目前尚未有角色可抽。";
@@ -539,11 +580,12 @@ function drawLotteryCharacter() {
   isGachaSpinning = true;
   const button = document.getElementById('gachaButton');
   const result = document.getElementById('lotteryResult');
+  const svg = document.querySelector('.gacha-svg-machine');
   button.disabled = true;
-  button.innerText = '⏳ 轉動中...';
+  button.innerText = '轉動中...';
   result.innerText = '扭蛋機正在轉動，請稍後...';
+  svg.classList.add('spinning');
 
-  // Reset SVG state
   document.getElementById('resultCircle').setAttribute('opacity', '0');
   document.getElementById('resultImg').setAttribute('opacity', '0');
   document.getElementById('resultQuestion').setAttribute('opacity', '0');
@@ -555,12 +597,17 @@ function drawLotteryCharacter() {
   ];
   balls.forEach(b => { b.el.setAttribute('opacity', '0.92'); b.shine.setAttribute('opacity', '1'); });
 
+  const svgRect = svg.getBoundingClientRect();
+  const sparkInterval = setInterval(() => {
+    spawnSparkle(svgRect.left + svgRect.width * 0.5, svgRect.top + svgRect.height * 0.3);
+  }, 280);
+
   let t = 0;
   const spinInterval = setInterval(() => {
-    t += 0.18;
+    t += 0.26;
     balls.forEach((b, i) => {
-      const dx = Math.sin(t + i * 2.1) * 26;
-      const dy = Math.cos(t * 1.4 + i * 1.6) * 18;
+      const dx = Math.sin(t + i * 2.1) * 30;
+      const dy = Math.cos(t * 1.4 + i * 1.6) * 22;
       b.el.setAttribute('cx', b.bx + dx);
       b.el.setAttribute('cy', b.by + dy);
       b.shine.setAttribute('cx', b.bx + dx - 8);
@@ -570,6 +617,8 @@ function drawLotteryCharacter() {
 
   setTimeout(() => {
     clearInterval(spinInterval);
+    clearInterval(sparkInterval);
+    svg.classList.remove('spinning');
     balls.forEach(b => { b.el.setAttribute('opacity', '0'); b.shine.setAttribute('opacity', '0'); });
 
     const randomCharacter = characterPool[Math.floor(Math.random() * characterPool.length)];
@@ -580,9 +629,9 @@ function drawLotteryCharacter() {
     button.innerText = '再轉一次';
     isGachaSpinning = false;
 
+    screenFlash();
     setTimeout(() => {
       showGachaModal(randomCharacter);
-      // 重設機器：球恢復、結果圖消失
       balls.forEach(b => { b.el.setAttribute('opacity', '0.92'); b.shine.setAttribute('opacity', '1'); });
       document.getElementById('resultCircle').setAttribute('opacity', '0');
       document.getElementById('resultImg').setAttribute('opacity', '0');
@@ -595,11 +644,21 @@ function showGachaModal(char) {
   document.getElementById('gachaModalImg').src = char.img;
   document.getElementById('gachaModalImg').alt = char.name;
   document.getElementById('gachaModalName').innerText = char.name;
-  document.getElementById('gachaModal').classList.add('active');
+  const overlay = document.getElementById('gachaModal');
+  const card = overlay.querySelector('.gacha-modal-card');
+  card.style.animation = 'popIn 0.45s cubic-bezier(0.175,0.885,0.32,1.275)';
+  overlay.classList.add('active');
+  setTimeout(() => {
+    card.style.animation = 'rainbowBorder 1.8s linear infinite';
+    launchConfetti();
+  }, 460);
 }
 
 function closeGachaModal() {
-  document.getElementById('gachaModal').classList.remove('active');
+  const overlay = document.getElementById('gachaModal');
+  const card = overlay.querySelector('.gacha-modal-card');
+  overlay.classList.remove('active');
+  card.style.animation = '';
 }
 
 const seriesMap = {
