@@ -575,17 +575,19 @@ function drawLotteryCharacter() {
     const randomCharacter = characterPool[Math.floor(Math.random() * characterPool.length)];
     window._lastGachaChar = randomCharacter;
 
-    document.getElementById('resultCircle').setAttribute('opacity', '1');
-    const imgEl = document.getElementById('resultImg');
-    imgEl.setAttribute('href', randomCharacter.img);
-    imgEl.setAttribute('opacity', '1');
-
-    result.innerText = `🎉 恭喜抽中：${randomCharacter.name}！`;
+    result.innerText = `恭喜抽中：${randomCharacter.name}！`;
     button.disabled = false;
-    button.innerText = '🎰 再轉一次';
+    button.innerText = '再轉一次';
     isGachaSpinning = false;
 
-    setTimeout(() => showGachaModal(randomCharacter), 350);
+    setTimeout(() => {
+      showGachaModal(randomCharacter);
+      // 重設機器：球恢復、結果圖消失
+      balls.forEach(b => { b.el.setAttribute('opacity', '0.92'); b.shine.setAttribute('opacity', '1'); });
+      document.getElementById('resultCircle').setAttribute('opacity', '0');
+      document.getElementById('resultImg').setAttribute('opacity', '0');
+      document.getElementById('resultQuestion').setAttribute('opacity', '1');
+    }, 350);
   }, 1800);
 }
 
