@@ -746,10 +746,22 @@ function renderDailyTimeline() {
       return l.date && l.date.startsWith(dateMD);
     });
     const photo = photoMap[date];
+    const [yyyy, mm, dd] = date.split('/');
+    const dateLabel = `${mm}月${dd}日`;
+    const weekDay = ['日','一','二','三','四','五','六'][new Date(date).getDay()];
     return `<div style="margin-bottom:20px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);">
+      <div style="background:rgba(255,255,255,0.12);padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.12);">
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;text-align:center;min-width:48px;">
+          <div style="font-size:18px;font-weight:900;color:#fff;line-height:1;">${dd}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:1px;">${mm}月</div>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:900;color:#fff;">${dateLabel}（${weekDay}）</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.45);">${yyyy}年</div>
+        </div>
+      </div>
       ${photo ? `<img src="${photo}" style="width:100%;max-height:220px;object-fit:cover;display:block;">` : ''}
       <div style="padding:12px 14px;">
-        <div style="font-size:13px;font-weight:900;color:rgba(255,255,255,0.7);margin-bottom:10px;">${date}</div>
         ${dayLogs.length === 0 ? '<div style="color:rgba(255,255,255,0.35);font-size:12px;">當日無農事紀錄</div>' :
           dayLogs.map(l => `
             <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
