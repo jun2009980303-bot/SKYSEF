@@ -332,16 +332,10 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
 </div>
 
-<div class="panel">
-<div class="panel-title">我的角色圖鑑 <span id="galleryCount" style="font-size:13px; font-weight:normal; color:#999;"></span></div>
-<div class="gallery-tabs">
-  <button class="gallery-tab active" data-series="全部" onclick="switchGalleryTab(this)">全部</button>
-  <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">野生動物</button>
-  <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">台灣農產</button>
-  <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">農村配件</button>
-  <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">農耕農具</button>
-</div>
-<div id="galleryGrid" class="gallery-grid"></div>
+<div class="panel" style="cursor:pointer;" onclick="switchView('viewGallery')">
+<div class="panel-title" style="justify-content:space-between;">我的角色圖鑑 <span id="galleryCountFarmer" style="font-size:13px;font-weight:normal;color:rgba(255,255,255,0.5);"></span></div>
+<div style="color:rgba(255,255,255,0.55);font-size:13px;margin-bottom:14px;">點擊查看已收集的角色</div>
+<button class="btn-main" style="pointer-events:none;">進入圖鑑 →</button>
 </div>
 
 <div class="panel" style="text-align:center;">
@@ -353,6 +347,28 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 </div>
 
+
+<div id="viewGallery" class="view-screen">
+<div class="container">
+
+<div style="display:flex;align-items:center;gap:12px;padding:20px 0 8px;">
+  <button onclick="switchView('viewFarmer')" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:14px;padding:8px 18px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:900;">← 返回</button>
+  <h2 style="margin:0;font-size:22px;letter-spacing:1px;">我的角色圖鑑</h2>
+</div>
+
+<div class="panel">
+<div class="gallery-tabs">
+  <button class="gallery-tab active" data-series="全部" onclick="switchGalleryTab(this)">全部</button>
+  <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">野生動物</button>
+  <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">台灣農產</button>
+  <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">農村配件</button>
+  <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">農耕農具</button>
+</div>
+<div id="galleryGrid" class="gallery-grid"></div>
+</div>
+
+</div>
+</div>
 
 <div id="viewConsumer" class="view-screen">
 <div class="container">
@@ -591,7 +607,9 @@ function renderGalleryItem(item, i) {
 function renderGallery() {
   const grid = document.getElementById('galleryGrid');
   const count = document.getElementById('galleryCount');
-  count.innerText = gallery.length > 0 ? `(${gallery.length} 個)` : '';
+  if (count) count.innerText = gallery.length > 0 ? `(${gallery.length} 個)` : '';
+  const countFarmer = document.getElementById('galleryCountFarmer');
+  if (countFarmer) countFarmer.innerText = gallery.length > 0 ? `${gallery.length} 個` : '尚無收藏';
 
   if (currentGalleryTab === '全部') {
     if (gallery.length === 0) {
@@ -1023,6 +1041,8 @@ window.onload = function() {
   const hash = window.location.hash.replace('#', '');
   if (viewParam === 'consumer' || hash === 'consumer') {
     switchView('viewConsumer');
+  } else if (viewParam === 'gallery' || hash === 'gallery') {
+    switchView('viewGallery');
   } else if (viewParam === 'farmer' || hash === 'farmer') {
     switchView('viewFarmer');
   } else {
