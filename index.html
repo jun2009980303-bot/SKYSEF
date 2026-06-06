@@ -302,14 +302,28 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
 <div class="panel">
   <div class="panel-title">今日植物拍照</div>
-  <input type="file" id="farmerPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFarmerPhoto(event)">
-  <div id="farmerPhotoPreview" onclick="document.getElementById('farmerPhotoInput').click()" style="min-height:200px;border-radius:18px;border:2px dashed rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:10px;transition:background 0.2s;">
+  <input type="file" id="farmerPhotoInput" accept="image/*" style="display:none;" onchange="handleFarmerPhoto(event)">
+
+  <!-- 相機預覽區 -->
+  <div id="cameraViewport" style="display:none;position:relative;border-radius:18px;overflow:hidden;background:#000;margin-bottom:12px;">
+    <video id="cameraStream" autoplay playsinline style="width:100%;max-height:280px;object-fit:cover;display:block;"></video>
+    <div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:14px;">
+      <button onclick="capturePhoto()" style="background:#fff;border:none;border-radius:50%;width:60px;height:60px;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.35);">📸</button>
+      <button onclick="stopCamera()" style="background:rgba(255,80,80,0.85);border:none;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;color:#fff;align-self:center;">✕</button>
+    </div>
+  </div>
+  <canvas id="cameraCanvas" style="display:none;"></canvas>
+
+  <!-- 靜態預覽區 -->
+  <div id="farmerPhotoPreview" style="min-height:200px;border-radius:18px;border:2px dashed rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:10px;transition:background 0.2s;" onclick="startCamera()">
     <div style="font-size:48px;opacity:0.7;">📷</div>
-    <div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊拍攝或上傳植物照片</div>
+    <div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊開啟相機拍攝</div>
     <div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>
   </div>
+
   <div style="display:flex;gap:10px;margin-top:14px;" id="photoButtons">
-    <button class="btn-main" id="photoUploadBtn" onclick="document.getElementById('farmerPhotoInput').click()" style="flex:1;">開啟相機 / 上傳照片</button>
+    <button class="btn-main" id="photoUploadBtn" onclick="startCamera()" style="flex:1;">開啟相機</button>
+    <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="flex:1;background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.06));border:1px solid rgba(255,255,255,0.3);">從相簿選取</button>
     <button id="photoDeleteBtn" onclick="deleteFarmerPhoto()" style="display:none;flex:0 0 auto;background:rgba(255,80,80,0.25);border:1px solid rgba(255,100,100,0.4);color:#fff;border-radius:18px;padding:15px 18px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit;">刪除</button>
   </div>
 </div>
@@ -689,25 +703,7 @@ function handleFarmerPhoto(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    const preview = document.getElementById('farmerPhotoPreview');
-    preview.innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;">`;
-    preview.style.padding = '0';
-    preview.style.border = 'none';
-    localStorage.setItem('puli_plant_photo', dataUrl);
-    const uploadBtn = document.getElementById('photoUploadBtn');
-    if (uploadBtn) uploadBtn.innerText = '更改照片';
-    const deleteBtn = document.getElementById('photoDeleteBtn');
-    if (deleteBtn) deleteBtn.style.display = '';
-    const dateKey = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
-    let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
-    const existing = dailyPhotos.findIndex(p => p.date === dateKey);
-    if (existing >= 0) dailyPhotos[existing].img = dataUrl;
-    else dailyPhotos.unshift({ date: dateKey, img: dataUrl });
-    localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
-    renderDailyTimeline();
-  };
+  reader.onload = function(e) { applyFarmerPhoto(e.target.result); };
   reader.readAsDataURL(file);
 }
 
@@ -765,6 +761,63 @@ function renderDailyTimeline() {
       </div>
     </div>`;
   }).join('');
+}
+
+let _cameraStream = null;
+
+function startCamera() {
+  const viewport = document.getElementById('cameraViewport');
+  const video = document.getElementById('cameraStream');
+  const preview = document.getElementById('farmerPhotoPreview');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    document.getElementById('farmerPhotoInput').click(); return;
+  }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+    .then(stream => {
+      _cameraStream = stream;
+      video.srcObject = stream;
+      viewport.style.display = 'block';
+      preview.style.display = 'none';
+      document.getElementById('photoButtons').style.display = 'none';
+    })
+    .catch(() => { document.getElementById('farmerPhotoInput').click(); });
+}
+
+function stopCamera() {
+  if (_cameraStream) { _cameraStream.getTracks().forEach(t => t.stop()); _cameraStream = null; }
+  document.getElementById('cameraViewport').style.display = 'none';
+  document.getElementById('farmerPhotoPreview').style.display = 'flex';
+  document.getElementById('photoButtons').style.display = 'flex';
+}
+
+function capturePhoto() {
+  const video = document.getElementById('cameraStream');
+  const canvas = document.getElementById('cameraCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  stopCamera();
+  applyFarmerPhoto(dataUrl);
+}
+
+function applyFarmerPhoto(dataUrl) {
+  const preview = document.getElementById('farmerPhotoPreview');
+  preview.innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;">`;
+  preview.style.padding = '0';
+  preview.style.border = 'none';
+  preview.onclick = null;
+  localStorage.setItem('puli_plant_photo', dataUrl);
+  document.getElementById('photoUploadBtn').innerText = '重新拍攝';
+  document.getElementById('photoUploadBtn').onclick = startCamera;
+  document.getElementById('photoDeleteBtn').style.display = '';
+  const dateKey = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+  let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  const existing = dailyPhotos.findIndex(p => p.date === dateKey);
+  if (existing >= 0) dailyPhotos[existing].img = dataUrl;
+  else dailyPhotos.unshift({ date: dateKey, img: dataUrl });
+  localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
+  renderDailyTimeline();
 }
 
 function deleteFarmerPhoto() {
@@ -1170,9 +1223,14 @@ window.onload = function() {
       preview.style.border = 'none';
     }
     const uploadBtn = document.getElementById('photoUploadBtn');
-    if (uploadBtn) uploadBtn.innerText = '更改照片';
+    if (uploadBtn) { uploadBtn.innerText = '重新拍攝'; uploadBtn.onclick = startCamera; }
     const deleteBtn = document.getElementById('photoDeleteBtn');
     if (deleteBtn) deleteBtn.style.display = '';
+    const preview = document.getElementById('farmerPhotoPreview');
+    if (preview) {
+      preview.innerHTML = `<img src="${savedPhoto}" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;">`;
+      preview.style.padding = '0'; preview.style.border = 'none'; preview.onclick = null;
+    }
   }
   initMusicPlayer();
   const urlParams = new URLSearchParams(window.location.search);
