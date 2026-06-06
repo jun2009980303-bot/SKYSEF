@@ -716,14 +716,29 @@ function renderDailyTimeline() {
     return;
   }
 
+  // Normalize log dates "MM/DD HH:MM" → "YYYY/MM/DD" for grouping
+  const curYear = new Date().getFullYear();
+  function logToFullDate(l) {
+    if (l.fullDate) return l.fullDate;
+    if (!l.date) return '';
+    const md = l.date.split(' ')[0]; // "06/06"
+    const parts = md.split('/');
+    if (parts.length === 2) return `${curYear}/${parts[0]}/${parts[1]}`;
+    return md;
+  }
+
   const allDates = new Set([
-    ...logs.map(l => l.date ? l.date.split(' ')[0] : ''),
+    ...logs.map(logToFullDate),
     ...dailyPhotos.map(p => p.date)
   ]);
   const sorted = [...allDates].filter(Boolean).sort((a,b) => b.localeCompare(a));
 
   el.innerHTML = sorted.map(date => {
-    const dayLogs = logs.filter(l => l.date && l.date.startsWith(date));
+    const dateMD = date.slice(5); // "06/06" from "2026/06/06"
+    const dayLogs = logs.filter(l => {
+      if (l.fullDate) return l.fullDate === date;
+      return l.date && l.date.startsWith(dateMD);
+    });
     const photo = photoMap[date];
     return `<div style="margin-bottom:20px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);">
       ${photo ? `<img src="${photo}" style="width:100%;max-height:220px;object-fit:cover;display:block;">` : ''}
@@ -766,8 +781,12 @@ function saveQuickLog() {
   const hum = parseFloat(document.getElementById('quickHum') ? document.getElementById('quickHum').value : '') || 0;
   const ph = document.getElementById('quickPH') ? (document.getElementById('quickPH').value.trim() || '--') : '--';
   const note = document.getElementById('quickNote').value.trim() || '例行性巡視，生長狀況良好。';
+  const now = new Date();
+  const fullDate = now.toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+  const timeStr = now.toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
   const newLog = {
-    date: new Date().toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    date: timeStr,
+    fullDate: fullDate,
     type: crop, name: batch || '今日批次', temp, hum, ph, note
   };
   logs.unshift(newLog);
