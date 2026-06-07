@@ -43,7 +43,7 @@ background-size: cover; background-position: center top; background-attachment: 
 height: 100vh; overflow: hidden;
 }
 
-.view-screen { display: none; height: 100vh; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+.view-screen { display: none; height: 100vh; overflow-y: auto; padding: 20px 20px 90px; box-sizing: border-box; }
 .view-screen.active { display: block; }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 
@@ -101,6 +101,34 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .confetti-dot { position:absolute; border-radius:3px; animation:confettiDrop var(--dur,1.6s) ease-out forwards; animation-delay:var(--delay,0s); pointer-events:none; }
 @keyframes confettiDrop { 0%{transform:translateY(0) rotate(0deg) scale(1);opacity:1} 80%{opacity:0.7} 100%{transform:translateY(250px) rotate(720deg) scale(0.5);opacity:0} }
 @keyframes rainbowBorder { 0%,100%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #ff6b6b,0 0 22px rgba(255,107,107,0.45)} 25%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #ffd93d,0 0 22px rgba(255,217,61,0.45)} 50%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #6bcb77,0 0 22px rgba(107,203,119,0.45)} 75%{box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 0 4px #4d96ff,0 0 22px rgba(77,150,255,0.45)} }
+/* ── Bottom Tab Bar ── */
+.bottom-tabbar { position:fixed; bottom:0; left:0; right:0; z-index:150; background:rgba(0,18,10,0.90); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-top:1px solid rgba(255,255,255,0.10); display:flex; justify-content:space-around; padding:8px 0 14px; }
+.tab-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; cursor:pointer; padding:6px 8px; border-radius:16px; margin:0 5px; transition:0.2s; font-family:inherit; }
+.tab-btn.active { background:rgba(100,220,140,0.13); }
+.tab-icon-wrap { font-size:22px; line-height:1; }
+.tab-label { font-size:10px; font-weight:900; color:rgba(255,255,255,0.38); letter-spacing:0.5px; }
+.tab-btn.active .tab-label { color:#80e5a0; }
+.tab-dot { width:5px; height:5px; background:#80e5a0; border-radius:50%; margin-top:2px; opacity:0; transition:0.2s; }
+.tab-btn.active .tab-dot { opacity:1; }
+/* ── Timeline (consumer daily records) ── */
+.tl-section { margin-bottom:10px; }
+.tl-date-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.tl-date-box { background:rgba(128,229,160,0.13); border:1.5px solid rgba(128,229,160,0.35); border-radius:14px; padding:8px 12px; text-align:center; flex-shrink:0; min-width:52px; }
+.tl-date-day { font-size:22px; font-weight:900; color:#80e5a0; line-height:1; }
+.tl-date-sub { font-size:10px; color:rgba(255,255,255,0.5); margin-top:2px; }
+.tl-date-line { flex:1; height:1px; background:rgba(255,255,255,0.09); }
+.tl-year { font-size:10px; color:rgba(255,255,255,0.3); flex-shrink:0; }
+.tl-body { position:relative; padding-left:22px; }
+.tl-vert { position:absolute; left:8px; top:0; bottom:0; width:2px; border-radius:1px; }
+.tl-item { position:relative; margin-bottom:10px; }
+.tl-dot-circle { position:absolute; left:-18px; top:14px; width:10px; height:10px; border-radius:50%; border:2px solid rgba(0,0,0,0.25); flex-shrink:0; }
+.tl-card { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.11); border-radius:16px; padding:12px 14px; overflow:hidden; }
+.tl-card-time { font-size:10px; color:rgba(255,255,255,0.38); margin-bottom:4px; }
+.tl-card-crop { font-size:13px; font-weight:900; color:rgba(255,255,255,0.92); margin-bottom:5px; }
+.tl-card-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px; }
+.tl-card-tag { background:rgba(255,255,255,0.09); border-radius:8px; padding:2px 8px; font-size:11px; color:rgba(255,255,255,0.65); }
+.tl-card-note { font-size:12px; color:rgba(255,255,255,0.6); line-height:1.5; }
+.tl-card-img { width:100%; max-height:200px; object-fit:cover; border-radius:12px; margin-top:8px; display:block; }
 .gacha-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
 .gacha-modal-overlay.active { display: flex; }
 .gacha-modal-card { background: linear-gradient(145deg, #fff 0%, #f0faff 100%); border-radius: 28px; padding: 30px 24px 24px; text-align: center; max-width: 300px; width: 88%; position: relative; overflow: hidden; animation: popIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,152,0,0.3); }
@@ -159,7 +187,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .btn-back:active { transform: scale(0.96); }
 
 /* Music Player */
-.music-player { position: fixed; bottom: 20px; left: 16px; z-index: 200; display: flex; flex-direction: column; align-items: flex-start; }
+.music-player { position: fixed; bottom: 74px; left: 16px; z-index: 200; display: flex; flex-direction: column; align-items: flex-start; }
 .music-player-bar { background: rgba(27,77,54,0.92); backdrop-filter: blur(10px); border-radius: 20px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 18px rgba(0,0,0,0.25); min-width: 0; max-width: 240px; }
 .music-player-bar.collapsed { max-width: 44px; padding: 8px; border-radius: 50%; }
 .music-note-btn { background: none; border: none; font-size: 20px; cursor: pointer; flex-shrink: 0; line-height: 1; padding: 0; }
@@ -282,11 +310,8 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div id="viewFarmer" class="view-screen active">
 <div class="container">
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+<div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:10px;">
   <button class="logout-btn" id="logoutBtn" onclick="doLogout()" style="display:none;">登出</button>
-  <div style="margin-left:auto;">
-    <a href="?view=consumer" style="color:rgba(255,255,255,0.75);font-size:13px;text-decoration:none;background:rgba(255,255,255,0.12);padding:7px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.25);font-weight:900;">消費者頁面 →</a>
-  </div>
 </div>
 
 <div class="panel">
@@ -423,9 +448,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <button class="btn-main" style="pointer-events:none;">進入圖鑑 →</button>
 </div>
 
-<div class="panel" style="text-align:center;">
-  <a href="?view=consumer" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0.08));border:1.5px solid rgba(255,255,255,0.45);color:#fff;border-radius:18px;padding:16px;font-size:16px;font-weight:900;letter-spacing:1px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.4),0 4px 18px rgba(0,0,0,0.18);transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.22)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0.08))'">消費者履歷頁面 →</a>
-</div>
 
 </div>
 </div>
@@ -434,8 +456,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 <div id="viewGallery" class="view-screen">
 <div class="container">
 
-<div style="display:flex;align-items:center;gap:12px;padding:20px 0 8px;">
-  <button onclick="switchView('viewFarmer')" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:14px;padding:8px 18px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:900;">← 返回</button>
+<div style="padding:20px 0 8px;">
   <h2 style="margin:0;font-size:22px;letter-spacing:1px;">我的角色圖鑑</h2>
 </div>
 
@@ -489,10 +510,25 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 
-<div style="position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:100;">
-  <a class="btn-back" href="?view=farmer" style="font-size:13px;padding:9px 18px;">農夫頁面</a>
 </div>
 </div>
+
+<div class="bottom-tabbar" id="bottomTabbar">
+  <button class="tab-btn active" id="tab-farmer" onclick="switchView('viewFarmer')">
+    <div class="tab-icon-wrap">🌱</div>
+    <div class="tab-label">農夫</div>
+    <div class="tab-dot"></div>
+  </button>
+  <button class="tab-btn" id="tab-consumer" onclick="switchView('viewConsumer')">
+    <div class="tab-icon-wrap">📋</div>
+    <div class="tab-label">消費者</div>
+    <div class="tab-dot"></div>
+  </button>
+  <button class="tab-btn" id="tab-gallery" onclick="switchView('viewGallery')">
+    <div class="tab-icon-wrap">🎴</div>
+    <div class="tab-label">圖鑑</div>
+    <div class="tab-dot"></div>
+  </button>
 </div>
 
 <div id="loginOverlay">
@@ -827,57 +863,73 @@ function renderDailyTimeline() {
     return;
   }
 
-  // Normalize log dates "MM/DD HH:MM" → "YYYY/MM/DD" for grouping
   const curYear = new Date().getFullYear();
   function logToFullDate(l) {
     if (l.fullDate) return l.fullDate;
     if (!l.date) return '';
-    const md = l.date.split(' ')[0]; // "06/06"
+    const md = l.date.split(' ')[0];
     const parts = md.split('/');
     if (parts.length === 2) return `${curYear}/${parts[0]}/${parts[1]}`;
     return md;
   }
 
-  const allDates = new Set([
-    ...logs.map(logToFullDate),
-    ...dailyPhotos.map(p => p.date)
-  ]);
+  const allDates = new Set([...logs.map(logToFullDate), ...dailyPhotos.map(p => p.date)]);
   const sorted = [...allDates].filter(Boolean).sort((a,b) => b.localeCompare(a));
+  const palette = ['#80e5a0','#64b5f6','#ffb74d','#f48fb1','#b39ddb'];
 
-  el.innerHTML = sorted.map(date => {
-    const dateMD = date.slice(5); // "06/06" from "2026/06/06"
-    const dayLogs = logs.filter(l => {
-      if (l.fullDate) return l.fullDate === date;
-      return l.date && l.date.startsWith(dateMD);
-    });
+  el.innerHTML = sorted.map((date, idx) => {
+    const dateMD = date.slice(5);
+    const dayLogs = logs.filter(l => l.fullDate ? l.fullDate === date : (l.date && l.date.startsWith(dateMD)));
     const photo = photoMap[date];
     const [yyyy, mm, dd] = date.split('/');
-    const dateLabel = `${mm}月${dd}日`;
     const weekDay = ['日','一','二','三','四','五','六'][new Date(date).getDay()];
-    return `<div style="margin-bottom:20px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);">
-      <div style="background:rgba(255,255,255,0.12);padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.12);">
-        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 12px;text-align:center;min-width:48px;">
-          <div style="font-size:18px;font-weight:900;color:#fff;line-height:1;">${dd}</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:1px;">${mm}月</div>
+    const color = palette[idx % palette.length];
+
+    const items = [];
+    if (photo) {
+      items.push(`<div class="tl-item">
+        <div class="tl-dot-circle" style="background:${color};"></div>
+        <div class="tl-card">
+          <div class="tl-card-time">今日植物照片</div>
+          <img class="tl-card-img" src="${photo}" alt="植物照片">
         </div>
-        <div>
-          <div style="font-size:15px;font-weight:900;color:#fff;">${dateLabel}（${weekDay}）</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.45);">${yyyy}年</div>
+      </div>`);
+    }
+    dayLogs.forEach(l => {
+      const timeStr = l.date ? l.date.split(' ').slice(1).join(' ') : '';
+      items.push(`<div class="tl-item">
+        <div class="tl-dot-circle" style="background:${color};"></div>
+        <div class="tl-card">
+          ${timeStr ? `<div class="tl-card-time">${timeStr}</div>` : ''}
+          <div class="tl-card-crop">${l.type || '農場作物'}${l.name && l.name !== '今日批次' ? ' · '+l.name : ''}</div>
+          <div class="tl-card-tags">
+            ${l.temp ? `<span class="tl-card-tag">溫 ${l.temp}°C</span>` : ''}
+            ${l.hum  ? `<span class="tl-card-tag">濕 ${l.hum}%</span>` : ''}
+            ${l.ph && l.ph !== '--' ? `<span class="tl-card-tag">pH ${l.ph}</span>` : ''}
+          </div>
+          ${l.note ? `<div class="tl-card-note">${l.note}</div>` : ''}
         </div>
+      </div>`);
+    });
+    if (items.length === 0) {
+      items.push(`<div class="tl-item">
+        <div class="tl-dot-circle" style="background:rgba(255,255,255,0.25);"></div>
+        <div class="tl-card"><div class="tl-card-note" style="color:rgba(255,255,255,0.3);">當日無農事紀錄</div></div>
+      </div>`);
+    }
+
+    return `<div class="tl-section">
+      <div class="tl-date-row">
+        <div class="tl-date-box" style="border-color:${color}55;background:${color}18;">
+          <div class="tl-date-day" style="color:${color};">${dd}</div>
+          <div class="tl-date-sub">${mm}月（${weekDay}）</div>
+        </div>
+        <div class="tl-date-line"></div>
+        <div class="tl-year">${yyyy}</div>
       </div>
-      ${photo ? `<img src="${photo}" style="width:100%;max-height:220px;object-fit:cover;display:block;">` : ''}
-      <div style="padding:12px 14px;">
-        ${dayLogs.length === 0 ? '<div style="color:rgba(255,255,255,0.35);font-size:12px;">當日無農事紀錄</div>' :
-          dayLogs.map(l => `
-            <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
-              <div style="font-size:13px;font-weight:900;color:#ffe97a;margin-bottom:5px;">${l.type || '農場作物'} ${l.name !== '今日批次' ? '· '+l.name : ''}</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-                ${l.temp ? `<span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:2px 8px;font-size:11px;">溫度 ${l.temp}°C</span>` : ''}
-                ${l.hum ? `<span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:2px 8px;font-size:11px;">濕度 ${l.hum}%</span>` : ''}
-                ${l.ph && l.ph !== '--' ? `<span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:2px 8px;font-size:11px;">pH ${l.ph}</span>` : ''}
-              </div>
-              <div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;">${l.note || ''}</div>
-            </div>`).join('')}
+      <div class="tl-body">
+        <div class="tl-vert" style="background:linear-gradient(180deg,${color}55,${color}08);"></div>
+        ${items.join('')}
       </div>
     </div>`;
   }).join('');
@@ -996,18 +1048,17 @@ function saveQuickLog() {
 
 function switchView(viewId) {
   const targetView = document.getElementById(viewId);
-  if (!targetView) {
-    console.error('找不到 viewId：', viewId);
-    return;
-  }
+  if (!targetView) { console.error('找不到 viewId：', viewId); return; }
   document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
   targetView.classList.add('active');
 
-  if (viewId === 'viewConsumer') {
-    initChart();
-    renderDailyTimeline();
-    generateRandomWiki();
-  }
+  // Sync bottom tab bar
+  const tabMap = { viewFarmer:'tab-farmer', viewConsumer:'tab-consumer', viewGallery:'tab-gallery' };
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const activeTab = document.getElementById(tabMap[viewId]);
+  if (activeTab) activeTab.classList.add('active');
+
+  if (viewId === 'viewConsumer') { initChart(); renderDailyTimeline(); generateRandomWiki(); }
 }
 
 function generateRandomWiki() {
