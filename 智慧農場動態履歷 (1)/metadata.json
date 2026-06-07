@@ -1,0 +1,6 @@
+{
+  "name": "智慧農場動態履歷",
+  "description": "精緻消費者端掃描 QR Code 智慧農場生產履歷展示平台。採用高質感毛玻璃美學，優雅呈現作物履歷、生長數據、小農自述與專屬好禮。",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
