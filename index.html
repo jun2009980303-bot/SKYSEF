@@ -513,9 +513,79 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   padding: 18px 0 6px;
 }
 
+/* Ticket badge */
+.ticket-fab {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 1200;
+  height: 40px;
+  min-width: 40px;
+  padding: 0 14px;
+  border-radius: 20px;
+  background: rgba(255,210,60,0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,210,60,0.45);
+  color: #ffe566;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22), 0 0 18px rgba(255,200,40,0.12);
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+.ticket-fab .ticket-num {
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,220,80,0.8);
+}
+
+/* Ticket toast */
+.ticket-toast {
+  position: fixed;
+  top: 68px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  z-index: 2000;
+  background: rgba(20,40,20,0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,210,60,0.45);
+  color: #ffe566;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 10px 20px;
+  border-radius: 50px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35), 0 0 24px rgba(255,200,40,0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  white-space: nowrap;
+}
+.ticket-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Gacha ticket info */
+.gacha-ticket-info {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-top: -4px;
+  margin-bottom: 10px;
+}
+
 </style>
 </head>
 <body>
+
+<div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-num" id="ticketBadge">0</span></div>
+<div class="ticket-toast" id="ticketToast"></div>
 
 <button class="settings-fab" onclick="openSettings()" title="設定">⚙</button>
 
@@ -645,8 +715,9 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   <text id="resultQuestion" x="120" y="88" text-anchor="middle" fill="#b0bec5" font-size="44" font-family="Arial" opacity="1">?</text>
 </svg>
 
-<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">轉動扭蛋機</button>
-<div id="lotteryResult" class="lottery-result">還沒抽，請按「轉動扭蛋機」開始抽球。</div>
+<button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">🎟 轉動扭蛋機</button>
+<div class="gacha-ticket-info">每次抽獎需消耗 1 張抽獎券 · 完成任務或連續打卡可獲得</div>
+<div id="lotteryResult" class="lottery-result">完成今日任務或連續打卡即可獲得抽獎券 🎟</div>
 </div>
 
 <div class="panel" style="cursor:pointer;" onclick="switchView('viewGallery')">
@@ -929,6 +1000,13 @@ function drawLotteryCharacter() {
     return;
   }
   if (isGachaSpinning) return;
+  if (_tickets <= 0) {
+    document.getElementById('lotteryResult').innerText = '🎟 沒有抽獎券了！完成今日全部任務或連續打卡可獲得。';
+    return;
+  }
+
+  _tickets--;
+  _saveTickets();
 
   isGachaSpinning = true;
   const button = document.getElementById('gachaButton');
@@ -979,7 +1057,7 @@ function drawLotteryCharacter() {
 
     result.innerText = `恭喜抽中：${randomCharacter.name}！`;
     button.disabled = false;
-    button.innerText = '再轉一次';
+    button.innerText = _tickets > 0 ? `🎟 再轉一次 (剩 ${_tickets})` : '🎟 無抽獎券';
     isGachaSpinning = false;
 
     screenFlash();
@@ -1030,6 +1108,61 @@ const ACHIEVEMENTS = [
   { id:'days7',  icon:'🔥', name:'一週堅持',   desc:'連續七天有農事記錄',    max:7,  getVal:()=>_getConsecutiveDays() },
 ];
 
+// ── 抽獎券系統 ───────────────────────────────────────────
+let _tickets = parseInt(localStorage.getItem('skysef_tickets') || '0', 10);
+
+function _saveTickets() {
+  localStorage.setItem('skysef_tickets', String(_tickets));
+  _renderTicketBadge();
+}
+
+function _renderTicketBadge() {
+  const el = document.getElementById('ticketBadge');
+  if (el) el.textContent = _tickets;
+}
+
+let _toastTimer = null;
+function showTicketToast(msg) {
+  const el = document.getElementById('ticketToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function _tryAwardDailyTaskTicket() {
+  const today = _getTodayStr();
+  if (localStorage.getItem('skysef_ticket_task_date') === today) return;
+  const state = _getDailyTaskState();
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  const todayPhoto = dailyPhotos.some(p => p.date === today);
+  const dateMD = today.slice(5);
+  const todayLog = logs.some(l => l.fullDate === today || (l.date && l.date.startsWith(dateMD)));
+  const manualDone = MANUAL_TASKS.every(n => !!state.manual[n]);
+  if (todayPhoto && todayLog && manualDone) {
+    _tickets++;
+    localStorage.setItem('skysef_ticket_task_date', today);
+    _saveTickets();
+    showTicketToast('🎟 完成今日全部任務！獲得 1 張抽獎券');
+  }
+}
+
+function _tryAwardStreakTicket() {
+  const streak = _getConsecutiveDays();
+  const milestones = JSON.parse(localStorage.getItem('skysef_ticket_milestones') || '[]');
+  [3, 7, 14, 30].forEach(m => {
+    if (streak >= m && !milestones.includes(m)) {
+      milestones.push(m);
+      localStorage.setItem('skysef_ticket_milestones', JSON.stringify(milestones));
+      _tickets++;
+      _saveTickets();
+      showTicketToast(`🎟 連續 ${m} 天打卡！獲得 1 張抽獎券`);
+    }
+  });
+}
+// ──────────────────────────────────────────────────────────
+
 function _getTodayStr() {
   return new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
 }
@@ -1050,6 +1183,7 @@ function toggleManualTask(name) {
   state.manual[name] = !state.manual[name];
   _saveDailyTaskState(state);
   renderTaskView();
+  _tryAwardDailyTaskTicket();
 }
 
 function _getConsecutiveDays() {
@@ -1375,6 +1509,8 @@ function applyFarmerPhoto(dataUrl) {
   renderFarmerPhotoGrid();
   renderDailyTimeline();
   renderTaskView();
+  _tryAwardDailyTaskTicket();
+  _tryAwardStreakTicket();
 }
 
 function deleteFarmerPhoto(index) {
@@ -1431,6 +1567,8 @@ function saveQuickLog() {
   });
   alert('紀錄已儲存！消費者頁面已更新。');
   renderTaskView();
+  _tryAwardDailyTaskTicket();
+  _tryAwardStreakTicket();
 }
 
 function switchView(viewId) {
@@ -1902,6 +2040,7 @@ window.onload = function() {
   renderDailyTimeline();
   renderTaskView();
   renderFarmerPhotoGrid();
+  _renderTicketBadge();
   initMusicPlayer();
   const urlParams = new URLSearchParams(window.location.search);
   const viewParam = urlParams.get('view');
