@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>智慧農場 - 動態履歷與編輯系統</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="js/firebase-config.js"></script>
@@ -674,7 +674,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
   <div id="qrCodeDisplay" style="display:none;margin-top:18px;text-align:center;">
     <div style="background:#fff;border-radius:20px;padding:18px 18px 14px;display:inline-block;box-shadow:0 6px 32px rgba(0,0,0,0.3);">
-      <canvas id="qrCodeCanvas" style="display:block;border-radius:6px;"></canvas>
+      <div id="qrCodeCanvas" style="line-height:0;border-radius:6px;overflow:hidden;"></div>
       <div id="qrFarmLabel" style="margin-top:10px;font-size:13px;font-weight:900;color:#333;text-align:center;letter-spacing:0.3px;"></div>
     </div>
     <div id="consumerLink" style="font-size:11px;color:rgba(255,255,255,0.38);word-break:break-all;margin:10px 8px 0;"></div>
@@ -943,6 +943,10 @@ const characterPool = [{"name":"台灣藍雀","img":"data:image/webp;base64,UklG
 let isGachaSpinning = false;
 
 function generateConsumerQR() {
+  if (typeof QRCode === 'undefined') {
+    alert('QR Code 功能載入失敗，請確認網路連線後重新整理頁面。');
+    return;
+  }
   const baseUrl = window.location.origin + window.location.pathname;
   const consumerUrl = baseUrl + '?view=consumer';
   window._consumerQrUrl = consumerUrl;
@@ -950,26 +954,19 @@ function generateConsumerQR() {
   document.getElementById('consumerLink').textContent = consumerUrl;
   document.getElementById('qrFarmLabel').textContent = `${farmProfile.farmer} · ${farmProfile.location}`;
 
-  const canvas = document.getElementById('qrCodeCanvas');
+  const container = document.getElementById('qrCodeCanvas');
+  container.innerHTML = '';
 
-  if (typeof QRCode === 'undefined') {
-    alert('QR Code 功能載入失敗，請確認網路連線後重新整理頁面。');
-    return;
-  }
-
-  QRCode.toCanvas(canvas, consumerUrl, {
+  new QRCode(container, {
+    text: consumerUrl,
     width: 190,
-    margin: 2,
-    color: { dark: '#111111', light: '#ffffff' },
-    errorCorrectionLevel: 'M'
-  }, function(err) {
-    if (err) {
-      console.error('QR toCanvas error:', err);
-      alert('QR Code 生成失敗：' + err.message);
-      return;
-    }
-    document.getElementById('qrCodeDisplay').style.display = 'block';
+    height: 190,
+    colorDark: '#111111',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
   });
+
+  document.getElementById('qrCodeDisplay').style.display = 'block';
 }
 
 function copyConsumerUrl() {
@@ -981,8 +978,9 @@ function copyConsumerUrl() {
 }
 
 function downloadQrCode() {
-  const canvas = document.getElementById('qrCodeCanvas');
-  if (!canvas || !canvas.width) { alert('請先按「生成 QR Code」'); return; }
+  const container = document.getElementById('qrCodeCanvas');
+  const canvas = container ? container.querySelector('canvas') : null;
+  if (!canvas) { alert('請先按「生成 QR Code」'); return; }
   const a = document.createElement('a');
   a.href = canvas.toDataURL('image/png');
   a.download = `農場QR_${farmProfile.farmer || 'qrcode'}.png`;
