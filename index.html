@@ -667,9 +667,26 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   <div class="farmer-photo-grid" id="farmerPhotoGrid"></div>
 </div>
 
+<div class="panel qr-panel">
+  <div class="panel-title">📲 分享消費者履歷</div>
+  <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:0 0 14px;line-height:1.6;">生成 QR Code，讓消費者掃描後即可查看完整生產履歷。</p>
+  <button class="btn-main" onclick="generateConsumerQR()" style="width:100%;">生成 QR Code</button>
+
+  <div id="qrCodeDisplay" style="display:none;margin-top:18px;text-align:center;">
+    <div style="background:#fff;border-radius:20px;padding:18px 18px 14px;display:inline-block;box-shadow:0 6px 32px rgba(0,0,0,0.3);">
+      <img id="qrCodeImg" src="" alt="QR Code" style="width:190px;height:190px;display:block;border-radius:6px;">
+      <div id="qrFarmLabel" style="margin-top:10px;font-size:13px;font-weight:900;color:#333;text-align:center;letter-spacing:0.3px;"></div>
+    </div>
+    <div id="consumerLink" style="font-size:11px;color:rgba(255,255,255,0.38);word-break:break-all;margin:10px 8px 0;"></div>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn-main" onclick="copyConsumerUrl()" style="flex:1;background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.06));border:1px solid rgba(255,255,255,0.3);font-size:13px;">📋 複製連結</button>
+      <button class="btn-main" onclick="downloadQrCode()" style="flex:1;font-size:13px;">⬇ 下載 QR Code</button>
+    </div>
+  </div>
+</div>
+
 <div class="panel lottery-panel">
 <div class="panel-title">農場扭蛋機</div>
-
 <svg class="gacha-svg-machine" viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient id="domeGrad" cx="38%" cy="32%" r="65%">
@@ -926,40 +943,47 @@ const characterPool = [{"name":"台灣藍雀","img":"data:image/webp;base64,UklG
 let isGachaSpinning = false;
 
 function generateConsumerQR() {
-  const qrDisplay = document.getElementById('qrCodeDisplay');
-  const qrCanvas = document.getElementById('qrCodeCanvas');
-  const consumerLink = document.getElementById('consumerLink');
-
-  // 生成消費者頁面的連結（假設部署後的 URL）
   const baseUrl = window.location.origin + window.location.pathname;
   const consumerUrl = baseUrl + '?view=consumer';
+  window._consumerQrUrl = consumerUrl;
 
-  consumerLink.textContent = consumerUrl;
-
-  // 清除之前的 QR Code
-  qrCanvas.innerHTML = '';
+  document.getElementById('consumerLink').textContent = consumerUrl;
+  document.getElementById('qrFarmLabel').textContent = `${farmProfile.farmer} · ${farmProfile.location}`;
 
   try {
-    // 生成 QR Code
-    QRCode.toCanvas(qrCanvas, consumerUrl, {
-      width: 150,
-      height: 150,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.M
-    }, function (error) {
-      if (error) {
-        console.error(error);
-        qrCanvas.innerHTML = '<p style="color:red;">生成 QR Code 失敗</p>';
-      } else {
-        qrDisplay.style.display = 'block';
-      }
+    QRCode.toDataURL(consumerUrl, {
+      width: 380,
+      margin: 2,
+      color: { dark: '#1a1a1a', light: '#ffffff' }
+    }, function(err, dataUrl) {
+      if (err) { alert('QR Code 生成失敗：' + err.message); return; }
+      document.getElementById('qrCodeImg').src = dataUrl;
+      window._qrDataUrl = dataUrl;
+      document.getElementById('qrCodeDisplay').style.display = 'block';
     });
-  } catch (error) {
-    console.error('QRCode error:', error);
-    qrCanvas.innerHTML = '<p style="color:red;">QR Code 庫載入失敗</p>';
-    qrDisplay.style.display = 'block';
+  } catch(e) {
+    alert('QR Code 庫載入失敗，請重新整理頁面後再試。');
   }
+}
+
+function copyConsumerUrl() {
+  const url = window._consumerQrUrl || '';
+  if (!url) { alert('請先按「生成 QR Code」'); return; }
+  navigator.clipboard.writeText(url)
+    .then(() => showTicketToast('✓ 消費者連結已複製'))
+    .catch(() => {
+      const el = document.getElementById('consumerLink');
+      el.select && el.select();
+      alert('請手動複製：' + url);
+    });
+}
+
+function downloadQrCode() {
+  if (!window._qrDataUrl) { alert('請先按「生成 QR Code」'); return; }
+  const a = document.createElement('a');
+  a.href = window._qrDataUrl;
+  a.download = `農場QR_${farmProfile.farmer || 'qrcode'}.png`;
+  a.click();
 }
 
 function spawnSparkle(cx, cy) {
