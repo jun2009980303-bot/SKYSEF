@@ -674,7 +674,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
   <div id="qrCodeDisplay" style="display:none;margin-top:18px;text-align:center;">
     <div style="background:#fff;border-radius:20px;padding:18px 18px 14px;display:inline-block;box-shadow:0 6px 32px rgba(0,0,0,0.3);">
-      <img id="qrCodeImg" src="" alt="QR Code" style="width:190px;height:190px;display:block;border-radius:6px;">
+      <canvas id="qrCodeCanvas" style="display:block;border-radius:6px;"></canvas>
       <div id="qrFarmLabel" style="margin-top:10px;font-size:13px;font-weight:900;color:#333;text-align:center;letter-spacing:0.3px;"></div>
     </div>
     <div id="consumerLink" style="font-size:11px;color:rgba(255,255,255,0.38);word-break:break-all;margin:10px 8px 0;"></div>
@@ -950,20 +950,26 @@ function generateConsumerQR() {
   document.getElementById('consumerLink').textContent = consumerUrl;
   document.getElementById('qrFarmLabel').textContent = `${farmProfile.farmer} · ${farmProfile.location}`;
 
-  try {
-    QRCode.toDataURL(consumerUrl, {
-      width: 380,
-      margin: 2,
-      color: { dark: '#1a1a1a', light: '#ffffff' }
-    }, function(err, dataUrl) {
-      if (err) { alert('QR Code 生成失敗：' + err.message); return; }
-      document.getElementById('qrCodeImg').src = dataUrl;
-      window._qrDataUrl = dataUrl;
-      document.getElementById('qrCodeDisplay').style.display = 'block';
-    });
-  } catch(e) {
-    alert('QR Code 庫載入失敗，請重新整理頁面後再試。');
+  const canvas = document.getElementById('qrCodeCanvas');
+
+  if (typeof QRCode === 'undefined') {
+    alert('QR Code 功能載入失敗，請確認網路連線後重新整理頁面。');
+    return;
   }
+
+  QRCode.toCanvas(canvas, consumerUrl, {
+    width: 190,
+    margin: 2,
+    color: { dark: '#111111', light: '#ffffff' },
+    errorCorrectionLevel: 'M'
+  }, function(err) {
+    if (err) {
+      console.error('QR toCanvas error:', err);
+      alert('QR Code 生成失敗：' + err.message);
+      return;
+    }
+    document.getElementById('qrCodeDisplay').style.display = 'block';
+  });
 }
 
 function copyConsumerUrl() {
@@ -971,17 +977,14 @@ function copyConsumerUrl() {
   if (!url) { alert('請先按「生成 QR Code」'); return; }
   navigator.clipboard.writeText(url)
     .then(() => showTicketToast('✓ 消費者連結已複製'))
-    .catch(() => {
-      const el = document.getElementById('consumerLink');
-      el.select && el.select();
-      alert('請手動複製：' + url);
-    });
+    .catch(() => alert('請手動複製：' + url));
 }
 
 function downloadQrCode() {
-  if (!window._qrDataUrl) { alert('請先按「生成 QR Code」'); return; }
+  const canvas = document.getElementById('qrCodeCanvas');
+  if (!canvas || !canvas.width) { alert('請先按「生成 QR Code」'); return; }
   const a = document.createElement('a');
-  a.href = window._qrDataUrl;
+  a.href = canvas.toDataURL('image/png');
   a.download = `農場QR_${farmProfile.farmer || 'qrcode'}.png`;
   a.click();
 }
