@@ -457,6 +457,62 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 /* Music player: no prev/next */
 .music-ctrl-btn.play { margin: 0 2px; }
 
+/* Farmer photo grid */
+.farmer-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+.farmer-photo-item {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.farmer-photo-item img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+}
+.farmer-photo-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%);
+  padding: 18px 8px 7px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.farmer-photo-del {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.farmer-photo-empty {
+  text-align: center;
+  color: rgba(255,255,255,0.38);
+  font-size: 13px;
+  padding: 18px 0 6px;
+}
+
 </style>
 </head>
 <body>
@@ -519,8 +575,8 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 
 <div class="panel">
-  <div class="panel-title">今日植物拍照</div>
-  <input type="file" id="farmerPhotoInput" accept="image/*" style="display:none;" onchange="handleFarmerPhoto(event)">
+  <div class="panel-title">植物照片記錄</div>
+  <input type="file" id="farmerPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFarmerPhoto(event)">
 
   <!-- 相機預覽區 -->
   <div id="cameraViewport" style="display:none;position:relative;border-radius:18px;overflow:hidden;background:#000;margin-bottom:12px;">
@@ -532,18 +588,13 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   </div>
   <canvas id="cameraCanvas" style="display:none;"></canvas>
 
-  <!-- 靜態預覽區 -->
-  <div id="farmerPhotoPreview" style="min-height:200px;border-radius:18px;border:2px dashed rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:10px;transition:background 0.2s;" onclick="startCamera()">
-    <div style="font-size:48px;opacity:0.7;">📷</div>
-    <div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊開啟相機拍攝</div>
-    <div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>
+  <div style="display:flex;gap:10px;margin-bottom:4px;">
+    <button class="btn-main" onclick="startCamera()" style="flex:1;">📷 開啟相機</button>
+    <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="flex:1;background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.06));border:1px solid rgba(255,255,255,0.3);">🖼 從相簿選取</button>
   </div>
 
-  <div style="display:flex;gap:10px;margin-top:14px;" id="photoButtons">
-    <button class="btn-main" id="photoUploadBtn" onclick="startCamera()" style="flex:1;">開啟相機</button>
-    <button class="btn-main" onclick="document.getElementById('farmerPhotoInput').click()" style="flex:1;background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.06));border:1px solid rgba(255,255,255,0.3);">從相簿選取</button>
-    <button id="photoDeleteBtn" onclick="deleteFarmerPhoto()" style="display:none;flex:0 0 auto;background:rgba(255,80,80,0.25);border:1px solid rgba(255,100,100,0.4);color:#fff;border-radius:18px;padding:15px 18px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit;">刪除</button>
-  </div>
+  <!-- 多張照片展示格 -->
+  <div class="farmer-photo-grid" id="farmerPhotoGrid"></div>
 </div>
 
 <div class="panel lottery-panel">
@@ -1189,8 +1240,11 @@ function renderDailyTimeline() {
   const el = document.getElementById('dailyTimeline');
   if (!el) return;
   const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
-  const photoMap = {};
-  dailyPhotos.forEach(p => photoMap[p.date] = p.img);
+  const photosByDate = {};
+  dailyPhotos.forEach(p => {
+    if (!photosByDate[p.date]) photosByDate[p.date] = [];
+    photosByDate[p.date].push(p);
+  });
 
   if (logs.length === 0 && dailyPhotos.length === 0) {
     el.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.45);font-size:13px;padding:16px 0;">尚無每日記錄。</p>';
@@ -1214,18 +1268,21 @@ function renderDailyTimeline() {
   el.innerHTML = sorted.map((date, idx) => {
     const dateMD = date.slice(5);
     const dayLogs = logs.filter(l => l.fullDate ? l.fullDate === date : (l.date && l.date.startsWith(dateMD)));
-    const photo = photoMap[date];
+    const datePhotos = photosByDate[date] || [];
     const [yyyy, mm, dd] = date.split('/');
     const weekDay = ['日','一','二','三','四','五','六'][new Date(date).getDay()];
     const color = palette[idx % palette.length];
 
     const items = [];
-    if (photo) {
+    if (datePhotos.length > 0) {
+      const thumbs = datePhotos.map(p =>
+        `<img src="${p.img}" alt="植物照片" style="width:${datePhotos.length === 1 ? '100%' : 'calc(50% - 4px)'};aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:inline-block;margin:0 2px 2px 0;">`
+      ).join('');
       items.push(`<div class="tl-item">
         <div class="tl-dot-circle" style="background:${color};"></div>
         <div class="tl-card">
-          <div class="tl-card-time">今日植物照片</div>
-          <img class="tl-card-img" src="${photo}" alt="植物照片">
+          <div class="tl-card-time">植物照片 ×${datePhotos.length}</div>
+          <div style="margin-top:6px;line-height:0;">${thumbs}</div>
         </div>
       </div>`);
     }
@@ -1308,39 +1365,43 @@ function capturePhoto() {
 }
 
 function applyFarmerPhoto(dataUrl) {
-  const preview = document.getElementById('farmerPhotoPreview');
-  preview.innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;">`;
-  preview.style.padding = '0';
-  preview.style.border = 'none';
-  preview.onclick = null;
-  localStorage.setItem('puli_plant_photo', dataUrl);
-  document.getElementById('photoUploadBtn').innerText = '重新拍攝';
-  document.getElementById('photoUploadBtn').onclick = startCamera;
-  document.getElementById('photoDeleteBtn').style.display = '';
-  const dateKey = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+  const now = new Date();
+  const dateKey = now.toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+  const timeKey = now.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit',hour12:false});
   let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
-  const existing = dailyPhotos.findIndex(p => p.date === dateKey);
-  if (existing >= 0) dailyPhotos[existing].img = dataUrl;
-  else dailyPhotos.unshift({ date: dateKey, img: dataUrl });
+  dailyPhotos.unshift({ date: dateKey, time: timeKey, img: dataUrl });
   localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
+  localStorage.setItem('puli_plant_photo', dataUrl);
+  renderFarmerPhotoGrid();
   renderDailyTimeline();
   renderTaskView();
 }
 
-function deleteFarmerPhoto() {
-  if (!confirm('確定刪除今日照片？')) return;
-  localStorage.removeItem('puli_plant_photo');
-  const today = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+function deleteFarmerPhoto(index) {
+  if (!confirm('確定刪除這張照片？')) return;
   let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
-  dailyPhotos = dailyPhotos.filter(p => p.date !== today);
+  dailyPhotos.splice(index, 1);
   localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
-  const preview = document.getElementById('farmerPhotoPreview');
-  preview.innerHTML = `<div style="font-size:48px;opacity:0.7;">📷</div><div style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:900;">點擊拍攝或上傳植物照片</div><div style="color:rgba(255,255,255,0.45);font-size:11px;">照片將同步顯示至消費者履歷</div>`;
-  preview.style.padding = '';
-  preview.style.border = '';
-  document.getElementById('photoUploadBtn').innerText = '開啟相機 / 上傳照片';
-  document.getElementById('photoDeleteBtn').style.display = 'none';
+  if (dailyPhotos.length > 0) localStorage.setItem('puli_plant_photo', dailyPhotos[0].img);
+  else localStorage.removeItem('puli_plant_photo');
+  renderFarmerPhotoGrid();
   renderDailyTimeline();
+}
+
+function renderFarmerPhotoGrid() {
+  const grid = document.getElementById('farmerPhotoGrid');
+  if (!grid) return;
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  if (dailyPhotos.length === 0) {
+    grid.innerHTML = '<div class="farmer-photo-empty">尚無照片，請使用上方按鈕拍攝或上傳</div>';
+    return;
+  }
+  grid.innerHTML = dailyPhotos.map((p, i) => `
+    <div class="farmer-photo-item">
+      <img src="${p.img}" alt="植物照片">
+      <div class="farmer-photo-badge">${p.date}${p.time ? ' ' + p.time : ''}</div>
+      <button class="farmer-photo-del" onclick="deleteFarmerPhoto(${i})" title="刪除">✕</button>
+    </div>`).join('');
 }
 
 function saveFarmProfile() {
@@ -1840,20 +1901,7 @@ window.onload = function() {
   renderGallery();
   renderDailyTimeline();
   renderTaskView();
-  const savedPhoto = localStorage.getItem('puli_plant_photo');
-  if (savedPhoto) {
-    const preview = document.getElementById('farmerPhotoPreview');
-    if (preview) {
-      preview.innerHTML = `<img src="${savedPhoto}" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;">`;
-      preview.style.padding = '0';
-      preview.style.border = 'none';
-      preview.onclick = null;
-    }
-    const uploadBtn = document.getElementById('photoUploadBtn');
-    if (uploadBtn) { uploadBtn.innerText = '重新拍攝'; uploadBtn.onclick = startCamera; }
-    const deleteBtn = document.getElementById('photoDeleteBtn');
-    if (deleteBtn) deleteBtn.style.display = '';
-  }
+  renderFarmerPhotoGrid();
   initMusicPlayer();
   const urlParams = new URLSearchParams(window.location.search);
   const viewParam = urlParams.get('view');
