@@ -740,11 +740,11 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   <text id="resultQuestion" x="120" y="88" text-anchor="middle" fill="#b0bec5" font-size="44" font-family="Arial" opacity="1">?</text>
 </svg>
 
-<div style="text-align:center;margin-bottom:12px;">
-  <img id="gachaTicketImg" src="" alt="抽獎券" style="width:100%;max-width:280px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,0.35);opacity:0.95;">
-</div>
 <button id="gachaButton" class="btn-main gacha-button" onclick="drawLotteryCharacter()">🎟 轉動扭蛋機</button>
-<div class="gacha-ticket-info">每次抽獎需消耗 1 張抽獎券 · 完成任務或連續打卡可獲得</div>
+<div class="gacha-ticket-info" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;">
+  <img id="gachaTicketImg" src="" alt="抽獎券" style="height:22px;border-radius:4px;box-shadow:0 1px 6px rgba(0,0,0,0.3);">
+  <span>每次消耗 1 張 · 完成任務或連續打卡可獲得</span>
+</div>
 <div id="lotteryResult" class="lottery-result">完成今日任務或連續打卡即可獲得抽獎券 🎟</div>
 </div>
 
