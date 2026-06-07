@@ -129,6 +129,29 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .tl-card-tag { background:rgba(255,255,255,0.09); border-radius:8px; padding:2px 8px; font-size:11px; color:rgba(255,255,255,0.65); }
 .tl-card-note { font-size:12px; color:rgba(255,255,255,0.6); line-height:1.5; }
 .tl-card-img { width:100%; max-height:200px; object-fit:cover; border-radius:12px; margin-top:8px; display:block; }
+/* ── Task & Achievement View ── */
+.task-item { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.07); }
+.task-item:last-child { border-bottom:none; }
+.task-check { width:26px; height:26px; border-radius:9px; border:2px solid rgba(255,255,255,0.28); flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.2s; }
+.task-check.done { background:#80e5a0; border-color:#80e5a0; }
+.task-check.auto-done { background:rgba(100,181,246,0.7); border-color:#64b5f6; cursor:default; }
+.task-label { font-size:14px; color:rgba(255,255,255,0.88); flex:1; line-height:1.3; }
+.task-label.done { text-decoration:line-through; color:rgba(255,255,255,0.35); }
+.task-tag { font-size:10px; font-weight:900; padding:2px 8px; border-radius:8px; flex-shrink:0; }
+.task-tag.auto { background:rgba(100,181,246,0.15); color:#64b5f6; border:1px solid rgba(100,181,246,0.3); }
+.task-tag.manual { background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.4); }
+.task-progress-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding:10px 14px; background:rgba(128,229,160,0.08); border:1px solid rgba(128,229,160,0.2); border-radius:14px; }
+.achieve-item { padding:13px 0; border-bottom:1px solid rgba(255,255,255,0.07); }
+.achieve-item:last-child { border-bottom:none; }
+.achieve-header { display:flex; align-items:center; gap:9px; margin-bottom:6px; }
+.achieve-icon { font-size:20px; line-height:1; width:28px; text-align:center; }
+.achieve-name { font-size:14px; font-weight:900; color:rgba(255,255,255,0.92); flex:1; }
+.achieve-badge { font-size:10px; font-weight:900; padding:3px 10px; border-radius:9px; flex-shrink:0; }
+.achieve-badge.done { background:rgba(128,229,160,0.18); color:#80e5a0; border:1px solid rgba(128,229,160,0.38); }
+.achieve-badge.locked { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.4); border:1px solid rgba(255,255,255,0.1); }
+.achieve-progress-bar { height:5px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; margin-bottom:5px; }
+.achieve-progress-fill { height:100%; background:linear-gradient(90deg,#80e5a0,#64b5f6); border-radius:3px; transition:width 0.8s ease; }
+.achieve-desc { font-size:11px; color:rgba(255,255,255,0.38); }
 .gacha-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
 .gacha-modal-overlay.active { display: flex; }
 .gacha-modal-card { background: linear-gradient(145deg, #fff 0%, #f0faff 100%); border-radius: 28px; padding: 30px 24px 24px; text-align: center; max-width: 300px; width: 88%; position: relative; overflow: hidden; animation: popIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,152,0,0.3); }
@@ -474,6 +497,24 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 </div>
 </div>
 
+<div id="viewTask" class="view-screen">
+<div class="container">
+<div style="padding:20px 0 8px;"><h2 style="font-size:22px;letter-spacing:1px;margin:0;">任務 · 成就</h2></div>
+
+<div class="panel" id="dailyTaskPanel">
+  <div class="panel-title">今日任務 <span id="dailyTaskCount" style="font-size:12px;font-weight:normal;color:rgba(255,255,255,0.5);"></span></div>
+  <div id="dailyTaskList"></div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.28);margin-top:10px;text-align:right;letter-spacing:0.5px;">每日午夜自動重置</div>
+</div>
+
+<div class="panel" id="achievementPanel">
+  <div class="panel-title">成就 <span id="achieveCount" style="font-size:12px;font-weight:normal;color:rgba(255,255,255,0.5);"></span></div>
+  <div id="achievementList"></div>
+</div>
+
+</div>
+</div>
+
 <div id="viewConsumer" class="view-screen">
 <div class="container">
 
@@ -527,6 +568,11 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   <button class="tab-btn" id="tab-gallery" onclick="switchView('viewGallery')">
     <div class="tab-icon-wrap">🎴</div>
     <div class="tab-label">圖鑑</div>
+    <div class="tab-dot"></div>
+  </button>
+  <button class="tab-btn" id="tab-task" onclick="switchView('viewTask')">
+    <div class="tab-icon-wrap">🏆</div>
+    <div class="tab-label">任務</div>
     <div class="tab-dot"></div>
   </button>
 </div>
@@ -740,6 +786,121 @@ function closeGachaModal() {
   overlay.classList.remove('active');
   card.style.animation = '';
 }
+
+// ── Task & Achievement System ──────────────────────────────
+const MANUAL_TASKS = ['澆水', '施肥', '除草', '巡視農場'];
+
+const ACHIEVEMENTS = [
+  { id:'log1',   icon:'📝', name:'農事新手',   desc:'記錄第1筆觀測日誌',    max:1,  getVal:()=>logs.length },
+  { id:'log10',  icon:'📋', name:'農事達人',   desc:'累計記錄10筆農事',     max:10, getVal:()=>logs.length },
+  { id:'log50',  icon:'🏅', name:'農場老手',   desc:'累計記錄50筆農事',     max:50, getVal:()=>logs.length },
+  { id:'photo1', icon:'📸', name:'愛記錄',     desc:'上傳第1張植物照片',    max:1,  getVal:()=>JSON.parse(localStorage.getItem('puli_daily_photos')||'[]').length },
+  { id:'photo7', icon:'🌿', name:'植物攝影師', desc:'累計上傳7張植物照片',  max:7,  getVal:()=>JSON.parse(localStorage.getItem('puli_daily_photos')||'[]').length },
+  { id:'gacha1', icon:'🎴', name:'收藏入門',   desc:'獲得第1個扭蛋角色',    max:1,  getVal:()=>gallery.length },
+  { id:'gacha5', icon:'✨', name:'角色收藏家', desc:'收集5個不同角色',       max:5,  getVal:()=>gallery.length },
+  { id:'gacha15',icon:'🌟', name:'收藏大師',   desc:'收集15個不同角色',      max:15, getVal:()=>gallery.length },
+  { id:'days3',  icon:'🌱', name:'三日連續',   desc:'連續三天有農事記錄',    max:3,  getVal:()=>_getConsecutiveDays() },
+  { id:'days7',  icon:'🔥', name:'一週堅持',   desc:'連續七天有農事記錄',    max:7,  getVal:()=>_getConsecutiveDays() },
+];
+
+function _getTodayStr() {
+  return new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+}
+
+function _getDailyTaskState() {
+  const today = _getTodayStr();
+  const saved = JSON.parse(localStorage.getItem('skysef_daily_tasks') || '{}');
+  if (saved.date !== today) return { date: today, manual: {} };
+  return saved;
+}
+
+function _saveDailyTaskState(state) {
+  localStorage.setItem('skysef_daily_tasks', JSON.stringify(state));
+}
+
+function toggleManualTask(name) {
+  const state = _getDailyTaskState();
+  state.manual[name] = !state.manual[name];
+  _saveDailyTaskState(state);
+  renderTaskView();
+}
+
+function _getConsecutiveDays() {
+  const photos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  const dates = new Set(photos.map(p => p.date));
+  logs.forEach(l => { if (l.fullDate) dates.add(l.fullDate); });
+  const sorted = [...dates].sort((a,b) => b.localeCompare(a));
+  if (!sorted.length) return 0;
+  let count = 1; let prev = sorted[0];
+  for (let i = 1; i < sorted.length; i++) {
+    const diff = (new Date(prev.replace(/\//g,'-')) - new Date(sorted[i].replace(/\//g,'-'))) / 86400000;
+    if (diff === 1) { count++; prev = sorted[i]; } else break;
+  }
+  return count;
+}
+
+function renderDailyTasks() {
+  const el = document.getElementById('dailyTaskList');
+  const countEl = document.getElementById('dailyTaskCount');
+  if (!el) return;
+  const today = _getTodayStr();
+  const state = _getDailyTaskState();
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  const todayPhoto = dailyPhotos.some(p => p.date === today);
+  const dateMD = today.slice(5);
+  const todayLog = logs.some(l => l.fullDate === today || (l.date && l.date.startsWith(dateMD)));
+
+  const tasks = [
+    { name:'記錄今日觀測日誌', done: todayLog,  auto: true  },
+    { name:'上傳今日植物照片', done: todayPhoto, auto: true  },
+    ...MANUAL_TASKS.map(n => ({ name: n, done: !!state.manual[n], auto: false })),
+  ];
+  const doneCount = tasks.filter(t => t.done).length;
+  if (countEl) countEl.textContent = `${doneCount} / ${tasks.length}`;
+
+  el.innerHTML = `
+    <div class="task-progress-row">
+      <span style="font-size:13px;font-weight:900;color:#80e5a0;">${doneCount === tasks.length ? '今日全部完成！' : `還有 ${tasks.length - doneCount} 項待完成`}</span>
+      <span style="font-size:13px;font-weight:900;color:rgba(255,255,255,0.6);">${Math.round(doneCount/tasks.length*100)}%</span>
+    </div>` +
+    tasks.map(t => `
+    <div class="task-item">
+      <div class="task-check ${t.done ? (t.auto ? 'auto-done' : 'done') : ''}" ${t.auto ? '' : `onclick="toggleManualTask('${t.name}')"`} style="${t.auto?'cursor:default;':''}">
+        ${t.done ? `<svg width="14" height="11" viewBox="0 0 14 11"><polyline points="1,5 5,10 13,1" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+      </div>
+      <div class="task-label ${t.done ? 'done' : ''}">${t.name}</div>
+      <div class="task-tag ${t.auto ? 'auto' : 'manual'}">${t.auto ? '自動' : '手動'}</div>
+    </div>`).join('');
+}
+
+function renderAchievements() {
+  const el = document.getElementById('achievementList');
+  const countEl = document.getElementById('achieveCount');
+  if (!el) return;
+  let doneCount = 0;
+  el.innerHTML = ACHIEVEMENTS.map(a => {
+    const val = Math.min(a.getVal(), a.max);
+    const done = val >= a.max;
+    if (done) doneCount++;
+    const pct = Math.round((val / a.max) * 100);
+    return `<div class="achieve-item">
+      <div class="achieve-header">
+        <div class="achieve-icon">${a.icon}</div>
+        <div class="achieve-name">${a.name}</div>
+        <div class="achieve-badge ${done ? 'done' : 'locked'}">${done ? '已完成' : `${val} / ${a.max}`}</div>
+      </div>
+      ${!done ? `<div class="achieve-progress-bar"><div class="achieve-progress-fill" style="width:${pct}%"></div></div>` : ''}
+      <div class="achieve-desc">${a.desc}</div>
+    </div>`;
+  }).join('');
+  if (countEl) countEl.textContent = `${doneCount} / ${ACHIEVEMENTS.length} 已解鎖`;
+}
+
+function renderTaskView() {
+  renderDailyTasks();
+  renderAchievements();
+}
+// ──────────────────────────────────────────────────────────
 
 const seriesMap = {
   '台灣藍雀':'野生動物','萃谷行者':'野生動物','台灣獼猴':'野生動物',
@@ -990,6 +1151,7 @@ function applyFarmerPhoto(dataUrl) {
   else dailyPhotos.unshift({ date: dateKey, img: dataUrl });
   localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
   renderDailyTimeline();
+  renderTaskView();
 }
 
 function deleteFarmerPhoto() {
@@ -1044,6 +1206,7 @@ function saveQuickLog() {
     if (el) el.value = '';
   });
   alert('紀錄已儲存！消費者頁面已更新。');
+  renderTaskView();
 }
 
 function switchView(viewId) {
@@ -1053,12 +1216,13 @@ function switchView(viewId) {
   targetView.classList.add('active');
 
   // Sync bottom tab bar
-  const tabMap = { viewFarmer:'tab-farmer', viewConsumer:'tab-consumer', viewGallery:'tab-gallery' };
+  const tabMap = { viewFarmer:'tab-farmer', viewConsumer:'tab-consumer', viewGallery:'tab-gallery', viewTask:'tab-task' };
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const activeTab = document.getElementById(tabMap[viewId]);
   if (activeTab) activeTab.classList.add('active');
 
   if (viewId === 'viewConsumer') { initChart(); renderDailyTimeline(); generateRandomWiki(); }
+  if (viewId === 'viewTask') { renderTaskView(); }
 }
 
 function generateRandomWiki() {
@@ -1454,6 +1618,7 @@ window.onload = function() {
   updateProfileDisplay();
   renderGallery();
   renderDailyTimeline();
+  renderTaskView();
   const savedPhoto = localStorage.getItem('puli_plant_photo');
   if (savedPhoto) {
     const preview = document.getElementById('farmerPhotoPreview');
