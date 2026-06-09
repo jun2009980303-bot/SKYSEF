@@ -1560,12 +1560,31 @@ function renderFarmerPhotoGrid() {
     grid.innerHTML = '<div class="farmer-photo-empty">尚無照片，請使用上方按鈕拍攝或上傳</div>';
     return;
   }
-  grid.innerHTML = dailyPhotos.map((p, i) => `
-    <div class="farmer-photo-item">
-      <img src="${p.img}" alt="植物照片">
-      <div class="farmer-photo-badge">${p.date}${p.time ? ' ' + p.time : ''}</div>
-      <button class="farmer-photo-del" onclick="deleteFarmerPhoto(${i})" title="刪除">✕</button>
-    </div>`).join('');
+
+  // Group by date, preserve original index for delete
+  const byDate = {};
+  dailyPhotos.forEach((p, i) => {
+    const d = p.date || '未知日期';
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push({ ...p, _idx: i });
+  });
+  const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
+  const today = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+
+  let html = '';
+  dates.forEach(date => {
+    const label = date === today ? `今天　${date}` : date;
+    html += `<div style="grid-column:1/-1;font-size:12px;font-weight:900;color:rgba(255,255,255,0.5);padding:10px 2px 4px;letter-spacing:0.5px;border-top:1px solid rgba(255,255,255,0.08);margin-top:2px;">${label}</div>`;
+    html += byDate[date].map(p => `
+      <div class="farmer-photo-item">
+        <img src="${p.img}" alt="植物照片">
+        <div class="farmer-photo-badge">${p.time || ''}</div>
+        <button class="farmer-photo-del" onclick="deleteFarmerPhoto(${p._idx})" title="刪除">✕</button>
+      </div>`).join('');
+  });
+
+  grid.innerHTML = html;
 }
 
 function saveFarmProfile() {
