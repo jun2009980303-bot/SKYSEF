@@ -9,7 +9,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="js/firebase-config.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
 @font-face {
   font-family: 'JetBrains Mono';
@@ -159,25 +158,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .gacha-modal-close { position: absolute; top: 12px; right: 12px; background: #eee; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #666; transition: 0.2s; }
 .gacha-modal-close:hover { background: #ff5252; color: white; }
 .gacha-modal-rarity { font-size: 16px; font-weight: 900; color: #ff9800; margin-bottom: 14px; letter-spacing: 3px; text-shadow: 0 0 12px rgba(255,152,0,0.4); }
-#loginOverlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; animation: loginFadeIn 0.6s ease; }
-#loginOverlay.hidden { display: none; }
-#loginOverlay::before { content:''; position:absolute; inset:0; background:rgba(0,0,0,0.52); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
-@keyframes loginFadeIn { from{opacity:0} to{opacity:1} }
-.login-card { position:relative; background:rgba(255,255,255,0.09); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border:1px solid rgba(255,255,255,0.28); border-radius:32px; padding:44px 32px 36px; text-align:center; max-width:360px; width:92%; box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.45),0 0 80px rgba(0,0,0,0.3),0 24px 60px rgba(0,0,0,0.28); animation:popIn 0.55s cubic-bezier(0.175,0.885,0.32,1.275); }
-.login-logo-svg { display:block; margin:0 auto 12px; opacity:0.9; }
-.login-title { font-size:32px; font-weight:900; color:white; letter-spacing:6px; text-shadow:0 2px 20px rgba(0,0,0,0.5); margin-bottom:4px; }
-.login-subtitle { font-size:13px; color:rgba(255,255,255,0.55); margin-bottom:30px; letter-spacing:1.5px; }
-.login-input { width:100%; box-sizing:border-box; background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22); border-radius:14px; padding:14px 18px; color:white; font-size:15px; font-family:'JetBrains Mono',monospace; outline:none; margin-bottom:12px; transition:0.2s; }
-.login-input::placeholder { color:rgba(255,255,255,0.38); }
-.login-input:focus { border-color:rgba(255,180,80,0.65); background:rgba(255,255,255,0.16); box-shadow:0 0 0 3px rgba(255,180,80,0.18); }
-.login-btn { width:100%; padding:15px; border:none; border-radius:16px; background:linear-gradient(135deg,#ffb300 0%,#f44336 100%); color:white; font-size:16px; font-weight:900; letter-spacing:1.5px; cursor:pointer; box-shadow:0 6px 22px rgba(244,67,54,0.45); transition:0.2s; margin-bottom:18px; font-family:'JetBrains Mono',monospace; }
-.login-btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(244,67,54,0.55); }
-.login-btn:active { transform:scale(0.97); }
-.login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-.login-toggle { font-size:13px; color:rgba(255,255,255,0.5); cursor:pointer; text-underline-offset:3px; transition:0.2s; }
-.login-toggle:hover { color:rgba(255,255,255,0.85); text-decoration:underline; }
-.login-error { color:#ff8a80; font-size:13px; min-height:18px; margin-bottom:10px; text-shadow:0 1px 4px rgba(0,0,0,0.3); }
-.logout-btn { font-size:12px; color:rgba(255,255,255,0.55); background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:16px; padding:6px 14px; cursor:pointer; font-family:inherit; font-weight:900; transition:0.2s; margin-left:8px; }
 .logout-btn:hover { background:rgba(255,100,80,0.25); color:#ff8a80; border-color:rgba(255,100,80,0.4); }
 .gacha-modal-img { width: 160px; height: 160px; object-fit: contain; border-radius: 20px; background: #f0f9f4; box-shadow: 0 6px 20px rgba(0,0,0,0.12); border: 3px solid #fff; }
 .gacha-modal-name { font-size: 22px; font-weight: 900; color: #1b4d36; margin: 14px 0 20px; }
@@ -441,19 +421,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   transition: opacity 0.15s;
 }
 .btn-settings-save:hover { opacity: 0.88; }
-.btn-settings-logout {
-  background: rgba(200,50,50,0.2);
-  border: 1px solid rgba(220,80,80,0.35);
-  color: #ff7070;
-  border-radius: 12px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  width: 100%;
-  transition: background 0.15s;
-}
-.btn-settings-logout:hover { background: rgba(200,50,50,0.35); }
 /* Music player: no prev/next */
 .music-ctrl-btn.play { margin: 0 2px; }
 
@@ -605,9 +572,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 
 <div id="viewFarmer" class="view-screen active">
 <div class="container">
-
-<span id="logoutBtn" style="display:none"></span>
-
 
 <div class="panel">
   <div class="panel-title">新增今日觀測日誌</div>
@@ -850,28 +814,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   </button>
 </div>
 
-<div id="loginOverlay">
-  <div class="login-card">
-    <svg class="login-logo-svg" width="72" height="52" viewBox="0 0 72 52" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 52 L22 18 L36 30 L50 8 L72 52Z" fill="rgba(255,255,255,0.12)"/>
-      <path d="M6 52 L26 24 L36 32 L50 10 L66 52Z" fill="rgba(255,255,255,0.08)"/>
-      <circle cx="58" cy="11" r="9" fill="rgba(255,200,100,0.65)"/>
-      <ellipse cx="58" cy="11" rx="13" ry="13" fill="none" stroke="rgba(255,200,100,0.25)" stroke-width="4"/>
-      <rect x="4" y="42" width="64" height="4" rx="2" fill="rgba(100,220,120,0.45)"/>
-      <rect x="8" y="47" width="56" height="3.5" rx="1.75" fill="rgba(100,220,120,0.3)"/>
-    </svg>
-    <div class="login-title">SKYSEF</div>
-    <div class="login-subtitle">智慧農場管理系統</div>
-    <input class="login-input" id="loginEmail" type="email" placeholder="電子郵件" autocomplete="email">
-    <input class="login-input" id="loginPassword" type="password" placeholder="密碼（至少 6 字元）" autocomplete="current-password">
-    <div class="login-error" id="loginError"></div>
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">登入</button>
-    <div class="login-toggle" id="loginToggle" onclick="toggleRegister()">還沒有帳號？點此註冊</div>
-    <div style="margin-top:20px;text-align:center;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px;">
-      <button onclick="bypassLogin()" style="background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.45);border-radius:10px;padding:8px 20px;font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:0.3px;">不登入，直接使用</button>
-    </div>
-  </div>
-</div>
 
 <div class="gacha-modal-overlay" id="gachaModal" onclick="closeGachaModal()">
   <div class="gacha-modal-card" onclick="event.stopPropagation()">
@@ -917,12 +859,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
       </div>
     </div>
 
-    <div class="settings-divider"></div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">帳號</div>
-      <button class="btn-settings-logout" onclick="doLogout(); closeSettings();">登出帳號</button>
-    </div>
   </div>
 </div>
 
@@ -1933,98 +1869,18 @@ function toggleMusicPlayer() {
 
 // ── Firebase 整合 ─────────────────────────────────────────
 let _fbDb = null;
-let _fbAuth = null;
-let _isRegistering = false;
 
-(function initAuth() {
+(function initFirebase() {
   try {
     if (window.SKYSER_FIREBASE_CONFIG && typeof firebase !== 'undefined') {
       if (!firebase.apps.length) firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
       _fbDb = firebase.firestore();
-      _fbAuth = firebase.auth();
       window.SKYSER_DB = _fbDb;
-      window.SKYSER_AUTH = _fbAuth;
-
-      _fbAuth.onAuthStateChanged(user => {
-        const overlay = document.getElementById('loginOverlay');
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (user) {
-          if (overlay) overlay.classList.add('hidden');
-          if (logoutBtn) logoutBtn.style.display = '';
-          loadFarmDataFromFirebase();
-        } else {
-          if (overlay) overlay.classList.remove('hidden');
-          if (logoutBtn) logoutBtn.style.display = 'none';
-        }
-      });
-    } else {
-      // Firebase not configured — hide login and run without auth
-      const overlay = document.getElementById('loginOverlay');
-      if (overlay) overlay.classList.add('hidden');
     }
   } catch(e) {
-    // Firebase init error — show bypass option
-    const bypass = document.getElementById('loginBypass');
-    if (bypass) bypass.style.display = 'block';
-    const errEl = document.getElementById('loginError');
-    if (errEl) errEl.textContent = 'Firebase 初始化失敗：' + e.message;
+    console.warn('Firebase init error:', e.message);
   }
 })();
-
-function doLogin() {
-  const errEl = document.getElementById('loginError');
-  const btn   = document.getElementById('loginBtn');
-  if (!_fbAuth) {
-    errEl.textContent = 'Firebase 未初始化，請重新整理頁面後再試。';
-    document.getElementById('loginBypass').style.display = 'block';
-    return;
-  }
-  const email    = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  if (!email || !password) { errEl.textContent = '請填寫電子郵件和密碼'; return; }
-  if (password.length < 6)  { errEl.textContent = '密碼至少需要 6 個字元'; return; }
-  errEl.textContent = '';
-  btn.disabled = true;
-  btn.textContent = '處理中...';
-  const action = _isRegistering
-    ? _fbAuth.createUserWithEmailAndPassword(email, password)
-    : _fbAuth.signInWithEmailAndPassword(email, password);
-  action
-    .then(() => { btn.disabled = false; btn.textContent = _isRegistering ? '建立帳號' : '登入'; })
-    .catch(err => {
-      btn.disabled = false;
-      btn.textContent = _isRegistering ? '建立帳號' : '登入';
-      const msgs = {
-        'auth/user-not-found':        '找不到此帳號，請先註冊',
-        'auth/wrong-password':        '密碼錯誤',
-        'auth/invalid-email':         '電子郵件格式錯誤',
-        'auth/email-already-in-use':  '此電子郵件已被使用，請直接登入',
-        'auth/weak-password':         '密碼至少需要 6 個字元',
-        'auth/too-many-requests':     '嘗試次數過多，請稍後再試',
-        'auth/invalid-credential':    '帳號或密碼錯誤',
-        'auth/network-request-failed':'網路連線異常，請確認網路後再試',
-        'auth/unauthorized-domain':   '此網域未授權。請至 Firebase Console → Authentication → Settings → Authorized domains 新增目前網址的域名',
-        'auth/operation-not-allowed': 'Email 登入未啟用。請至 Firebase Console → Authentication → Sign-in method 啟用 Email/Password',
-      };
-      errEl.textContent = msgs[err.code] || ('操作失敗：' + err.message);
-    });
-}
-
-function bypassLogin() {
-  const overlay = document.getElementById('loginOverlay');
-  if (overlay) overlay.classList.add('hidden');
-}
-
-function toggleRegister() {
-  _isRegistering = !_isRegistering;
-  document.getElementById('loginBtn').textContent    = _isRegistering ? '建立帳號' : '登入';
-  document.getElementById('loginToggle').textContent = _isRegistering ? '已有帳號？點此登入' : '還沒有帳號？點此註冊';
-  document.getElementById('loginError').textContent  = '';
-}
-
-function doLogout() {
-  if (_fbAuth) _fbAuth.signOut();
-}
 
 async function loadFarmDataFromFirebase() {
   if (!_fbDb) return;
@@ -2124,12 +1980,7 @@ function _syncMuteBtn() {
 // ──────────────────────────────────────────────────────────
 
 window.onload = function() {
-  // Enter key support for login form
-  const pwInput = document.getElementById('loginPassword');
-  if (pwInput) pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  const emInput = document.getElementById('loginEmail');
-  if (emInput) emInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPassword').focus(); });
-
+  loadFarmDataFromFirebase();
   updateProfileDisplay();
   renderGallery();
   renderDailyTimeline();
