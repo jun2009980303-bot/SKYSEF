@@ -863,10 +863,14 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
     <div class="login-title">SKYSEF</div>
     <div class="login-subtitle">智慧農場管理系統</div>
     <input class="login-input" id="loginEmail" type="email" placeholder="電子郵件" autocomplete="email">
-    <input class="login-input" id="loginPassword" type="password" placeholder="密碼" autocomplete="current-password">
+    <input class="login-input" id="loginPassword" type="password" placeholder="密碼（至少 6 字元）" autocomplete="current-password">
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">登入</button>
     <div class="login-toggle" id="loginToggle" onclick="toggleRegister()">還沒有帳號？點此註冊</div>
+    <div id="loginBypass" style="display:none;margin-top:14px;text-align:center;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px;">Firebase 連線失敗</div>
+      <button onclick="bypassLogin()" style="background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);border-radius:10px;padding:7px 16px;font-size:12px;cursor:pointer;font-family:inherit;">不登入，直接使用</button>
+    </div>
   </div>
 </div>
 
@@ -1955,25 +1959,34 @@ let _isRegistering = false;
         }
       });
     } else {
+      // Firebase not configured — hide login and run without auth
       const overlay = document.getElementById('loginOverlay');
       if (overlay) overlay.classList.add('hidden');
     }
   } catch(e) {
-    const overlay = document.getElementById('loginOverlay');
-    if (overlay) overlay.classList.add('hidden');
+    // Firebase init error — show bypass option
+    const bypass = document.getElementById('loginBypass');
+    if (bypass) bypass.style.display = 'block';
+    const errEl = document.getElementById('loginError');
+    if (errEl) errEl.textContent = 'Firebase 初始化失敗：' + e.message;
   }
 })();
 
 function doLogin() {
-  if (!_fbAuth) return;
+  const errEl = document.getElementById('loginError');
+  const btn   = document.getElementById('loginBtn');
+  if (!_fbAuth) {
+    errEl.textContent = 'Firebase 未初始化，請重新整理頁面後再試。';
+    document.getElementById('loginBypass').style.display = 'block';
+    return;
+  }
   const email    = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-  const errEl    = document.getElementById('loginError');
-  const btn      = document.getElementById('loginBtn');
   if (!email || !password) { errEl.textContent = '請填寫電子郵件和密碼'; return; }
+  if (password.length < 6)  { errEl.textContent = '密碼至少需要 6 個字元'; return; }
   errEl.textContent = '';
   btn.disabled = true;
-  btn.textContent  = '處理中...';
+  btn.textContent = '處理中...';
   const action = _isRegistering
     ? _fbAuth.createUserWithEmailAndPassword(email, password)
     : _fbAuth.signInWithEmailAndPassword(email, password);
@@ -1983,17 +1996,24 @@ function doLogin() {
       btn.disabled = false;
       btn.textContent = _isRegistering ? '建立帳號' : '登入';
       const msgs = {
-        'auth/user-not-found':     '找不到此帳號',
-        'auth/wrong-password':     '密碼錯誤',
-        'auth/invalid-email':      '電子郵件格式錯誤',
-        'auth/email-already-in-use':'此電子郵件已被使用',
-        'auth/weak-password':      '密碼至少需要 6 個字元',
-        'auth/too-many-requests':  '嘗試次數過多，請稍後再試',
-        'auth/invalid-credential': '帳號或密碼錯誤',
-        'auth/network-request-failed':'網路連線異常',
+        'auth/user-not-found':        '找不到此帳號，請先註冊',
+        'auth/wrong-password':        '密碼錯誤',
+        'auth/invalid-email':         '電子郵件格式錯誤',
+        'auth/email-already-in-use':  '此電子郵件已被使用，請直接登入',
+        'auth/weak-password':         '密碼至少需要 6 個字元',
+        'auth/too-many-requests':     '嘗試次數過多，請稍後再試',
+        'auth/invalid-credential':    '帳號或密碼錯誤',
+        'auth/network-request-failed':'網路連線異常，請確認網路後再試',
+        'auth/unauthorized-domain':   '此網域未授權。請至 Firebase Console → Authentication → Settings → Authorized domains 新增目前網址的域名',
+        'auth/operation-not-allowed': 'Email 登入未啟用。請至 Firebase Console → Authentication → Sign-in method 啟用 Email/Password',
       };
-      errEl.textContent = msgs[err.code] || '操作失敗：' + err.message;
+      errEl.textContent = msgs[err.code] || ('操作失敗：' + err.message);
     });
+}
+
+function bypassLogin() {
+  const overlay = document.getElementById('loginOverlay');
+  if (overlay) overlay.classList.add('hidden');
 }
 
 function toggleRegister() {
