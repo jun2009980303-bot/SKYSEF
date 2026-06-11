@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <style>
 @font-face {
@@ -407,18 +408,24 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   background: rgba(255,255,255,0.07);
   margin: 14px 20px;
 }
-/* ── Password login overlay ─────────────────────────────── */
-#pwLoginOverlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.7); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
-#pwLoginOverlay.hidden { display:none; }
-.pw-card { position:relative; background:rgba(255,255,255,0.09); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border:1px solid rgba(255,255,255,0.28); border-radius:32px; padding:44px 32px 36px; text-align:center; max-width:340px; width:92%; box-shadow:0 0 80px rgba(0,0,0,0.4),0 24px 60px rgba(0,0,0,0.3); animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
-.pw-logo { font-size:36px; font-weight:900; color:#fff; letter-spacing:6px; margin-bottom:4px; }
-.pw-sub { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:28px; letter-spacing:1.5px; }
-.pw-label { font-size:13px; color:rgba(255,255,255,0.65); margin-bottom:10px; }
-.pw-input { width:100%; box-sizing:border-box; background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22); border-radius:14px; padding:14px 18px; color:white; font-size:22px; font-family:'JetBrains Mono',monospace; outline:none; margin-bottom:14px; text-align:center; letter-spacing:4px; transition:0.2s; }
-.pw-input:focus { border-color:rgba(100,224,122,0.65); box-shadow:0 0 0 3px rgba(100,224,122,0.18); }
-.pw-btn { width:100%; padding:15px; border:none; border-radius:16px; background:linear-gradient(135deg,#43a047,#1b5e20); color:white; font-size:16px; font-weight:900; letter-spacing:1.5px; cursor:pointer; box-shadow:0 6px 22px rgba(67,160,71,0.45); transition:0.2s; font-family:'JetBrains Mono',monospace; }
-.pw-btn:hover { transform:translateY(-2px); }
-.pw-err { color:#ff8a80; font-size:13px; min-height:18px; margin-bottom:10px; }
+/* ── Login overlay ───────────────────────────────────────── */
+#loginOverlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.65); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); animation:loginFadeIn 0.5s ease; }
+#loginOverlay.hidden { display:none; }
+@keyframes loginFadeIn { from{opacity:0} to{opacity:1} }
+.login-card { background:rgba(255,255,255,0.09); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border:1px solid rgba(255,255,255,0.25); border-radius:32px; padding:40px 30px 32px; text-align:center; max-width:360px; width:92%; box-shadow:0 0 80px rgba(0,0,0,0.4),0 24px 60px rgba(0,0,0,0.3); animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+.login-logo { font-size:32px; font-weight:900; color:#fff; letter-spacing:6px; margin-bottom:2px; }
+.login-sub { font-size:12px; color:rgba(255,255,255,0.45); letter-spacing:2px; margin-bottom:8px; }
+.login-title { font-size:20px; font-weight:700; color:rgba(255,255,255,0.9); margin-bottom:20px; }
+.login-input { width:100%; box-sizing:border-box; background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22); border-radius:14px; padding:13px 16px; color:white; font-size:15px; font-family:'JetBrains Mono',monospace; outline:none; margin-bottom:11px; transition:0.2s; }
+.login-input::placeholder { color:rgba(255,255,255,0.38); }
+.login-input:focus { border-color:rgba(100,224,122,0.6); box-shadow:0 0 0 3px rgba(100,224,122,0.15); }
+.login-err { min-height:18px; font-size:13px; margin-bottom:12px; }
+.login-btn { width:100%; padding:14px; border:none; border-radius:16px; background:linear-gradient(135deg,#ffb300,#f44336); color:#fff; font-size:15px; font-weight:900; letter-spacing:1.5px; cursor:pointer; box-shadow:0 6px 20px rgba(244,67,54,0.4); transition:0.2s; font-family:'JetBrains Mono',monospace; margin-bottom:16px; }
+.login-btn:hover { transform:translateY(-2px); }
+.login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+.login-links { display:flex; justify-content:space-between; font-size:13px; }
+.login-link { color:rgba(255,255,255,0.5); cursor:pointer; transition:0.15s; }
+.login-link:hover { color:rgba(255,255,255,0.9); text-decoration:underline; }
 .btn-settings-logout { background:rgba(200,50,50,0.2); border:1px solid rgba(220,80,80,0.35); color:#ff7070; border-radius:12px; padding:10px 20px; font-size:14px; font-weight:700; cursor:pointer; width:100%; transition:background 0.15s; }
 .btn-settings-logout:hover { background:rgba(200,50,50,0.35); }
 .btn-settings-save {
@@ -876,24 +883,36 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
     <div class="settings-divider"></div>
 
     <div class="settings-section">
-      <div class="settings-section-label">安全</div>
-      <button class="btn-settings-save" onclick="openChangePwModal()" style="margin-bottom:10px;">更改農場密碼</button>
-      <button class="btn-settings-logout" onclick="doLogout()">登出此裝置</button>
+      <div class="settings-section-label">帳號</div>
+      <button class="btn-settings-save" onclick="sendResetEmail()" style="margin-bottom:10px;">更改密碼（發送重設信）</button>
+      <button class="btn-settings-logout" onclick="doLogout(); closeSettings();">登出帳號</button>
     </div>
 
   </div>
 </div>
 
-<div id="pwLoginOverlay">
-  <div class="pw-card">
-    <div class="pw-logo">SKYSEF</div>
-    <div class="pw-sub">智慧農場管理系統</div>
-    <div class="pw-label" id="pwLabel">輸入農場密碼</div>
-    <input class="pw-input" id="pwInput" type="password" placeholder="••••" maxlength="20"
-           onkeydown="if(event.key==='Enter')doAuth()">
-    <div class="pw-err" id="pwErr"></div>
-    <button class="pw-btn" id="pwBtn" onclick="doAuth()">進入</button>
-    <div id="pwSetupNote" style="display:none;margin-top:16px;font-size:12px;color:rgba(255,255,255,0.45);">首次使用，請設定一組農場密碼</div>
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">SKYSEF</div>
+    <div class="login-sub">智慧農場管理系統</div>
+    <div class="login-title" id="loginTitle">登入</div>
+    <input class="login-input" id="loginEmail" type="email" placeholder="電子郵件" autocomplete="email"
+           onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
+    <div id="loginPwRow">
+      <input class="login-input" id="loginPassword" type="password" placeholder="密碼（至少 6 字元）"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="loginConfirmRow" style="display:none">
+      <input class="login-input" id="loginConfirm" type="password" placeholder="再次輸入密碼"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-err" id="loginErr" style="color:#ff8a80;"></div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">登入</button>
+    <div class="login-links">
+      <span id="loginForgotLink" class="login-link" onclick="setLoginMode('forgot')">忘記密碼？</span>
+      <span id="loginBackLink"   class="login-link" onclick="setLoginMode('login')" style="display:none">← 返回登入</span>
+      <span id="loginToggleLink" class="login-link" onclick="toggleLoginMode()">還沒有帳號？點此註冊</span>
+    </div>
   </div>
 </div>
 
@@ -1903,14 +1922,17 @@ function toggleMusicPlayer() {
 
 
 // ── Firebase 整合 ─────────────────────────────────────────
-let _fbDb = null;
+let _fbDb   = null;
+let _fbAuth = null;
 
 (function initFirebase() {
   try {
     if (window.SKYSER_FIREBASE_CONFIG && typeof firebase !== 'undefined') {
       if (!firebase.apps.length) firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
-      _fbDb = firebase.firestore();
-      window.SKYSER_DB = _fbDb;
+      _fbDb   = firebase.firestore();
+      _fbAuth = firebase.auth();
+      window.SKYSER_DB   = _fbDb;
+      window.SKYSER_AUTH = _fbAuth;
     }
   } catch(e) {
     console.warn('Firebase init error:', e.message);
@@ -2014,83 +2036,120 @@ function _syncMuteBtn() {
 }
 // ──────────────────────────────────────────────────────────
 
-// ── Password Auth ─────────────────────────────────────────
-let _isSettingPw = false;
+// ── Firebase Auth ─────────────────────────────────────────
+let _loginMode = 'login'; // 'login' | 'register' | 'forgot'
 
-async function checkAuth() {
-  // Consumer view is public — no auth needed
+function initAuth() {
+  // Consumer view is always public
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('view') === 'consumer' || window.location.hash === '#consumer') {
     startApp(); return;
   }
-  if (localStorage.getItem('skysef_authed') === '1') {
-    startApp(); return;
+  if (!_fbAuth) {
+    document.getElementById('loginErr').textContent = 'Firebase 未連線，請重新整理';
+    return;
   }
-  const overlay = document.getElementById('pwLoginOverlay');
-  // Try Firestore first, then localStorage fallback
-  let storedPw = localStorage.getItem('puli_farm_password');
-  if (_fbDb) {
-    try {
-      const doc = await _fbDb.collection('settings').doc('auth').get();
-      if (doc.exists) storedPw = doc.data().password || storedPw;
-    } catch(e) {}
-  }
-  if (!storedPw) {
-    // First time — setup mode
-    _isSettingPw = true;
-    document.getElementById('pwLabel').textContent = '設定農場密碼';
-    document.getElementById('pwBtn').textContent = '設定密碼';
-    document.getElementById('pwSetupNote').style.display = 'block';
-  }
-  overlay.classList.remove('hidden');
-}
-
-async function doAuth() {
-  const pwd = document.getElementById('pwInput').value;
-  const err = document.getElementById('pwErr');
-  if (!pwd) { err.textContent = '請輸入密碼'; return; }
-  if (_isSettingPw) {
-    // Save new password
-    localStorage.setItem('puli_farm_password', pwd);
-    if (_fbDb) {
-      try { await _fbDb.collection('settings').doc('auth').set({ password: pwd }); } catch(e) {}
-    }
-    localStorage.setItem('skysef_authed', '1');
-    document.getElementById('pwLoginOverlay').classList.add('hidden');
-    startApp();
-  } else {
-    let storedPw = localStorage.getItem('puli_farm_password');
-    if (_fbDb) {
-      try {
-        const doc = await _fbDb.collection('settings').doc('auth').get();
-        if (doc.exists) storedPw = doc.data().password || storedPw;
-      } catch(e) {}
-    }
-    if (pwd === storedPw) {
-      localStorage.setItem('skysef_authed', '1');
-      document.getElementById('pwLoginOverlay').classList.add('hidden');
+  _fbAuth.onAuthStateChanged(user => {
+    const overlay = document.getElementById('loginOverlay');
+    if (user) {
+      overlay.classList.add('hidden');
       startApp();
     } else {
-      err.textContent = '密碼錯誤，請再試一次';
-      document.getElementById('pwInput').value = '';
-      document.getElementById('pwInput').focus();
+      overlay.classList.remove('hidden');
     }
+  });
+}
+
+function setLoginMode(mode) {
+  _loginMode = mode;
+  const isLogin    = mode === 'login';
+  const isRegister = mode === 'register';
+  const isForgot   = mode === 'forgot';
+  document.getElementById('loginTitle').textContent       = isLogin ? '登入' : isRegister ? '建立帳號' : '重設密碼';
+  document.getElementById('loginPwRow').style.display     = isForgot   ? 'none' : '';
+  document.getElementById('loginConfirmRow').style.display= isRegister ? ''     : 'none';
+  document.getElementById('loginForgotLink').style.display= isLogin    ? ''     : 'none';
+  document.getElementById('loginBackLink').style.display  = isForgot   ? ''     : 'none';
+  document.getElementById('loginToggleLink').style.display= isForgot   ? 'none' : '';
+  document.getElementById('loginToggleLink').textContent  = isLogin ? '還沒有帳號？點此註冊' : '已有帳號？點此登入';
+  document.getElementById('loginBtn').textContent         = isLogin ? '登入' : isRegister ? '建立帳號' : '發送重設連結';
+  const err = document.getElementById('loginErr');
+  err.textContent = ''; err.style.color = '#ff8a80';
+}
+
+function toggleLoginMode() {
+  setLoginMode(_loginMode === 'login' ? 'register' : 'login');
+}
+
+async function doLogin() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword') ? document.getElementById('loginPassword').value : '';
+  const err = document.getElementById('loginErr');
+  const btn = document.getElementById('loginBtn');
+  err.style.color = '#ff8a80';
+
+  if (_loginMode === 'forgot') {
+    if (!email) { err.textContent = '請輸入電子郵件'; return; }
+    btn.disabled = true;
+    try {
+      await _fbAuth.sendPasswordResetEmail(email);
+      err.style.color = '#64e07a';
+      err.textContent = '重設連結已寄出，請檢查信箱';
+    } catch(e) { err.textContent = _authErrMsg(e.code); }
+    btn.disabled = false;
+    return;
   }
+
+  if (!email || !password) { err.textContent = '請填寫電子郵件和密碼'; return; }
+  if (password.length < 6) { err.textContent = '密碼至少需要 6 個字元'; return; }
+  if (_loginMode === 'register') {
+    const confirm = document.getElementById('loginConfirm').value;
+    if (password !== confirm) { err.textContent = '兩次密碼不相符'; return; }
+  }
+
+  btn.disabled = true;
+  const origText = btn.textContent;
+  btn.textContent = '處理中...';
+  try {
+    if (_loginMode === 'login') {
+      await _fbAuth.signInWithEmailAndPassword(email, password);
+    } else {
+      await _fbAuth.createUserWithEmailAndPassword(email, password);
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = origText;
+    err.textContent = _authErrMsg(e.code);
+  }
+}
+
+function _authErrMsg(code) {
+  const m = {
+    'auth/user-not-found':        '找不到此帳號，請先註冊',
+    'auth/wrong-password':        '密碼錯誤',
+    'auth/invalid-credential':    '帳號或密碼錯誤',
+    'auth/invalid-email':         '電子郵件格式錯誤',
+    'auth/email-already-in-use':  '此信箱已被使用，請直接登入',
+    'auth/weak-password':         '密碼至少需要 6 個字元',
+    'auth/too-many-requests':     '嘗試次數過多，請稍後再試',
+    'auth/network-request-failed':'網路連線異常',
+    'auth/unauthorized-domain':   '⚠ 此網域未授權。請至 Firebase Console → Authentication → Settings → Authorized domains 新增目前網址',
+    'auth/operation-not-allowed': '⚠ Email 登入未啟用。請至 Firebase Console → Authentication → Sign-in method 啟用 Email/Password',
+  };
+  return m[code] || ('操作失敗：' + code);
 }
 
 function doLogout() {
-  localStorage.removeItem('skysef_authed');
-  location.reload();
+  if (_fbAuth) _fbAuth.signOut();
 }
 
-async function openChangePwModal() {
-  const newPw = prompt('請輸入新密碼：');
-  if (!newPw) return;
-  localStorage.setItem('puli_farm_password', newPw);
-  if (_fbDb) {
-    try { await _fbDb.collection('settings').doc('auth').set({ password: newPw }); } catch(e) {}
-  }
-  alert('密碼已更新');
+async function sendResetEmail() {
+  const user = _fbAuth && _fbAuth.currentUser;
+  if (!user) { alert('請先登入'); return; }
+  try {
+    await _fbAuth.sendPasswordResetEmail(user.email);
+    alert('重設密碼連結已寄至 ' + user.email);
+  } catch(e) { alert(_authErrMsg(e.code)); }
 }
 
 function startApp() {
@@ -2122,7 +2181,7 @@ function startApp() {
 // ──────────────────────────────────────────────────────────
 
 window.onload = function() {
-  checkAuth();
+  initAuth();
 };
 </script>
 </body>
