@@ -407,6 +407,20 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   background: rgba(255,255,255,0.07);
   margin: 14px 20px;
 }
+/* ── Password login overlay ─────────────────────────────── */
+#pwLoginOverlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.7); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+#pwLoginOverlay.hidden { display:none; }
+.pw-card { position:relative; background:rgba(255,255,255,0.09); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border:1px solid rgba(255,255,255,0.28); border-radius:32px; padding:44px 32px 36px; text-align:center; max-width:340px; width:92%; box-shadow:0 0 80px rgba(0,0,0,0.4),0 24px 60px rgba(0,0,0,0.3); animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+.pw-logo { font-size:36px; font-weight:900; color:#fff; letter-spacing:6px; margin-bottom:4px; }
+.pw-sub { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:28px; letter-spacing:1.5px; }
+.pw-label { font-size:13px; color:rgba(255,255,255,0.65); margin-bottom:10px; }
+.pw-input { width:100%; box-sizing:border-box; background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22); border-radius:14px; padding:14px 18px; color:white; font-size:22px; font-family:'JetBrains Mono',monospace; outline:none; margin-bottom:14px; text-align:center; letter-spacing:4px; transition:0.2s; }
+.pw-input:focus { border-color:rgba(100,224,122,0.65); box-shadow:0 0 0 3px rgba(100,224,122,0.18); }
+.pw-btn { width:100%; padding:15px; border:none; border-radius:16px; background:linear-gradient(135deg,#43a047,#1b5e20); color:white; font-size:16px; font-weight:900; letter-spacing:1.5px; cursor:pointer; box-shadow:0 6px 22px rgba(67,160,71,0.45); transition:0.2s; font-family:'JetBrains Mono',monospace; }
+.pw-btn:hover { transform:translateY(-2px); }
+.pw-err { color:#ff8a80; font-size:13px; min-height:18px; margin-bottom:10px; }
+.btn-settings-logout { background:rgba(200,50,50,0.2); border:1px solid rgba(220,80,80,0.35); color:#ff7070; border-radius:12px; padding:10px 20px; font-size:14px; font-weight:700; cursor:pointer; width:100%; transition:background 0.15s; }
+.btn-settings-logout:hover { background:rgba(200,50,50,0.35); }
 .btn-settings-save {
   background: linear-gradient(135deg,#43a047,#1b5e20);
   color: #fff;
@@ -859,6 +873,27 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
       </div>
     </div>
 
+    <div class="settings-divider"></div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">安全</div>
+      <button class="btn-settings-save" onclick="openChangePwModal()" style="margin-bottom:10px;">更改農場密碼</button>
+      <button class="btn-settings-logout" onclick="doLogout()">登出此裝置</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="pwLoginOverlay">
+  <div class="pw-card">
+    <div class="pw-logo">SKYSEF</div>
+    <div class="pw-sub">智慧農場管理系統</div>
+    <div class="pw-label" id="pwLabel">輸入農場密碼</div>
+    <input class="pw-input" id="pwInput" type="password" placeholder="••••" maxlength="20"
+           onkeydown="if(event.key==='Enter')doAuth()">
+    <div class="pw-err" id="pwErr"></div>
+    <button class="pw-btn" id="pwBtn" onclick="doAuth()">進入</button>
+    <div id="pwSetupNote" style="display:none;margin-top:16px;font-size:12px;color:rgba(255,255,255,0.45);">首次使用，請設定一組農場密碼</div>
   </div>
 </div>
 
@@ -1979,7 +2014,86 @@ function _syncMuteBtn() {
 }
 // ──────────────────────────────────────────────────────────
 
-window.onload = function() {
+// ── Password Auth ─────────────────────────────────────────
+let _isSettingPw = false;
+
+async function checkAuth() {
+  // Consumer view is public — no auth needed
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('view') === 'consumer' || window.location.hash === '#consumer') {
+    startApp(); return;
+  }
+  if (localStorage.getItem('skysef_authed') === '1') {
+    startApp(); return;
+  }
+  const overlay = document.getElementById('pwLoginOverlay');
+  // Try Firestore first, then localStorage fallback
+  let storedPw = localStorage.getItem('puli_farm_password');
+  if (_fbDb) {
+    try {
+      const doc = await _fbDb.collection('settings').doc('auth').get();
+      if (doc.exists) storedPw = doc.data().password || storedPw;
+    } catch(e) {}
+  }
+  if (!storedPw) {
+    // First time — setup mode
+    _isSettingPw = true;
+    document.getElementById('pwLabel').textContent = '設定農場密碼';
+    document.getElementById('pwBtn').textContent = '設定密碼';
+    document.getElementById('pwSetupNote').style.display = 'block';
+  }
+  overlay.classList.remove('hidden');
+}
+
+async function doAuth() {
+  const pwd = document.getElementById('pwInput').value;
+  const err = document.getElementById('pwErr');
+  if (!pwd) { err.textContent = '請輸入密碼'; return; }
+  if (_isSettingPw) {
+    // Save new password
+    localStorage.setItem('puli_farm_password', pwd);
+    if (_fbDb) {
+      try { await _fbDb.collection('settings').doc('auth').set({ password: pwd }); } catch(e) {}
+    }
+    localStorage.setItem('skysef_authed', '1');
+    document.getElementById('pwLoginOverlay').classList.add('hidden');
+    startApp();
+  } else {
+    let storedPw = localStorage.getItem('puli_farm_password');
+    if (_fbDb) {
+      try {
+        const doc = await _fbDb.collection('settings').doc('auth').get();
+        if (doc.exists) storedPw = doc.data().password || storedPw;
+      } catch(e) {}
+    }
+    if (pwd === storedPw) {
+      localStorage.setItem('skysef_authed', '1');
+      document.getElementById('pwLoginOverlay').classList.add('hidden');
+      startApp();
+    } else {
+      err.textContent = '密碼錯誤，請再試一次';
+      document.getElementById('pwInput').value = '';
+      document.getElementById('pwInput').focus();
+    }
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('skysef_authed');
+  location.reload();
+}
+
+async function openChangePwModal() {
+  const newPw = prompt('請輸入新密碼：');
+  if (!newPw) return;
+  localStorage.setItem('puli_farm_password', newPw);
+  if (_fbDb) {
+    try { await _fbDb.collection('settings').doc('auth').set({ password: newPw }); } catch(e) {}
+  }
+  alert('密碼已更新');
+}
+
+function startApp() {
   loadFarmDataFromFirebase();
   updateProfileDisplay();
   renderGallery();
@@ -2004,6 +2118,11 @@ window.onload = function() {
   } else {
     switchView('viewFarmer');
   }
+}
+// ──────────────────────────────────────────────────────────
+
+window.onload = function() {
+  checkAuth();
 };
 </script>
 </body>
