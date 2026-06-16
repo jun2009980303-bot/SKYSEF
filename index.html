@@ -1934,19 +1934,19 @@ function toggleMusicPlayer() {
 let _fbDb   = null;
 let _fbAuth = null;
 
-(function initFirebase() {
+function _tryInitFirebase() {
   try {
-    if (window.SKYSER_FIREBASE_CONFIG && typeof firebase !== 'undefined') {
-      if (!firebase.apps.length) firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
-      _fbDb   = firebase.firestore();
-      _fbAuth = firebase.auth();
-      window.SKYSER_DB   = _fbDb;
-      window.SKYSER_AUTH = _fbAuth;
-    }
+    if (typeof firebase === 'undefined') return false;
+    if (!window.SKYSER_FIREBASE_CONFIG) return false;
+    if (!firebase.apps.length) firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
+    if (!_fbDb   && typeof firebase.firestore === 'function') { _fbDb   = firebase.firestore(); window.SKYSER_DB = _fbDb; }
+    if (!_fbAuth && typeof firebase.auth      === 'function') { _fbAuth = firebase.auth();      window.SKYSER_AUTH = _fbAuth; }
+    return !!_fbAuth;
   } catch(e) {
     console.warn('Firebase init error:', e.message);
+    return false;
   }
-})();
+}
 
 async function loadFarmDataFromFirebase() {
   if (!_fbDb) return;
@@ -2054,8 +2054,17 @@ function initAuth() {
   if (urlParams.get('view') === 'consumer' || window.location.hash === '#consumer') {
     startApp(); return;
   }
+  // Ensure Firebase is initialised (onload timing fix)
+  _tryInitFirebase();
   if (!_fbAuth) {
-    document.getElementById('loginErr').textContent = 'Firebase 未連線，請重新整理';
+    const err = document.getElementById('loginErr');
+    if (typeof firebase === 'undefined') {
+      err.textContent = '⚠ 無法載入 Firebase，請確認網路連線後重新整理';
+    } else if (typeof firebase.auth !== 'function') {
+      err.textContent = '⚠ Firebase Auth 未載入，請重新整理頁面';
+    } else {
+      err.textContent = '⚠ Firebase 初始化失敗，請重新整理頁面';
+    }
     return;
   }
   _fbAuth.onAuthStateChanged(user => {
@@ -2190,6 +2199,7 @@ function startApp() {
 // ──────────────────────────────────────────────────────────
 
 window.onload = function() {
+  _tryInitFirebase(); // ensure CDN fully loaded before auth check
   initAuth();
 };
 </script>
