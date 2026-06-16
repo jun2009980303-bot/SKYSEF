@@ -2049,6 +2049,13 @@ function _syncMuteBtn() {
 let _loginMode = 'login'; // 'login' | 'register' | 'forgot'
 
 function initAuth() {
+  // Detect local file open — Firebase Auth won't work
+  if (location.protocol === 'file:' || location.protocol === 'content:') {
+    const err = document.getElementById('loginErr');
+    err.style.color = '#ffcc00';
+    err.innerHTML = '⚠ 請用瀏覽器開啟網址，不要直接開啟檔案：<br><a href="https://jun2009980303-bot.github.io/SKYSEF/" style="color:#64e07a;word-break:break-all;">jun2009980303-bot.github.io/SKYSEF/</a>';
+    return;
+  }
   // Consumer view is always public
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('view') === 'consumer' || window.location.hash === '#consumer') {
