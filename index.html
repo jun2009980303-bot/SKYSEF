@@ -2128,12 +2128,12 @@ async function doLogin() {
   btn.disabled = true;
   const origText = btn.textContent;
   btn.textContent = '處理中...';
+  const timeout = new Promise((_,reject) => setTimeout(() => reject({code:'auth/timeout'}), 10000));
   try {
-    if (_loginMode === 'login') {
-      await _fbAuth.signInWithEmailAndPassword(email, password);
-    } else {
-      await _fbAuth.createUserWithEmailAndPassword(email, password);
-    }
+    const action = _loginMode === 'login'
+      ? _fbAuth.signInWithEmailAndPassword(email, password)
+      : _fbAuth.createUserWithEmailAndPassword(email, password);
+    await Promise.race([action, timeout]);
   } catch(e) {
     btn.disabled = false;
     btn.textContent = origText;
@@ -2153,6 +2153,7 @@ function _authErrMsg(code) {
     'auth/network-request-failed':'網路連線異常',
     'auth/unauthorized-domain':   '⚠ 此網域未授權。請至 Firebase Console → Authentication → Settings → Authorized domains 新增目前網址',
     'auth/operation-not-allowed': '⚠ Email 登入未啟用。請至 Firebase Console → Authentication → Sign-in method 啟用 Email/Password',
+    'auth/timeout':               '連線逾時。請確認網路正常，並使用 GitHub Pages 網址開啟（非本機檔案）',
   };
   return m[code] || ('操作失敗：' + code);
 }
