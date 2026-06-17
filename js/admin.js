@@ -1,5 +1,5 @@
 // ============================================================
-// SKYSER Admin.js — 後台核心邏輯
+// 福萌芽 Admin.js — 後台核心邏輯
 // ============================================================
 
 let db, auth, storage, currentUser, currentFarmId;
@@ -10,14 +10,14 @@ let db, auth, storage, currentUser, currentFarmId;
 function initAdmin() {
   try {
     if (!firebase.apps.length) {
-      firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
+      firebase.initializeApp(window.福萌芽_FIREBASE_CONFIG);
     }
     db      = firebase.firestore();
     auth    = firebase.auth();
     storage = firebase.storage();
-    window.SKYSER_DB      = db;
-    window.SKYSER_AUTH    = auth;
-    window.SKYSER_STORAGE = storage;
+    window.福萌芽_DB      = db;
+    window.福萌芽_AUTH    = auth;
+    window.福萌芽_STORAGE = storage;
 
     auth.onAuthStateChanged(async user => {
       if (!user) {
@@ -31,7 +31,7 @@ function initAdmin() {
       loadDashboard();
     });
   } catch (e) {
-    console.error('[SKYSER] Firebase 初始化失敗', e);
+    console.error('[福萌芽] Firebase 初始化失敗', e);
     showToast('Firebase 連線失敗：' + e.message, 'error');
   }
 }

@@ -505,7 +505,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
       <rect x="4" y="42" width="64" height="4" rx="2" fill="rgba(100,220,120,0.45)"/>
       <rect x="8" y="47" width="56" height="3.5" rx="1.75" fill="rgba(100,220,120,0.3)"/>
     </svg>
-    <div class="login-title">SKYSEF</div>
+    <div class="login-title">福萌芽</div>
     <div class="login-subtitle">智慧農場管理系統</div>
     <input class="login-input" id="loginEmail" type="email" placeholder="電子郵件" autocomplete="email">
     <input class="login-input" id="loginPassword" type="password" placeholder="密碼" autocomplete="current-password">
@@ -1282,12 +1282,12 @@ let _isRegistering = false;
 
 (function initAuth() {
   try {
-    if (window.SKYSER_FIREBASE_CONFIG && typeof firebase !== 'undefined') {
-      if (!firebase.apps.length) firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
+    if (window.福萌芽_FIREBASE_CONFIG && typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) firebase.initializeApp(window.福萌芽_FIREBASE_CONFIG);
       _fbDb = firebase.firestore();
       _fbAuth = firebase.auth();
-      window.SKYSER_DB = _fbDb;
-      window.SKYSER_AUTH = _fbAuth;
+      window.福萌芽_DB = _fbDb;
+      window.福萌芽_AUTH = _fbAuth;
 
       _fbAuth.onAuthStateChanged(user => {
         const overlay = document.getElementById('loginOverlay');

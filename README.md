@@ -1,4 +1,4 @@
-# 智慧農場：透明動態履歷與智慧編輯系統 (SKYSER)
+# 智慧農場：透明動態履歷與智慧編輯系統 (福萌芽)
 
 ![Status](https://img.shields.io/badge/Status-In_Development-yellow)
 ![Frontend](https://img.shields.io/badge/Frontend-HTML%20%7C%20JS%20%7C%20CSS-blue)
@@ -38,7 +38,7 @@
 ## 📁 檔案結構
 
 ```
-SKYSER/
+福萌芽/
 ├── index.html              # 消費者端（唯讀透明履歷）
 ├── login.html              # 農夫登入頁 ✅ 已建立
 ├── admin.html              # 農夫後台主介面（開發中）
@@ -359,4 +359,4 @@ service cloud.firestore {
 
 ---
 
-**SKYSEF 專案組 — 致力於打造透明、互信的農業未來** 🌱
+**福萌芽 專案組 — 致力於打造透明、互信的農業未來** 🌱

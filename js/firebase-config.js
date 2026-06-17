@@ -1,5 +1,5 @@
 // ============================================================
-// Firebase Configuration - SKYSER 智慧農場系統
+// Firebase Configuration - 福萌芽 智慧農場系統
 // 使用 Firebase Compat CDN 模式（配合 HTML 中的 CDN script 標籤）
 // ============================================================
 
@@ -13,9 +13,9 @@ const firebaseConfig = {
 };
 
 // 掛載到 window 供各頁面使用（Compat 版本由 HTML CDN 引入後統一初始化）
-window.SKYSER_FIREBASE_CONFIG = firebaseConfig;
+window.福萌芽_FIREBASE_CONFIG = firebaseConfig;
 
 // Firebase 實例（初始化後由各頁面填入）
-window.SKYSER_DB      = null;
-window.SKYSER_AUTH    = null;
-window.SKYSER_STORAGE = null;
+window.福萌芽_DB      = null;
+window.福萌芽_AUTH    = null;
+window.福萌芽_STORAGE = null;

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SKYSER 農場後台 - 登入</title>
-<meta name="description" content="SKYSER 智慧農場管理系統 - 農夫專屬後台登入頁面" />
+<title>福萌芽 農場後台 - 登入</title>
+<meta name="description" content="福萌芽 智慧農場管理系統 - 農夫專屬後台登入頁面" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
 <link rel="stylesheet" href="css/login.css" />
 </head>
@@ -15,7 +15,7 @@
     <div class="logo-badge">
       <div class="logo-icon">🌿</div>
     </div>
-    <h1>SKYSER</h1>
+    <h1>福萌芽</h1>
     <p>智慧農場透明履歷系統｜農夫後台</p>
   </div>
 
@@ -53,7 +53,7 @@
 
   <div class="login-footer">
     <p>消費者查看履歷請掃描農產品 QR Code</p>
-    <p style="margin-top:6px;">© 2026 SKYSER 智慧農場系統</p>
+    <p style="margin-top:6px;">© 2026 福萌芽 智慧農場系統</p>
   </div>
 </div>
 
@@ -71,12 +71,12 @@ let app, auth;
 function initFirebase() {
   try {
     if (!firebase.apps.length) {
-      app = firebase.initializeApp(window.SKYSER_FIREBASE_CONFIG);
+      app = firebase.initializeApp(window.福萌芽_FIREBASE_CONFIG);
     } else {
       app = firebase.apps[0];
     }
     auth = firebase.auth();
-    window.SKYSER_AUTH = auth;
+    window.福萌芽_AUTH = auth;
 
     // 若已登入，直接跳轉後台
     auth.onAuthStateChanged(user => {
@@ -85,8 +85,8 @@ function initFirebase() {
       }
     });
   } catch (e) {
-    console.warn('[SKYSER] Firebase 未設定，使用本地測試模式', e.message);
-    window.SKYSER_DEV_MODE = true;
+    console.warn('[福萌芽] Firebase 未設定，使用本地測試模式', e.message);
+    window.福萌芽_DEV_MODE = true;
   }
 }
 
@@ -108,7 +108,7 @@ async function handleLogin(e) {
   errBox.classList.remove('show');
 
   // ---- 開發模式（Firebase 未設定時）----
-  if (window.SKYSER_DEV_MODE) {
+  if (window.福萌芽_DEV_MODE) {
     await sleep(1000);
     if (email === 'demo@skyser.farm' && password === 'demo1234') {
       localStorage.setItem('skyser_dev_user', JSON.stringify({ email, name: '測試農夫', farmId: 'demo-farm' }));
