@@ -13,9 +13,9 @@ const firebaseConfig = {
 };
 
 // 掛載到 window 供各頁面使用（Compat 版本由 HTML CDN 引入後統一初始化）
-window.福萌芽_FIREBASE_CONFIG = firebaseConfig;
+window.FUMENYA_FIREBASE_CONFIG = firebaseConfig;
 
 // Firebase 實例（初始化後由各頁面填入）
-window.福萌芽_DB      = null;
-window.福萌芽_AUTH    = null;
-window.福萌芽_STORAGE = null;
+window.FUMENYA_DB      = null;
+window.FUMENYA_AUTH    = null;
+window.FUMENYA_STORAGE = null;

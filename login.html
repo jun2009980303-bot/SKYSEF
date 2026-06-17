@@ -71,12 +71,12 @@ let app, auth;
 function initFirebase() {
   try {
     if (!firebase.apps.length) {
-      app = firebase.initializeApp(window.福萌芽_FIREBASE_CONFIG);
+      app = firebase.initializeApp(window.FUMENYA_FIREBASE_CONFIG);
     } else {
       app = firebase.apps[0];
     }
     auth = firebase.auth();
-    window.福萌芽_AUTH = auth;
+    window.FUMENYA_AUTH = auth;
 
     // 若已登入，直接跳轉後台
     auth.onAuthStateChanged(user => {
@@ -86,7 +86,7 @@ function initFirebase() {
     });
   } catch (e) {
     console.warn('[福萌芽] Firebase 未設定，使用本地測試模式', e.message);
-    window.福萌芽_DEV_MODE = true;
+    window.FUMENYA_DEV_MODE = true;
   }
 }
 
@@ -108,7 +108,7 @@ async function handleLogin(e) {
   errBox.classList.remove('show');
 
   // ---- 開發模式（Firebase 未設定時）----
-  if (window.福萌芽_DEV_MODE) {
+  if (window.FUMENYA_DEV_MODE) {
     await sleep(1000);
     if (email === 'demo@skyser.farm' && password === 'demo1234') {
       localStorage.setItem('skyser_dev_user', JSON.stringify({ email, name: '測試農夫', farmId: 'demo-farm' }));

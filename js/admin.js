@@ -10,14 +10,14 @@ let db, auth, storage, currentUser, currentFarmId;
 function initAdmin() {
   try {
     if (!firebase.apps.length) {
-      firebase.initializeApp(window.福萌芽_FIREBASE_CONFIG);
+      firebase.initializeApp(window.FUMENYA_FIREBASE_CONFIG);
     }
     db      = firebase.firestore();
     auth    = firebase.auth();
     storage = firebase.storage();
-    window.福萌芽_DB      = db;
-    window.福萌芽_AUTH    = auth;
-    window.福萌芽_STORAGE = storage;
+    window.FUMENYA_DB      = db;
+    window.FUMENYA_AUTH    = auth;
+    window.FUMENYA_STORAGE = storage;
 
     auth.onAuthStateChanged(async user => {
       if (!user) {
