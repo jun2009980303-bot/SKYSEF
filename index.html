@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1" />
+<meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>福萌芽 Formoya - 智慧農場動態履歷</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2376,7 +2376,7 @@ function switchView(viewId) {
   const targetView = document.getElementById(viewId);
   if (!targetView) { console.error('找不到 viewId：', viewId); return; }
   const vp = document.getElementById('viewportMeta');
-  if (vp) vp.setAttribute('content', (viewId === 'viewFarmer' || viewId === 'viewMe') ? 'width=device-width, initial-scale=1' : 'width=1200');
+  if (vp) vp.setAttribute('content', (viewId === 'viewFarmer' || viewId === 'viewMe') ? 'width=device-width, initial-scale=1, viewport-fit=cover' : 'width=1200');
   document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
   targetView.classList.add('active');
 
