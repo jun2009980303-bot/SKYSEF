@@ -267,10 +267,11 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 }
 /* ── 首頁：2026 單畫面精簡版（真實 PNG 素材） ───────────── */
 :root { --brand:#37B24D; --bg-app:#F7FBF6; }
-#viewFarmer.home-v2 { padding:0; background:var(--bg-app); }
-#viewFarmer.home-v2.active {
+#viewFarmer.home-v2 {
+  padding:0;
   height:100svh; height:100dvh; height:100vh;
   overflow:hidden;
+  background:var(--bg-app);
   display:flex; flex-direction:column;
 }
 .hb-wrap {
@@ -353,7 +354,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   .hb-chip-val { font-size:12px; }
   .hb-chip-label { font-size:8.5px; }
   .hb-note { font-size:9.5px; margin-bottom:5px; }
-  .hb-bigbtn { font-size:13px; }
+  .hb-bigbtn { height:38px; font-size:13px; }
   .hb-qic { width:40px; height:40px; }
   .hb-qn { font-size:9px; }
   .hb-ring-outer { width:44px; height:44px; }
@@ -364,7 +365,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   .hb-gacha-top img { max-width:76px; }
   .hb-gcount { font-size:9.5px; }
   .hb-gcount b { font-size:13px; }
-  .hb-drawbtn { font-size:11px; }
+  .hb-drawbtn { height:32px; font-size:11px; }
 }
 @media (min-width:420px) {
   .hb-greet-h { font-size:16px; }
