@@ -1781,6 +1781,508 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .gallery-progress-wrap { background: rgba(0,0,0,0.38) !important; }
 .gallery-progress-fill { background: linear-gradient(90deg,#42a95d,#80e5a0) !important; }
 
+/* Gallery page: bright farm-style reconstruction */
+#viewGallery.view-screen {
+  width: 100%;
+  max-width: 430px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 0 0 118px;
+  color: #193b2c;
+  background: linear-gradient(180deg, #eaf8ff 0, #f7fbf1 34%, #fffdf5 100%) !important;
+  background-image: none !important;
+  background-attachment: scroll;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+#viewGallery .container {
+  width: 100%;
+  max-width: 430px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 0 14px 28px;
+  gap: 0;
+  box-sizing: border-box;
+  overflow: visible;
+}
+#viewGallery .gallery-hero {
+  position: relative;
+  width: calc(100% + 28px);
+  height: 264px;
+  margin: 0 -14px;
+  overflow: hidden;
+  border-radius: 0 0 30px 30px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(221,255,206,0.08)),
+    url('assets/images/consumer-hero-farm.jpg') center center / cover no-repeat;
+  box-shadow: 0 10px 24px rgba(66, 132, 81, 0.14);
+}
+#viewGallery .gallery-hero::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 82px;
+  background: linear-gradient(180deg, transparent, rgba(232,248,225,0.38));
+  pointer-events: none;
+}
+#viewGallery .gallery-coin {
+  position: absolute;
+  z-index: 3;
+  top: max(16px, env(safe-area-inset-top));
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 78px;
+  height: 42px;
+  padding: 0 14px 0 10px;
+  border: 1px solid rgba(255,255,255,0.92);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.9);
+  color: #183526;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 6px 16px rgba(46,105,65,0.15);
+  box-sizing: border-box;
+}
+#viewGallery .gallery-coin img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+#viewGallery .gallery-settings {
+  position: absolute;
+  z-index: 3;
+  top: max(14px, env(safe-area-inset-top));
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.94);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  color: #194333;
+  box-shadow: 0 6px 16px rgba(46,105,65,0.15);
+  cursor: pointer;
+}
+#viewGallery .gallery-settings svg { width: 23px; height: 23px; }
+#viewGallery .gallery-hero-copy {
+  position: absolute;
+  z-index: 2;
+  top: 70px;
+  left: 18px;
+  max-width: 245px;
+  color: #123f2d;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.78);
+}
+#viewGallery .gallery-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#viewGallery .gallery-title {
+  margin: 0;
+  color: #174b34 !important;
+  font-size: 31px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 0 rgba(255,255,255,.94), 0 3px 8px rgba(39,94,54,.12);
+}
+#viewGallery .gallery-title-leaf {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+  transform: rotate(-10deg);
+}
+#viewGallery .gallery-hero-count {
+  margin-left: 2px;
+  padding: 4px 8px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.7);
+  color: #2c6946;
+  font-size: 12px;
+  font-weight: 800;
+}
+#viewGallery .gallery-hero-count { color: #2c6946 !important; }
+#viewGallery .gallery-subtitle {
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: #284f3d;
+}
+#viewGallery .gallery-tabs {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  display: flex;
+  gap: 7px;
+  margin: 0 !important;
+  padding: 3px 14px 4px;
+  overflow-x: auto;
+  scroll-padding-inline: 14px;
+  scrollbar-width: none;
+  box-sizing: border-box;
+}
+#viewGallery .gallery-tabs::-webkit-scrollbar { display: none; }
+#viewGallery .gallery-tab {
+  width: auto;
+  min-width: 82px;
+  height: 60px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  overflow: visible;
+  border: 1.5px solid rgba(91,139,76,0.34);
+  border-radius: 18px;
+  background: rgba(255,254,236,0.94);
+  color: #4b6c59;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  box-shadow: 0 5px 12px rgba(61,108,58,0.12), inset 0 1px 0 #fff;
+}
+#viewGallery .gallery-tab::before { display: none; }
+#viewGallery .gallery-tab:hover {
+  color: #31553f;
+  border-color: rgba(70,139,72,0.5);
+  box-shadow: 0 5px 12px rgba(61,108,58,0.14);
+}
+#viewGallery .gallery-tab.active {
+  color: #176b38;
+  border-color: #38a657;
+  background: linear-gradient(180deg, #fbffe4 0%, #efffc8 100%);
+  box-shadow: 0 5px 14px rgba(47,143,72,0.2), inset 0 0 0 2px rgba(97,191,88,0.12);
+}
+#viewGallery .gallery-tab > span:last-child { color: inherit !important; }
+#viewGallery .gallery-tab-icon {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  font-size: 24px;
+  line-height: 1;
+}
+#viewGallery .gallery-tab-icon svg {
+  width: 25px;
+  height: 25px;
+  opacity: 1;
+  color: currentColor;
+}
+#viewGallery .gallery-tab.active .gallery-tab-icon svg {
+  opacity: 1;
+  filter: none;
+}
+#viewGallery .gallery-summary {
+  position: relative;
+  z-index: 6;
+  width: calc(100% - 28px);
+  min-height: 88px;
+  margin: -13px auto 10px;
+  padding: 13px 15px;
+  display: grid;
+  grid-template-columns: 62px minmax(0,1fr) 78px;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid rgba(130,171,111,0.2);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 9px 22px rgba(71,112,67,0.13);
+  box-sizing: border-box;
+}
+#viewGallery .gallery-summary-book {
+  width: 58px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: linear-gradient(145deg,#75cb56,#359447);
+  color: white;
+  font-size: 31px;
+  box-shadow: 0 5px 10px rgba(42,126,61,0.22);
+  transform: rotate(-3deg);
+}
+#viewGallery .gallery-summary-book img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+#viewGallery .gallery-summary-main,
+#viewGallery .gallery-summary-achievement { min-width: 0; }
+#viewGallery .gallery-summary-label {
+  color: #385345;
+  font-size: 12px;
+  font-weight: 800;
+}
+#viewGallery .gallery-progress-frac {
+  margin-top: 2px;
+  color: #173d2a;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+#viewGallery .gallery-progress-frac small {
+  color: #849287;
+  font-size: 13px;
+  font-weight: 700;
+}
+#viewGallery .gallery-achievement-value {
+  margin-top: 4px;
+  color: #315b43;
+  font-size: 18px;
+  font-weight: 900;
+}
+#viewGallery .gallery-progress-bar {
+  height: 7px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #edf0e9;
+}
+#viewGallery .gallery-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg,#47c970,#77d45b) !important;
+}
+#viewGallery .gallery-progress-fill::after { display: none; }
+#viewGallery .gallery-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 100%;
+  margin: 0;
+}
+#viewGallery .gallery-series-section {
+  --series-bg: #fffaf0;
+  --series-border: #efd9ad;
+  --series-ink: #875b12;
+  position: relative;
+  width: 100%;
+  padding: 11px 10px 13px;
+  overflow: hidden;
+  border: 1px solid var(--series-border);
+  border-radius: 22px;
+  background: var(--series-bg);
+  box-shadow: 0 5px 15px rgba(78,100,66,0.08);
+  box-sizing: border-box;
+}
+#viewGallery .gallery-series-section::after {
+  content: '';
+  position: absolute;
+  right: -13px;
+  bottom: -17px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.75), transparent 66%);
+  opacity: .75;
+  pointer-events: none;
+}
+#viewGallery .gallery-series-section.series-wildlife {
+  --series-bg: linear-gradient(145deg,#fffdf5,#fff8e8);
+  --series-border: #f1dcac;
+  --series-ink: #945b07;
+}
+#viewGallery .gallery-series-section.series-taiwan {
+  --series-bg: linear-gradient(145deg,#f7fcff,#edf8ff);
+  --series-border: #bfdeef;
+  --series-ink: #176da0;
+}
+#viewGallery .gallery-series-section.series-accessory {
+  --series-bg: linear-gradient(145deg,#fcf8ff,#f6eeff);
+  --series-border: #dac9eb;
+  --series-ink: #7c489e;
+}
+#viewGallery .gallery-series-section.series-tools {
+  --series-bg: linear-gradient(145deg,#f8fff3,#eff9e9);
+  --series-border: #c9e0bb;
+  --series-ink: #3c7d35;
+}
+#viewGallery .gallery-series-banner {
+  width: 100%;
+  min-height: 28px;
+  margin: 0 0 8px;
+  padding: 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+#viewGallery .gallery-series-banner::before { display: none; }
+#viewGallery .gallery-series-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #203c30;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .3px;
+}
+#viewGallery .gallery-series-banner-left span:last-child { color: #203c30 !important; }
+#viewGallery .gallery-series-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+#viewGallery .gallery-series-banner-right {
+  padding: 4px 10px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.72);
+  color: var(--series-ink);
+  font-size: 11px;
+  font-weight: 900;
+}
+#viewGallery .gallery-series-bar { display: none; }
+#viewGallery .gallery-series-items {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 7px;
+}
+#viewGallery .gallery-item {
+  min-width: 0;
+  height: 94px;
+  padding: 5px 3px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  border: 1px solid var(--series-border);
+  border-radius: 15px;
+  background: rgba(255,255,255,0.48);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-sizing: border-box;
+}
+#viewGallery .gallery-item::before,
+#viewGallery .gallery-item.collected::after { display: none; }
+#viewGallery .gallery-item.collected {
+  border-color: var(--series-border);
+  background: rgba(255,255,255,0.72);
+  box-shadow: inset 0 1px 0 #fff, 0 3px 8px rgba(64,104,64,.08);
+}
+#viewGallery .gallery-item.locked {
+  opacity: 1;
+  border-color: var(--series-border);
+  background: rgba(255,255,255,0.38);
+}
+#viewGallery .gallery-item:hover,
+#viewGallery .gallery-item.collected:hover,
+#viewGallery .gallery-item.locked:hover {
+  opacity: 1;
+  transform: none;
+  border-color: var(--series-border);
+  box-shadow: inset 0 1px 0 #fff, 0 3px 8px rgba(64,104,64,.08);
+}
+#viewGallery .gallery-item-rarity-label {
+  width: 100%;
+  height: 11px;
+  padding: 0 4px;
+  color: var(--series-ink) !important;
+  font-size: 8px;
+  line-height: 11px;
+  text-align: right;
+  opacity: .62;
+  box-sizing: border-box;
+}
+#viewGallery .gallery-item-art {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto;
+  flex: 0 0 46px;
+}
+#viewGallery .gallery-item img,
+#viewGallery .gallery-item-art img {
+  width: 46px !important;
+  height: 46px !important;
+  object-fit: contain !important;
+  border-radius: 9px !important;
+}
+#viewGallery .gallery-item.locked .gallery-item-art img {
+  filter: grayscale(1) opacity(.16) !important;
+}
+#viewGallery .gallery-lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #68736b;
+  font-size: 0;
+}
+#viewGallery .gallery-lock svg {
+  display: none;
+}
+#viewGallery .gallery-lock::before {
+  content: '';
+  width: 21px;
+  height: 17px;
+  margin-top: 8px;
+  border: 3px solid #68736b;
+  border-radius: 5px;
+  background: rgba(255,255,255,.7);
+  box-shadow: 0 2px 3px rgba(65,78,68,.12);
+  box-sizing: border-box;
+}
+#viewGallery .gallery-lock::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 11px;
+  height: 13px;
+  border: 3px solid #68736b;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+}
+#viewGallery .gallery-stars {
+  height: 9px;
+  margin: 1px 0;
+  gap: 0;
+}
+#viewGallery .gallery-stars svg { width: 8px; height: 8px; }
+#viewGallery .gallery-item-name {
+  width: 100%;
+  min-height: 14px;
+  margin: 0;
+  overflow: hidden;
+  color: #263c31 !important;
+  font-size: 10px;
+  font-weight: 800 !important;
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#viewGallery .gallery-item.locked .gallery-item-name {
+  color: #536158 !important;
+}
+#viewGallery .gallery-empty {
+  padding: 24px 12px;
+  color: #668071 !important;
+  font-size: 13px;
+  text-align: center;
+}
+@media (max-width: 374px) {
+  #viewGallery .gallery-title { font-size: 28px; }
+  #viewGallery .gallery-tab { min-width: 78px; padding-inline: 8px; }
+  #viewGallery .gallery-series-items { gap: 5px; }
+  #viewGallery .gallery-item { height: 90px; }
+}
+
 /* Lottery result */
 .lottery-result { color: rgba(255,255,255,0.90) !important; }
 
@@ -2949,30 +3451,92 @@ body:has(#viewConsumer.active) #loginOverlay { display: none; }
 <div id="viewGallery" class="view-screen">
 <div class="container">
 
-<div style="padding:18px 0 4px; display:flex; align-items:center; justify-content:space-between;">
-  <h2 style="margin:0;font-size:21px;font-weight:700;letter-spacing:0.5px;">角色圖鑑</h2>
-  <span id="galleryCount" style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);"></span>
-</div>
+<section class="gallery-hero">
+  <div class="gallery-coin" aria-label="目前金幣">
+    <img src="assets/images/others/coin.png" alt="">
+    <span id="galleryCoinCount">0</span>
+  </div>
+  <button class="gallery-settings" type="button" aria-label="開啟設定" onclick="openSettings()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.16.38.37.72.6 1 .3.35.68.55 1.1.6H21v4h-.09a1.7 1.7 0 0 0-1.51.4Z"></path>
+    </svg>
+  </button>
+  <div class="gallery-hero-copy">
+    <div class="gallery-title-row">
+      <h2 class="gallery-title">圖鑑</h2>
+      <img class="gallery-title-leaf" src="assets/images/decorations/leaf-right.png" alt="">
+      <span class="gallery-hero-count" id="galleryCount"></span>
+    </div>
+    <div class="gallery-subtitle">記錄農場的每一個發現！</div>
+  </div>
 
-<div class="gallery-tabs" style="margin-bottom:0;">
-  <button class="gallery-tab active" data-series="全部" onclick="switchGalleryTab(this)">
-    <div class="gallery-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/></svg></div>全部
-  </button>
-  <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">
-    <div class="gallery-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-4 0-7-2.5-7-6 0-1.5.5-2.8 1.4-3.8C5.8 9.2 5 7.7 5 6c0-1.1.9-2 2-2 .8 0 1.5.4 1.9 1C9.2 4.4 10 4 11 4h2c1 0 1.8.4 2.1 1C15.5 4.4 16.2 4 17 4c1.1 0 2 .9 2 2 0 1.7-.8 3.2-1.4 4.2C18.5 11.2 19 12.5 19 14c0 3.5-3 6-7 6z"/><circle cx="9" cy="14" r="1" fill="currentColor"/><circle cx="15" cy="14" r="1" fill="currentColor"/></svg></div>野生動物
-  </button>
-  <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">
-    <div class="gallery-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>台灣農產
-  </button>
-  <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">
-    <div class="gallery-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>農村配件
-  </button>
-  <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">
-    <div class="gallery-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg></div>農耕農具
-  </button>
-</div>
-<div id="galleryGrid" class="gallery-grid"></div>
+  <div class="gallery-tabs">
+    <button class="gallery-tab active" data-series="全部" onclick="switchGalleryTab(this)">
+      <span class="gallery-tab-icon" aria-hidden="true">🌐</span><span>全部</span>
+    </button>
+    <button class="gallery-tab" data-series="野生動物" onclick="switchGalleryTab(this)">
+      <span class="gallery-tab-icon" aria-hidden="true">🐾</span><span>野生動物</span>
+    </button>
+    <button class="gallery-tab" data-series="台灣農產" onclick="switchGalleryTab(this)">
+      <span class="gallery-tab-icon" aria-hidden="true">🐟</span><span>台灣魚類</span>
+    </button>
+    <button class="gallery-tab" data-series="農村配件" onclick="switchGalleryTab(this)">
+      <span class="gallery-tab-icon" aria-hidden="true">🏺</span><span>魚類標本</span>
+    </button>
+    <button class="gallery-tab" data-series="農耕農具" onclick="switchGalleryTab(this)">
+      <span class="gallery-tab-icon" aria-hidden="true">🌿</span><span>植物標本</span>
+    </button>
+  </div>
+</section>
 
+<div id="gallerySummary">
+  <div class="gallery-summary">
+    <div class="gallery-summary-book" aria-hidden="true"><img src="assets/images/decorations/leaf-right.png" alt=""></div>
+    <div class="gallery-summary-main">
+      <div class="gallery-summary-label">收藏總數</div>
+      <div class="gallery-progress-frac">0 <small>/ 30</small></div>
+      <div class="gallery-progress-bar"><div class="gallery-progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="gallery-summary-achievement">
+      <div class="gallery-summary-label">成就</div>
+      <div class="gallery-achievement-value">0%</div>
+    </div>
+  </div>
+</div>
+<div id="galleryGrid" class="gallery-grid">
+  <section class="gallery-series-section series-wildlife" aria-label="圖鑑載入中">
+    <div class="gallery-series-banner">
+      <div class="gallery-series-banner-left"><span class="gallery-series-icon">🐾</span><span>野生動物</span></div>
+      <div class="gallery-series-banner-right">0/7</div>
+    </div>
+    <div class="gallery-series-items">
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+    </div>
+  </section>
+  <section class="gallery-series-section series-taiwan" aria-label="圖鑑載入中">
+    <div class="gallery-series-banner">
+      <div class="gallery-series-banner-left"><span class="gallery-series-icon">🐟</span><span>台灣魚類</span></div>
+      <div class="gallery-series-banner-right">0/15</div>
+    </div>
+    <div class="gallery-series-items">
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+      <div class="gallery-item locked"><div class="gallery-item-rarity-label">???</div><div class="gallery-item-art"><div class="gallery-lock">🔒</div></div><div class="gallery-item-name">???</div></div>
+    </div>
+  </section>
+</div>
 </div>
 </div>
 
@@ -3756,7 +4320,13 @@ const seriesMap = {
   '澆水壺':'農耕農具','復古澆水壺':'農耕農具','圓胖澆水壺':'農耕農具','帆布袋':'農耕農具',
 };
 const SERIES_ORDER = ['野生動物','台灣農產','農村配件','農耕農具'];
-const SERIES_LABELS = {'野生動物':'野生動物','台灣農產':'台灣農產','農村配件':'農村配件','農耕農具':'農耕農具'};
+const SERIES_LABELS = {'野生動物':'野生動物','台灣農產':'台灣魚類','農村配件':'魚類標本','農耕農具':'植物標本'};
+const GALLERY_SERIES_UI = {
+  '野生動物': { icon:'🐾', className:'series-wildlife' },
+  '台灣農產': { icon:'🐟', className:'series-taiwan' },
+  '農村配件': { icon:'🏺', className:'series-accessory' },
+  '農耕農具': { icon:'🌿', className:'series-tools' },
+};
 let currentGalleryTab = '全部';
 
 let gallery = JSON.parse(localStorage.getItem('skysef_gallery') || '[]');
@@ -3807,27 +4377,28 @@ function renderGalleryItem(item, collected, seriesColor) {
   if (collected) {
     return `<div class="gallery-item collected" style="--series-color:${col}">
       <div class="gallery-item-rarity-label" style="color:${rarity.color}">${rarity.label}</div>
-      <img src="${item.img}" alt="${item.name}">
+      <div class="gallery-item-art"><img src="${item.img}" alt="${item.name}"></div>
       <div class="gallery-stars">${stars}</div>
       <div class="gallery-item-name">${item.name}</div>
     </div>`;
   } else {
     return `<div class="gallery-item locked">
-      <div class="gallery-item-rarity-label" style="color:rgba(255,255,255,0.2)">???</div>
-      <div style="position:relative;width:68px;height:68px;margin:0 auto;">
-        <img src="${item.img}" alt="?" style="width:68px;height:68px;object-fit:contain;border-radius:10px;filter:brightness(0) saturate(0) opacity(0.45);">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="gallery-item-rarity-label">???</div>
+      <div class="gallery-item-art">
+        <img src="${item.img}" alt="">
+        <div class="gallery-lock" aria-label="尚未解鎖">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
         </div>
       </div>
-      <div class="gallery-stars">${_rarityStars(rarity.stars,'rgba(255,255,255,0.12)')}</div>
-      <div class="gallery-item-name" style="color:rgba(255,255,255,0.25);">???</div>
+      <div class="gallery-stars">${_rarityStars(rarity.stars,'rgba(86,116,91,0.2)')}</div>
+      <div class="gallery-item-name">???</div>
     </div>`;
   }
 }
 
 function renderGallery() {
   const grid = document.getElementById('galleryGrid');
+  const summary = document.getElementById('gallerySummary');
   const collectedNames = new Set(gallery.map(g => g.name));
   const total = characterPool.length;
   const collected = collectedNames.size;
@@ -3836,36 +4407,49 @@ function renderGallery() {
   if (count) count.innerText = `(${collected}/${total})`;
   const countFarmer = document.getElementById('galleryCountFarmer');
   if (countFarmer) countFarmer.innerText = `${collected}/${total} 個`;
+  const galleryCoinCount = document.getElementById('galleryCoinCount');
+  const ticketBadge = document.getElementById('ticketBadge');
+  if (galleryCoinCount) galleryCoinCount.textContent = ticketBadge ? ticketBadge.textContent : '0';
 
-  // Progress bar
   const pct = total > 0 ? Math.round(collected / total * 100) : 0;
-  let html = `<div class="gallery-progress-wrap">
-    <div class="gallery-progress-top">
-      <span class="gallery-progress-label">收集進度</span>
-      <span class="gallery-progress-frac">${collected} <span style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);">/ ${total}</span></span>
-    </div>
-    <div class="gallery-progress-bar"><div class="gallery-progress-fill" style="width:${pct}%"></div></div>
-  </div>`;
+  if (summary) {
+    summary.innerHTML = `<div class="gallery-summary">
+      <div class="gallery-summary-book" aria-hidden="true"><img src="assets/images/decorations/leaf-right.png" alt=""></div>
+      <div class="gallery-summary-main">
+        <div class="gallery-summary-label">收藏總數</div>
+        <div class="gallery-progress-frac">${collected} <small>/ ${total}</small></div>
+        <div class="gallery-progress-bar"><div class="gallery-progress-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="gallery-summary-achievement">
+        <div class="gallery-summary-label">成就</div>
+        <div class="gallery-achievement-value">${pct}%</div>
+      </div>
+    </div>`;
+  }
 
+  let html = '';
   const seriesToShow = currentGalleryTab === '全部' ? SERIES_ORDER : [currentGalleryTab];
 
   for (const s of seriesToShow) {
     const chars = characterPool.filter(c => (seriesMap[c.name] || '其他') === s);
     if (chars.length === 0) continue;
     const sc = SERIES_COLORS[s] || SERIES_COLORS['其他'];
+    const ui = GALLERY_SERIES_UI[s] || { icon:'🌱', className:'series-tools' };
     const seriesCollected = chars.filter(c => collectedNames.has(c.name)).length;
-    const sPct = chars.length > 0 ? Math.round(seriesCollected / chars.length * 100) : 0;
-    html += `<div class="gallery-series-banner" style="--series-color:${sc.css};">
-      <div>
-        <div class="gallery-series-banner-left">${s}</div>
-        <div class="gallery-series-bar"><div class="gallery-series-bar-fill" style="width:${sPct}%;background:rgba(255,255,255,0.6);"></div></div>
+    html += `<section class="gallery-series-section ${ui.className}">
+      <div class="gallery-series-banner" style="--series-color:${sc.css};">
+        <div class="gallery-series-banner-left"><span class="gallery-series-icon" aria-hidden="true">${ui.icon}</span><span>${SERIES_LABELS[s] || s}</span></div>
+        <div class="gallery-series-banner-right">${seriesCollected}/${chars.length}</div>
       </div>
-      <div class="gallery-series-banner-right">${seriesCollected}/${chars.length}</div>
-    </div>`;
-    html += chars.map(c => renderGalleryItem(c, collectedNames.has(c.name), sc.css)).join('');
+      <div class="gallery-series-items">
+        ${chars.map(c => renderGalleryItem(c, collectedNames.has(c.name), sc.css)).join('')}
+      </div>
+    </section>`;
   }
 
-  if (!html.includes('gallery-series-banner')) html += '<div class="gallery-empty">此系列尚無角色資料。</div>';
+  if (!html.includes('gallery-series-section')) {
+    html = '<div class="gallery-empty">此系列尚無角色資料。</div>';
+  }
   grid.innerHTML = html;
 }
 
