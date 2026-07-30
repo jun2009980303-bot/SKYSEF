@@ -2433,6 +2433,7 @@ body:has(#viewFarmer.active) .ticket-fab { display:none; }
 #viewConsumer .cs-month-selector {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   min-height: 28px;
   box-sizing: border-box;
@@ -2443,7 +2444,14 @@ body:has(#viewFarmer.active) .ticket-fab { display:none; }
   color: #57705C;
   font-size: 10px;
   font-weight: 750;
+  font-family: inherit;
   box-shadow: 0 3px 9px rgba(63, 102, 59, 0.07);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#viewConsumer .cs-month-selector:focus-visible {
+  outline: 2px solid rgba(74, 154, 91, 0.42);
+  outline-offset: 2px;
 }
 #viewConsumer .cs-month-selector::before {
   content: '▣';
@@ -2455,6 +2463,115 @@ body:has(#viewFarmer.active) .ticket-fab { display:none; }
   color: #7A8D7D;
   font-size: 11px;
   transform: translateY(-1px);
+}
+#viewConsumer .cs-date-picker {
+  display: none;
+  position: absolute;
+  z-index: 25;
+  top: 54px;
+  left: 12px;
+  right: 12px;
+  width: auto;
+  max-width: calc(100% - 24px);
+  max-height: min(380px, calc(100dvh - 150px));
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid rgba(144, 181, 133, 0.5);
+  border-radius: 20px;
+  background: rgba(255, 255, 252, 0.98);
+  box-shadow: 0 16px 38px rgba(44, 82, 47, 0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+#viewConsumer .cs-date-picker.open { display: block; }
+#viewConsumer .cs-picker-toolbar {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) minmax(0, 0.82fr) 30px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#viewConsumer .cs-picker-nav,
+#viewConsumer .cs-picker-select,
+#viewConsumer .cs-picker-action,
+#viewConsumer .cs-picker-day {
+  border: 1px solid rgba(138, 176, 129, 0.34);
+  background: #F5FAF2;
+  color: #405F48;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#viewConsumer .cs-picker-nav {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 15px;
+}
+#viewConsumer .cs-picker-select {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 5px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 750;
+}
+#viewConsumer .cs-picker-weekdays,
+#viewConsumer .cs-picker-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+#viewConsumer .cs-picker-weekdays {
+  margin-bottom: 4px;
+  color: #839087;
+  font-size: 9px;
+  font-weight: 750;
+  text-align: center;
+}
+#viewConsumer .cs-picker-weekdays > span { padding: 3px 0; }
+#viewConsumer .cs-picker-day {
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border-color: transparent;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+}
+#viewConsumer .cs-picker-day.has-records {
+  border-color: rgba(88, 157, 94, 0.34);
+  background: #EBF6E8;
+}
+#viewConsumer .cs-picker-day.selected {
+  border-color: #398B50;
+  background: #3FA45C;
+  color: #fff;
+}
+#viewConsumer .cs-picker-day:disabled {
+  visibility: hidden;
+  pointer-events: none;
+}
+#viewConsumer .cs-picker-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+#viewConsumer .cs-picker-action {
+  min-height: 30px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 750;
+}
+#viewConsumer .cs-picker-action.primary {
+  border-color: rgba(63, 164, 92, 0.45);
+  background: #E6F4E5;
+  color: #347448;
 }
 #viewConsumer .tl-section {
   display: grid;
@@ -2512,7 +2629,13 @@ body:has(#viewFarmer.active) .ticket-fab { display:none; }
   padding: 11px 13px;
   box-shadow: 0 7px 17px rgba(55, 102, 58, 0.08);
 }
-#viewConsumer .tl-card.has-thumb { padding-right: 74px; }
+#viewConsumer .tl-card.has-thumb {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(72px, 20vw, 82px);
+  align-items: center;
+  gap: 9px;
+}
+#viewConsumer .tl-card-body { min-width: 0; }
 #viewConsumer .tl-card-time {
   color: #829086 !important;
   font-size: 10px;
@@ -2547,28 +2670,17 @@ body:has(#viewFarmer.active) .ticket-fab { display:none; }
 }
 #viewConsumer .tl-card-note { color: #637067 !important; font-size: 11px; line-height: 1.45; }
 #viewConsumer .tl-card-thumb {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  width: 58px;
-  height: 58px;
-  object-fit: contain;
-  border-radius: 15px;
-  transform: translateY(-50%);
-  mix-blend-mode: normal;
-}
-#viewConsumer .tl-photo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 5px;
-  margin-top: 6px;
-}
-#viewConsumer .tl-photo-grid.single { grid-template-columns: 1fr; }
-#viewConsumer .tl-photo-grid img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
+  position: static;
+  display: block;
+  width: clamp(72px, 20vw, 82px);
+  height: clamp(72px, 20vw, 82px);
+  max-width: 82px;
+  aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(133, 172, 124, 0.24);
+  box-shadow: 0 4px 11px rgba(55, 86, 56, 0.11);
+  mix-blend-mode: normal;
 }
 #viewConsumer .tl-empty {
   position: relative;
@@ -2948,7 +3060,23 @@ body:has(#viewConsumer.active) #loginOverlay { display: none; }
 <div class="panel cs-timeline-card">
 <div class="cs-timeline-header">
   <div class="panel-title"><img class="cs-panel-icon" src="assets/images/icons/icon-task.png" alt=""><span>每日記錄</span></div>
-  <div class="cs-month-selector" id="timelineMonthLabel">2026年7月</div>
+  <button class="cs-month-selector" id="timelineMonthLabel" type="button" aria-expanded="false" aria-controls="timelineDatePicker" onclick="toggleTimelineDatePicker(event)">2026年7月</button>
+</div>
+<div class="cs-date-picker" id="timelineDatePicker" aria-hidden="true">
+  <div class="cs-picker-toolbar">
+    <button class="cs-picker-nav" type="button" aria-label="上一個月" onclick="shiftTimelineMonth(-1)">‹</button>
+    <select class="cs-picker-select" id="timelineYearSelect" aria-label="選擇年份" onchange="changeTimelineYear(this.value)"></select>
+    <select class="cs-picker-select" id="timelineMonthSelect" aria-label="選擇月份" onchange="changeTimelineMonth(this.value)"></select>
+    <button class="cs-picker-nav" type="button" aria-label="下一個月" onclick="shiftTimelineMonth(1)">›</button>
+  </div>
+  <div class="cs-picker-weekdays" aria-hidden="true">
+    <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+  </div>
+  <div class="cs-picker-days" id="timelineCalendarDays" role="grid" aria-label="選擇日期"></div>
+  <div class="cs-picker-footer">
+    <button class="cs-picker-action primary" type="button" onclick="showTimelineWholeMonth()">顯示整月</button>
+    <button class="cs-picker-action" type="button" onclick="closeTimelineDatePicker()">關閉</button>
+  </div>
 </div>
 <div id="dailyTimeline"></div>
 </div>
@@ -3774,6 +3902,128 @@ function handleFarmerPhoto(event) {
   reader.readAsDataURL(file);
 }
 
+let timelineSelectedYear = null;
+let timelineSelectedMonth = null;
+let timelineSelectedDay = null;
+let timelineAvailableDates = new Set();
+
+function normalizeTimelineDate(value) {
+  const match = String(value || '').match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+  if (!match) return '';
+  return `${match[1]}/${String(Number(match[2])).padStart(2, '0')}/${String(Number(match[3])).padStart(2, '0')}`;
+}
+
+function timelineLogFullDate(log, fallbackYear = new Date().getFullYear()) {
+  const fullDate = normalizeTimelineDate(log && log.fullDate);
+  if (fullDate) return fullDate;
+  const dateText = String((log && log.date) || '');
+  const fullFromDate = normalizeTimelineDate(dateText);
+  if (fullFromDate) return fullFromDate;
+  const md = dateText.match(/(\d{1,2})[/-](\d{1,2})/);
+  return md ? `${fallbackYear}/${String(Number(md[1])).padStart(2, '0')}/${String(Number(md[2])).padStart(2, '0')}` : '';
+}
+
+function timelineMinutes(value) {
+  const match = String(value || '').match(/(\d{1,2}):(\d{2})/);
+  return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+}
+
+function closeTimelineDatePicker() {
+  const picker = document.getElementById('timelineDatePicker');
+  const selector = document.getElementById('timelineMonthLabel');
+  if (picker) {
+    picker.classList.remove('open');
+    picker.setAttribute('aria-hidden', 'true');
+  }
+  if (selector) selector.setAttribute('aria-expanded', 'false');
+}
+
+function toggleTimelineDatePicker(event) {
+  if (event) event.stopPropagation();
+  const picker = document.getElementById('timelineDatePicker');
+  const selector = document.getElementById('timelineMonthLabel');
+  if (!picker || !selector) return;
+  const opening = !picker.classList.contains('open');
+  picker.classList.toggle('open', opening);
+  picker.setAttribute('aria-hidden', String(!opening));
+  selector.setAttribute('aria-expanded', String(opening));
+  if (opening) renderTimelineDatePicker();
+}
+
+function changeTimelineYear(value) {
+  timelineSelectedYear = Number(value);
+  timelineSelectedDay = null;
+  renderDailyTimeline();
+}
+
+function changeTimelineMonth(value) {
+  timelineSelectedMonth = Number(value);
+  timelineSelectedDay = null;
+  renderDailyTimeline();
+}
+
+function shiftTimelineMonth(step) {
+  let year = Number(timelineSelectedYear);
+  let month = Number(timelineSelectedMonth) + step;
+  if (month < 1) { month = 12; year -= 1; }
+  if (month > 12) { month = 1; year += 1; }
+  timelineSelectedYear = year;
+  timelineSelectedMonth = month;
+  timelineSelectedDay = null;
+  renderDailyTimeline();
+}
+
+function selectTimelineDay(day) {
+  timelineSelectedDay = Number(day);
+  renderDailyTimeline();
+  closeTimelineDatePicker();
+}
+
+function showTimelineWholeMonth() {
+  timelineSelectedDay = null;
+  renderDailyTimeline();
+  closeTimelineDatePicker();
+}
+
+function renderTimelineDatePicker() {
+  const yearSelect = document.getElementById('timelineYearSelect');
+  const monthSelect = document.getElementById('timelineMonthSelect');
+  const daysEl = document.getElementById('timelineCalendarDays');
+  if (!yearSelect || !monthSelect || !daysEl || !timelineSelectedYear || !timelineSelectedMonth) return;
+
+  const availableYears = [...timelineAvailableDates].map(date => Number(date.slice(0, 4))).filter(Boolean);
+  const currentYear = new Date().getFullYear();
+  const minYear = Math.min(currentYear - 3, timelineSelectedYear, ...(availableYears.length ? availableYears : [timelineSelectedYear]));
+  const maxYear = Math.max(currentYear + 3, timelineSelectedYear, ...(availableYears.length ? availableYears : [timelineSelectedYear]));
+  yearSelect.innerHTML = Array.from({ length: maxYear - minYear + 1 }, (_, index) => {
+    const year = minYear + index;
+    return `<option value="${year}"${year === timelineSelectedYear ? ' selected' : ''}>${year}年</option>`;
+  }).join('');
+  monthSelect.innerHTML = Array.from({ length: 12 }, (_, index) => {
+    const month = index + 1;
+    return `<option value="${month}"${month === timelineSelectedMonth ? ' selected' : ''}>${month}月</option>`;
+  }).join('');
+
+  const firstWeekday = new Date(timelineSelectedYear, timelineSelectedMonth - 1, 1).getDay();
+  const daysInMonth = new Date(timelineSelectedYear, timelineSelectedMonth, 0).getDate();
+  const cells = Array.from({ length: firstWeekday }, () => '<button class="cs-picker-day" type="button" disabled aria-hidden="true"></button>');
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const dateKey = `${timelineSelectedYear}/${String(timelineSelectedMonth).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+    const hasRecords = timelineAvailableDates.has(dateKey);
+    const selected = timelineSelectedDay === day;
+    cells.push(`<button class="cs-picker-day${hasRecords ? ' has-records' : ''}${selected ? ' selected' : ''}" type="button" role="gridcell" aria-label="${timelineSelectedYear}年${timelineSelectedMonth}月${day}日${hasRecords ? '，有紀錄' : ''}" onclick="selectTimelineDay(${day})">${day}</button>`);
+  }
+  daysEl.innerHTML = cells.join('');
+}
+
+document.addEventListener('click', event => {
+  const picker = document.getElementById('timelineDatePicker');
+  const selector = document.getElementById('timelineMonthLabel');
+  if (picker && picker.classList.contains('open') && !picker.contains(event.target) && event.target !== selector) {
+    closeTimelineDatePicker();
+  }
+});
+
 function renderDailyTimeline() {
   const el = document.getElementById('dailyTimeline');
   if (!el) return;
@@ -3817,81 +4067,112 @@ function renderDailyTimeline() {
     }
   ];
   const timelineLogs = previewOnly ? previewLogs : logs;
+  const fallbackYear = new Date().getFullYear();
   const photosByDate = {};
-  dailyPhotos.forEach(p => {
-    if (!photosByDate[p.date]) photosByDate[p.date] = [];
-    photosByDate[p.date].push(p);
+  dailyPhotos.forEach(photo => {
+    const date = normalizeTimelineDate(photo.date);
+    if (!date) return;
+    if (!photosByDate[date]) photosByDate[date] = [];
+    photosByDate[date].push(photo);
   });
 
-  const curYear = new Date().getFullYear();
-  function logToFullDate(l) {
-    if (l.fullDate) return l.fullDate;
-    if (!l.date) return '';
-    const md = l.date.split(' ')[0];
-    const parts = md.split('/');
-    if (parts.length === 2) return `${curYear}/${parts[0]}/${parts[1]}`;
-    return md;
+  const allDates = new Set([
+    ...timelineLogs.map(log => timelineLogFullDate(log, fallbackYear)),
+    ...Object.keys(photosByDate)
+  ].filter(Boolean));
+  const allSortedDates = [...allDates].sort((a, b) => b.localeCompare(a));
+  timelineAvailableDates = new Set(allSortedDates);
+
+  if (!timelineSelectedYear || !timelineSelectedMonth) {
+    const initialDate = allSortedDates[0] || normalizeTimelineDate(new Date().toLocaleDateString('zh-TW'));
+    const [year, month] = initialDate.split('/').map(Number);
+    timelineSelectedYear = year;
+    timelineSelectedMonth = month;
   }
 
-  const allDates = new Set([...timelineLogs.map(logToFullDate), ...dailyPhotos.map(p => p.date)]);
-  const sorted = [...allDates].filter(Boolean).sort((a,b) => b.localeCompare(a));
+  const selectedMonthKey = `${timelineSelectedYear}/${String(timelineSelectedMonth).padStart(2, '0')}`;
+  const selectedDayKey = timelineSelectedDay
+    ? `${selectedMonthKey}/${String(timelineSelectedDay).padStart(2, '0')}`
+    : '';
+  const sorted = allSortedDates.filter(date => selectedDayKey ? date === selectedDayKey : date.startsWith(`${selectedMonthKey}/`));
   const palette = ['#80e5a0','#64b5f6','#ffb74d','#f48fb1','#b39ddb'];
   const monthLabel = document.getElementById('timelineMonthLabel');
-  if (monthLabel && sorted.length > 0) {
-    const [labelYear, labelMonth] = sorted[0].split('/');
-    monthLabel.textContent = `${labelYear}年${Number(labelMonth)}月`;
+  if (monthLabel) monthLabel.textContent = `${timelineSelectedYear}年${timelineSelectedMonth}月`;
+
+  if (sorted.length === 0) {
+    el.innerHTML = `<div class="tl-empty">
+      <div class="tl-empty-title">${timelineSelectedDay ? `${timelineSelectedMonth}月${timelineSelectedDay}日` : `${timelineSelectedYear}年${timelineSelectedMonth}月`}尚無農事記錄</div>
+      <div class="tl-empty-text">可選擇其他日期，或點選「顯示整月」查看本月全部紀錄。</div>
+    </div>`;
+    renderTimelineDatePicker();
+    return;
   }
 
   el.innerHTML = sorted.map((date, idx) => {
-    const dateMD = date.slice(5);
-    const dayLogs = timelineLogs.filter(l => l.fullDate ? l.fullDate === date : (l.date && l.date.startsWith(dateMD)));
-    const datePhotos = photosByDate[date] || [];
+    const dayLogs = timelineLogs.filter(log => timelineLogFullDate(log, fallbackYear) === date);
+    const unmatchedPhotos = [...(photosByDate[date] || [])];
     const [yyyy, mm, dd] = date.split('/');
-    const weekDay = ['日','一','二','三','四','五','六'][new Date(date).getDay()];
+    const weekDay = ['日','一','二','三','四','五','六'][new Date(Number(yyyy), Number(mm) - 1, Number(dd)).getDay()];
     const color = palette[idx % palette.length];
-
     const items = [];
-    if (datePhotos.length > 0) {
-      const thumbs = datePhotos.map(p =>
-        `<img src="${p.img}" alt="植物照片">`
-      ).join('');
+
+    dayLogs.forEach(log => {
+      const timeStr = log.date ? log.date.split(' ').slice(1).join(' ') : '';
+      let recordImage = log.img || log.image || log.photo || '';
+      if (!recordImage && unmatchedPhotos.length) {
+        const logMinute = timelineMinutes(timeStr);
+        let photoIndex = 0;
+        if (logMinute !== null) {
+          let closestDifference = Infinity;
+          unmatchedPhotos.forEach((photo, index) => {
+            const photoMinute = timelineMinutes(photo.time);
+            const difference = photoMinute === null ? Infinity : Math.abs(photoMinute - logMinute);
+            if (difference < closestDifference) {
+              closestDifference = difference;
+              photoIndex = index;
+            }
+          });
+        }
+        recordImage = unmatchedPhotos.splice(photoIndex, 1)[0]?.img || '';
+      }
+      if (!recordImage && log.previewOnly) recordImage = consumerWikiImages[log.type] || '';
+
       items.push(`<div class="tl-item">
         <div class="tl-dot-circle" style="background:${color};"></div>
-        <div class="tl-card">
-          <div class="tl-card-time">植物照片 ×${datePhotos.length}</div>
-          <div class="tl-photo-grid${datePhotos.length === 1 ? ' single' : ''}">${thumbs}</div>
-        </div>
-      </div>`);
-    }
-    dayLogs.forEach(l => {
-      const timeStr = l.date ? l.date.split(' ').slice(1).join(' ') : '';
-      const cropImage = consumerWikiImages[l.type] || '';
-      items.push(`<div class="tl-item">
-        <div class="tl-dot-circle" style="background:${color};"></div>
-        <div class="tl-card${cropImage ? ' has-thumb' : ''}">
-          <div class="tl-card-time-row">
-            ${timeStr ? `<div class="tl-card-time">${timeStr}</div>` : ''}
-            ${l.previewOnly ? '<span class="tl-preview-chip">版面預覽</span>' : ''}
+        <div class="tl-card${recordImage ? ' has-thumb' : ''}">
+          <div class="tl-card-body">
+            <div class="tl-card-time-row">
+              ${timeStr ? `<div class="tl-card-time">${timeStr}</div>` : ''}
+              ${log.previewOnly ? '<span class="tl-preview-chip">版面預覽</span>' : ''}
+            </div>
+            <div class="tl-card-crop">${log.type || '農場作物'}${log.name && log.name !== '今日批次' ? ' · '+log.name : ''}</div>
+            <div class="tl-card-tags">
+              ${log.temp ? `<span class="tl-card-tag">溫 ${log.temp}°C</span>` : ''}
+              ${log.hum  ? `<span class="tl-card-tag">濕 ${log.hum}%</span>` : ''}
+              ${log.ph && log.ph !== '--' ? `<span class="tl-card-tag">pH ${log.ph}</span>` : ''}
+            </div>
+            ${log.note ? `<div class="tl-card-note">${log.note}</div>` : ''}
           </div>
-          <div class="tl-card-crop">${l.type || '農場作物'}${l.name && l.name !== '今日批次' ? ' · '+l.name : ''}</div>
-          <div class="tl-card-tags">
-            ${l.temp ? `<span class="tl-card-tag">溫 ${l.temp}°C</span>` : ''}
-            ${l.hum  ? `<span class="tl-card-tag">濕 ${l.hum}%</span>` : ''}
-            ${l.ph && l.ph !== '--' ? `<span class="tl-card-tag">pH ${l.ph}</span>` : ''}
-          </div>
-          ${l.note ? `<div class="tl-card-note">${l.note}</div>` : ''}
-          ${cropImage ? `<img class="tl-card-thumb" src="${cropImage}" alt="${l.type || '作物'}">` : ''}
+          ${recordImage ? `<img class="tl-card-thumb" src="${recordImage}" alt="${log.type || '農事紀錄'}照片">` : ''}
         </div>
       </div>`);
     });
-    if (items.length === 0) {
-      items.push(`<div class="tl-item">
-        <div class="tl-dot-circle" style="background:rgba(255,255,255,0.25);"></div>
-        <div class="tl-card"><div class="tl-card-note" style="color:rgba(255,255,255,0.3);">當日無農事紀錄</div></div>
-      </div>`);
-    }
 
-    return `<div class="tl-section">
+    unmatchedPhotos.forEach(photo => {
+      items.push(`<div class="tl-item">
+        <div class="tl-dot-circle" style="background:${color};"></div>
+        <div class="tl-card has-thumb">
+          <div class="tl-card-body">
+            <div class="tl-card-time">${photo.time || ''}</div>
+            <div class="tl-card-crop">植物照片紀錄</div>
+            <div class="tl-card-note">當日生長影像紀錄</div>
+          </div>
+          <img class="tl-card-thumb" src="${photo.img}" alt="植物照片">
+        </div>
+      </div>`);
+    });
+
+    return `<div class="tl-section" id="timeline-date-${yyyy}-${mm}-${dd}">
       <div class="tl-date-column">
         <div class="tl-date-box" style="border-color:${color}55;background:${color}18;">
           <div class="tl-date-day" style="color:${color};">${dd}</div>
@@ -3903,6 +4184,7 @@ function renderDailyTimeline() {
       <div class="tl-day-content">${items.join('')}</div>
     </div>`;
   }).join('');
+  renderTimelineDatePicker();
 }
 
 let _cameraStream = null;
