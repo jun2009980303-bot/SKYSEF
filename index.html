@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>福萌芽 Formoya - 智慧農場動態履歷</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2091,6 +2091,12 @@ body:has(#viewFarmer.active) .ticket-fab { display:none; }
     radial-gradient(circle at 10% 42%, rgba(255, 228, 146, 0.18), transparent 27%),
     radial-gradient(circle at 92% 68%, rgba(158, 221, 169, 0.18), transparent 25%),
     linear-gradient(180deg, #EFF9F2 0%, #FFFDF5 43%, #F2FAF2 100%);
+  width: 100%;
+  max-width: 430px;
+  min-width: 0;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
   padding: 0 0 116px;
   scroll-padding-bottom: 116px;
   scrollbar-width: none;
@@ -2153,11 +2159,27 @@ body:has(#viewFarmer.active) .ticket-fab { display:none; }
 #viewConsumer .container {
   position: relative;
   z-index: 2;
-  width: auto;
-  max-width: 760px;
-  margin: -70px 18px 0;
+  width: calc(100% - 36px);
+  max-width: 394px;
+  min-width: 0;
+  margin: -70px auto 0;
+  box-sizing: border-box;
   gap: 14px;
   padding-bottom: 36px;
+}
+
+#viewConsumer img,
+#viewConsumer svg,
+#viewConsumer canvas,
+#viewConsumer .panel,
+#viewConsumer .daily-card,
+#viewConsumer .cs-chart-box,
+#viewConsumer .cs-timeline-card,
+#viewConsumer .tl-section,
+#viewConsumer .tl-card {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 #viewConsumer .daily-card {
@@ -4056,8 +4078,8 @@ function saveQuickLog() {
 function switchView(viewId) {
   const targetView = document.getElementById(viewId);
   if (!targetView) { console.error('找不到 viewId：', viewId); return; }
-  const vp = document.getElementById('viewportMeta');
-  if (vp) vp.setAttribute('content', (viewId === 'viewFarmer' || viewId === 'viewMe') ? 'width=device-width, initial-scale=1, viewport-fit=cover' : 'width=1200');
+  const vp = document.querySelector('meta[name="viewport"]');
+  if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
   document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
   targetView.classList.add('active');
 
