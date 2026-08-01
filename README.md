@@ -1,4 +1,4 @@
-# 智慧農場：透明動態履歷與智慧編輯系統 (SKYSER)
+# 智慧農場：透明動態履歷與智慧編輯系統 (SKYSEF)
 
 ![Status](https://img.shields.io/badge/Status-In_Development-yellow)
 ![Frontend](https://img.shields.io/badge/Frontend-HTML%20%7C%20JS%20%7C%20CSS-blue)
@@ -35,26 +35,34 @@
 
 ---
 
-## 📁 檔案結構
+## 📁 目前前端架構
 
 ```
-SKYSER/
-├── index.html              # 消費者端（唯讀透明履歷）
-├── login.html              # 農夫登入頁 ✅ 已建立
-├── admin.html              # 農夫後台主介面（開發中）
+SKYSEF/
+├── index.html              # 主應用的語意化 HTML 結構
 ├── js/
-│   ├── firebase-config.js  # Firebase 設定與初始化 ✅ 已建立
-│   ├── admin.js            # 後台核心邏輯（開發中）
-│   ├── consumer.js         # 消費者端邏輯
-│   └── gacha.js            # 扭蛋抽獎邏輯
+│   ├── app.js              # 共用狀態與所有功能邏輯
+│   ├── character-data.js   # 大型扭蛋角色與圖像資料
+│   ├── i18n.js             # 中文、英文、日文共用翻譯層
+│   └── firebase-config.js  # Firebase 設定與初始化
 ├── css/
-│   ├── admin.css           # 後台深色主題樣式 ✅ 已建立
-│   ├── login.css           # 登入頁樣式 ✅ 已建立
-│   └── consumer.css        # 消費者端樣式
-├── tmp_script.js           # 暫存（待整合後刪除）
-├── tmp_gacha_script.js     # 暫存（待整合後刪除）
+│   ├── app.css             # 視覺元件與頁面樣式
+│   └── responsive.css      # 手機、平板、筆電斷點與無障礙調整
+├── assets/                 # 圖片、音樂與其他靜態資源
 └── README.md
 ```
+
+所有語言共用同一份 HTML 與功能程式。新增或修正功能只需修改 `app.js`；介面文案集中在 `i18n.js`，不需要維護三套頁面。
+
+## 💻 本機執行
+
+此專案是靜態網頁，不需安裝套件。在專案根目錄執行：
+
+```bash
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+然後開啟 `http://127.0.0.1:8000/`。頁面可使用瀏覽器本機儲存模擬農事資料；登入與雲端同步功能則需要可連線的 Firebase 專案。
 
 ---
 
