@@ -4381,6 +4381,14 @@ function toggleManualTask(name) {
   const wasUndone = !state.manual[name];
   state.manual[name] = !state.manual[name];
   _saveDailyTaskState(state);
+  const history = JSON.parse(localStorage.getItem('skysef_task_history') || '[]');
+  const id = `${state.date}:${name}`;
+  const next = history.filter(item => item.taskId !== id);
+  if (state.manual[name]) next.unshift({taskId:id, fullDate:state.date,
+    date:new Date().toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    type:'農場任務', name, note:`已完成：${name}`, temp:null, hum:null, ph:null});
+  localStorage.setItem('skysef_task_history', JSON.stringify(next));
+  refreshObservationViews(true);
   if (wasUndone) addExp(EXP_REWARDS.manualTask, `完成任務：${name}`);
   renderTaskView();
   _tryAwardDailyTaskTicket();
@@ -4796,45 +4804,8 @@ function renderDailyTimeline() {
   const el = document.getElementById('dailyTimeline');
   if (!el) return;
   const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
-  const previewOnly = logs.length === 0 && dailyPhotos.length === 0;
-  // These records exist only for rendering the empty consumer preview.
-  // They are never written to localStorage, Firebase, or the real logs array.
-  const previewLogs = [
-    {
-      fullDate: '2026/07/29',
-      date: '07/29 09:20',
-      type: '玉米',
-      name: '晨間巡田',
-      temp: 26.4,
-      hum: 72,
-      ph: 6.5,
-      note: '葉片舒展、土壤濕潤，完成晨間灌溉與生長觀察。',
-      previewOnly: true
-    },
-    {
-      fullDate: '2026/07/27',
-      date: '07/27 15:40',
-      type: '苦瓜',
-      name: '藤蔓整理',
-      temp: 27.1,
-      hum: 68,
-      ph: 6.3,
-      note: '整理攀藤方向並移除老葉，日照與通風狀態良好。',
-      previewOnly: true
-    },
-    {
-      fullDate: '2026/07/25',
-      date: '07/25 07:35',
-      type: '青江菜',
-      name: '採收前檢查',
-      temp: 24.8,
-      hum: 76,
-      ph: 6.6,
-      note: '株型飽滿、葉色均勻，已完成採收前品質確認。',
-      previewOnly: true
-    }
-  ];
-  const timelineLogs = previewOnly ? previewLogs : logs;
+  const taskRecords = JSON.parse(localStorage.getItem('skysef_task_history') || '[]');
+  const timelineLogs = [...logs, ...taskRecords];
   const fallbackYear = new Date().getFullYear();
   const photosByDate = {};
   dailyPhotos.forEach(photo => {
@@ -4903,7 +4874,6 @@ function renderDailyTimeline() {
         }
         recordImage = unmatchedPhotos.splice(photoIndex, 1)[0]?.img || '';
       }
-      if (!recordImage && log.previewOnly) recordImage = consumerWikiImages[log.type] || '';
 
       items.push(`<div class="tl-item">
         <div class="tl-dot-circle" style="background:${color};"></div>
@@ -4911,13 +4881,13 @@ function renderDailyTimeline() {
           <div class="tl-card-body">
             <div class="tl-card-time-row">
               ${timeStr ? `<div class="tl-card-time">${timeStr}</div>` : ''}
-              ${log.previewOnly ? '<span class="tl-preview-chip">版面預覽</span>' : ''}
+
             </div>
             <div class="tl-card-crop">${log.type || '農場作物'}${log.name && log.name !== '今日批次' ? ' · '+log.name : ''}</div>
             <div class="tl-card-tags">
-              ${log.temp ? `<span class="tl-card-tag">溫 ${log.temp}°C</span>` : ''}
-              ${log.hum  ? `<span class="tl-card-tag">濕 ${log.hum}%</span>` : ''}
-              ${log.ph && log.ph !== '--' ? `<span class="tl-card-tag">pH ${log.ph}</span>` : ''}
+              ${log.temp ? `<span class="tl-card-tag">溫 ${log.temp ?? '—'}°C</span>` : ''}
+              ${log.hum  ? `<span class="tl-card-tag">濕 ${log.hum ?? '—'}%</span>` : ''}
+              ${log.ph && log.ph !== '--' ? `<span class="tl-card-tag">pH ${log.ph ?? '—'}</span>` : ''}
             </div>
             ${log.note ? `<div class="tl-card-note">${log.note}</div>` : ''}
           </div>
@@ -5030,7 +5000,7 @@ function _storePhoto(dataUrl) {
   }
   if (!saved) { alert('儲存空間已滿，照片無法儲存。請先刪除部分舊照片。'); return; }
   renderFarmerPhotoGrid();
-  renderDailyTimeline();
+  refreshObservationViews(true);
   // 今天第一次上傳照片才給 EXP
   const _todayForExp = _getTodayStr();
   const _existingPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
@@ -5092,13 +5062,33 @@ function saveFarmProfile() {
   saveSettingsFarmProfile();
 }
 
+function readObservation(id, min, max) {
+  const raw = document.getElementById(id)?.value.trim() || '';
+  if (!raw) return null;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= min && value <= max ? value : NaN;
+}
+function refreshObservationViews(focusToday = false) {
+  if (focusToday) {
+    const now = new Date();
+    timelineSelectedYear = now.getFullYear();
+    timelineSelectedMonth = now.getMonth() + 1;
+    timelineSelectedDay = null;
+  }
+  renderDailyTimeline();
+  initChart();
+  renderHomeWidgets();
+}
+
 function saveQuickLog() {
+  if (!_fbAuth || !_fbAuth.currentUser) { showLogin('請先登入再新增記錄'); return; }
   const crop = document.getElementById('quickCrop').value.trim() || '農場作物';
   const batch = document.getElementById('quickBatch') ? document.getElementById('quickBatch').value.trim() : '';
-  const temp = parseFloat(document.getElementById('quickTemp') ? document.getElementById('quickTemp').value : '') || 0;
-  const hum = parseFloat(document.getElementById('quickHum') ? document.getElementById('quickHum').value : '') || 0;
-  const ph = document.getElementById('quickPH') ? (document.getElementById('quickPH').value.trim() || '--') : '--';
-  const note = document.getElementById('quickNote').value.trim() || '例行性巡視，生長狀況良好。';
+  const temp = readObservation('quickTemp', -50, 70);
+  const hum = readObservation('quickHum', 0, 100);
+  const ph = readObservation('quickPH', 0, 14);
+  if ([temp, hum, ph].some(Number.isNaN)) { alert('請輸入有效數據：溫度 -50～70°C、濕度 0～100%、pH 0～14。'); return; }
+  const note = document.getElementById('quickNote').value.trim();
   const now = new Date();
   const fullDate = now.toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
   const timeStr = now.toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
@@ -5113,7 +5103,8 @@ function saveQuickLog() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-  alert('紀錄已儲存！消費者頁面已更新。');
+  refreshObservationViews(true);
+  alert('紀錄已儲存！履歷曲線與每日記錄已更新。');
   // 今天第一筆日誌才給 EXP
   const _todayMD = _getTodayStr().slice(5);
   const _todayLogCount = logs.filter(l => l.fullDate === _getTodayStr() || (l.date && l.date.startsWith(_todayMD))).length;
@@ -5213,6 +5204,7 @@ alert("紀錄已成功發佈！掃描 QR Code 即可看到最新履歷。");
 }
 
 localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+refreshObservationViews(true);
 clearForm();
 resetFormUI();
 renderFarmerLogs();
@@ -5238,6 +5230,7 @@ if(confirm("確定要刪除這筆紀錄嗎？此動作無法復原。")) {
 if(editingIndex === index) cancelEdit(); // 如果正在編輯這筆，強制退出編輯模式
 logs.splice(index, 1);
 localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+refreshObservationViews();
 renderFarmerLogs();
 }
 }
@@ -5309,22 +5302,19 @@ function initChart(metric = consumerChartMetric) {
       label: '溫度',
       meta: '溫度變化（°C）',
       border: '#F29B38',
-      background: 'rgba(242, 155, 56, 0.16)',
-      preview: [24, 25, 24.5, 26, 25.5, 27]
+      background: 'rgba(242, 155, 56, 0.16)'
     },
     hum: {
       label: '濕度',
       meta: '濕度變化（%）',
       border: '#4AA8C8',
-      background: 'rgba(74, 168, 200, 0.15)',
-      preview: [74, 72, 76, 71, 73, 70]
+      background: 'rgba(74, 168, 200, 0.15)'
     },
     ph: {
       label: 'pH',
       meta: '土壤酸鹼值（pH）',
       border: '#55A967',
-      background: 'rgba(85, 169, 103, 0.15)',
-      preview: [6.4, 6.3, 6.5, 6.4, 6.6, 6.5]
+      background: 'rgba(85, 169, 103, 0.15)'
     }
   };
   const config = metricConfig[metric] || metricConfig.temp;
@@ -5333,16 +5323,12 @@ function initChart(metric = consumerChartMetric) {
     const value = Number.parseFloat(log[metric]);
     return Number.isFinite(value) ? value : null;
   });
-  const usePreview = chartData.length === 0 || actualValues.every(value => value === null);
-  const labels = usePreview
-    ? ['週一', '週二', '週三', '週四', '週五', '週六']
-    : chartData.map(log => (log.date || '').split(' ')[0] || '紀錄');
-  const values = usePreview ? config.preview : actualValues;
-
+  const labels = chartData.map(log => log.date || '紀錄');
+  const values = actualValues;
   const metricLabel = document.getElementById('chartMetricLabel');
   const previewBadge = document.getElementById('chartPreviewBadge');
-  if (metricLabel) metricLabel.textContent = config.meta;
-  if (previewBadge) previewBadge.classList.toggle('visible', usePreview);
+  if (metricLabel) metricLabel.textContent = values.some(value => value !== null) ? config.meta : `${config.meta}：尚無觀測數據`;
+  if (previewBadge) previewBadge.remove();
 
   try {
     lineChart = new Chart(canvas.getContext('2d'), {
@@ -5522,15 +5508,16 @@ async function loadFarmDataFromFirebase() {
     }
     // Load farm logs
     const logsSnap = await _fbDb.collection('logs').orderBy('timestamp', 'desc').limit(20).get();
-    if (!logsSnap.empty) {
+    if (!logsSnap.empty && logs.length === 0) {
       logs = logsSnap.docs.map(d => {
         const data = d.data();
         return {
+          fullDate: data.fullDate || '',
           date: data.date || new Date(data.timestamp?.toDate?.() || Date.now()).toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
           type: data.type || data.cropType || '未知作物',
           name: data.name || data.batchId || '批次',
-          temp: data.temp || 0,
-          hum:  data.hum  || 0,
+          temp: data.temp ?? null,
+          hum:  data.hum ?? null,
           ph:   data.ph   || '--',
           note: data.note || ''
         };
