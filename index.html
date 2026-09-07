@@ -4658,6 +4658,8 @@ function updateProfileDisplay() {
   const sf = document.getElementById('settingsFarmerName');
   if (sl) sl.value = farmProfile.location;
   if (sf) sf.value = farmProfile.farmer;
+  renderMePage();
+  updateHomeGreeting();
 }
 
 function handleFarmerPhoto(event) {
@@ -5515,7 +5517,7 @@ async function loadFarmDataFromFirebase() {
     if (profileSnap.exists) {
       const p = profileSnap.data();
       if (p.location) { farmProfile.location = p.location; }
-      if (p.farmer)   { farmProfile.farmer   = p.farmer;   }
+      if (p.farmer && !farmProfile.farmer) { farmProfile.farmer = p.farmer; }
       updateProfileDisplay();
     }
     // Load farm logs
@@ -5781,17 +5783,24 @@ async function sendResetEmail() {
   } catch(e) { alert(_authErrMsg(e.code)); }
 }
 
+function updateHomeGreeting(now = new Date()) {
+  const hour = now.getHours();
+  const greeting = hour >= 5 && hour < 12 ? '早安' : hour >= 12 && hour < 18 ? '午安' : '晚安';
+  const name = (farmProfile.farmer || '').trim() || '在地小農';
+  const el = document.getElementById('homeGreeting');
+  if (el) el.textContent = `${greeting}，${name}！`;
+  const locationEl = document.getElementById('homeWeatherLoc');
+  if (locationEl) locationEl.textContent = farmProfile.location || '台灣在地';
+}
+// Refresh across time boundaries, including when returning from a background tab.
+setInterval(updateHomeGreeting, 30000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) updateHomeGreeting();
+});
+window.addEventListener('focus', () => updateHomeGreeting());
+
 function renderHomeWidgets() {
-  // 問候語
-  const greetEl = document.getElementById('homeGreeting');
-  if (greetEl) {
-    const h = new Date().getHours();
-    const greet = h < 11 ? '早安' : h < 18 ? '午安' : '晚安';
-    const name = farmProfile.farmer || '在地小農';
-    greetEl.textContent = `${greet}，${name}！`;
-  }
-  const wloc = document.getElementById('homeWeatherLoc');
-  if (wloc) wloc.textContent = farmProfile.location || '台灣在地';
+  updateHomeGreeting();
 
   // 今日農場紀錄摘要（取最新一筆日誌）
   const latest = logs[0];
