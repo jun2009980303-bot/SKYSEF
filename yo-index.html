@@ -3417,7 +3417,32 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 .social-record { border-top:1px solid #e3ecdf; padding:12px 0; }
 #bottomTabbar .tab-btn { min-width:0; flex:1; }
 @media(max-width:400px) { #bottomTabbar .tab-label { font-size:10px; } .social-card { padding:14px; } }
-</style></head>
+</style><style>/* Ensure community text stays legible despite older global theme overrides. */
+#viewCommunity, #viewCommunity h1, #viewCommunity h2, #viewCommunity h3,
+#viewCommunity b, #viewCommunity summary, #viewCommunity label { color:#183c27 !important; text-shadow:none !important; }
+#viewCommunity p, #viewCommunity span, #viewCommunity time { color:#344c3c !important; text-shadow:none !important; }
+#viewCommunity input, #viewCommunity textarea { background:#fff !important; color:#172c20 !important; border:1px solid #99b29b; font:inherit; font-size:16px; }
+#viewCommunity input::placeholder, #viewCommunity textarea::placeholder { color:#596d60 !important; opacity:1; }
+#viewCommunity button { color:#17442a !important; }
+#viewCommunity button[aria-pressed=true], #viewCommunity #publishPost { background:#24653b; color:#fff !important; }
+#viewCommunity #socialStatus, #viewCommunity #postStatus { color:#963120 !important; margin-top:10px; }
+#viewCommunity #postFiles { display:block; border:0; padding:8px 0; max-width:100%; font-size:14px; }
+#viewCommunity .post-upload { display:inline-block; margin-top:12px; cursor:pointer; font-weight:700; }
+#postCounter { text-align:right; color:#425d4b; font-size:13px; }
+.post-feed { display:grid; gap:18px; }
+.post-header { display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center; gap:8px; }
+#viewCommunity .post-author { padding:0; border:0; background:transparent; font-weight:800; text-align:left; text-decoration:underline; text-underline-offset:4px; }
+.post-body, .post-comment-text { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.7; }
+.post-date { font-size:12px; }
+.post-comments { margin-top:14px; border-top:1px solid #d1dfd0; padding-top:12px; }
+.post-comment { padding:10px 0; border-bottom:1px solid #edf1e9; }
+.post-comment-form { display:flex; gap:8px; align-items:flex-end; margin-top:12px; }
+.post-comment-form textarea { flex:1; min-width:0; }
+.post-preview { position:relative; }
+.post-preview button { margin:6px 0; }
+#viewCommunity .social-choice input { width:20px; }
+#viewCommunity [hidden] { display:none !important; }
+</style><style>body:has(#viewCommunity.active) .ticket-fab, body:has(#viewCommunity.active) .settings-fab { display:none; }</style></head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
@@ -3844,6 +3869,16 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
    <p>信箱、精確農場位置與未選取的資料不會加入社群。取消公開並儲存後，其他農友將無法再從社群讀取；他人先前保存的副本無法收回。</p>
    <div class="social-actions"><button type="button" onclick="saveSocialProfile(this)">儲存公開範圍</button><button type="button" onclick="withdrawSocialProfile(this)">撤下我的公開農場</button></div>
   </details>
+<section class="social-card" id="postComposer">
+ <h2>分享你的田間日常</h2><p>聊聊心情、分享資訊，或直接上傳今天拍的照片。</p>
+ <label for="postText">想分享什麼？</label><textarea id="postText" maxlength="2000" rows="4" placeholder="今天的農場有什麼新鮮事？" oninput="updatePostCounter()"></textarea><div id="postCounter">0 / 2000</div>
+ <label class="post-upload" for="postFiles">＋ 加入照片（最多 3 張）</label><input id="postFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple onchange="selectPostPhotos(this)">
+ <div id="postPhotos" class="social-grid"></div>
+ <p>貼文與留言會分享給已登入的農友。農場履歷仍依「公開範圍」設定，發文不會公開其他私人資料。</p>
+ <button type="button" id="publishPost" onclick="publishSocialPost(this)">發布貼文</button><div id="postStatus" role="status" aria-live="polite"></div>
+</section>
+<section><h2>農友動態</h2><p>最新分享、栽培心得與生活小事。</p><div id="postFeed" class="post-feed"></div><button type="button" id="postMore" hidden onclick="loadMorePosts(this)">載入更多貼文</button></section>
+
   <section><h2>本週精選農場</h2><p>從已公開農場每週輪換展示，讓不同農友被看見。</p><div id="socialFeatured" class="social-grid"></div></section>
   <section><div class="social-actions"><h2>探索農友</h2><button id="socialFollowFilter" type="button" aria-pressed="false" onclick="socialFollowingOnly=!socialFollowingOnly; renderSocialFeed()">只看已追蹤</button></div><div id="socialFeed" class="social-grid"></div><button id="socialMore" type="button" hidden onclick="loadSocialPage()">載入更多農友</button></section>
   <section id="socialVisit" class="social-card" hidden tabindex="-1"></section>
@@ -5217,7 +5252,7 @@ function switchView(viewId) {
   if (viewId === 'viewConsumer') { initChart(); renderDailyTimeline(); generateRandomWiki(); setTimeout(loadConsumerPublicProfile, 400); }
   if (viewId === 'viewTask') { renderTaskView(); }
   if (viewId === 'viewCommunity') openCommunity();
-  else clearSocialVisit();
+  else { clearSocialVisit(); stopPostFeed(); }
 }
 
 function generateRandomWiki() {
@@ -6210,6 +6245,7 @@ function socialRequireUser() {
 function socialError(error) { socialMessage(error.code === 'permission-denied' ? '社群尚未取得存取權限。請先完成 Firebase 社群規則設定。' : (error.message || '連線失敗，請稍後再試。')); }
 function clearSocialVisit() { if(socialVisitUnsubscribe) socialVisitUnsubscribe(); socialVisitUnsubscribe=null; socialLikeUnsubscribes.forEach(fn=>fn()); socialLikeUnsubscribes=[]; }
 function resetCommunity() {
+ resetPosts();
  socialGeneration++; clearSocialVisit(); socialUser=null; socialProfiles=[]; socialFollowing.clear(); socialCursor=null; socialLoading=false;
  for(const id of ['socialFeed','socialFeatured','socialVisit','socialPhotoChoices','socialLogChoices']) document.getElementById(id).replaceChildren();
  document.getElementById('socialVisit').hidden=true;
@@ -6239,6 +6275,7 @@ async function openCommunity() {
   document.getElementById('socialPhotoChoices').innerHTML=socialPhotos.map((p,i)=>`<label><img class="social-photo" src="${socialEscape(socialImage(p.img))}" alt="待選取的植物照片"><span class="social-choice"><input type="checkbox" data-photo-index="${i}" ${(own.photos||[]).some(x=>x.id===p.id)?'checked':''}>${socialEscape(p.date)} 公開此照片</span></label>`).join('')||'<p>目前沒有可選擇的照片，請先上傳植物照片。</p>';
   document.getElementById('socialLogChoices').innerHTML=socialLogs.map((r,i)=>`<label class="social-choice"><input type="checkbox" data-log-index="${i}" ${(own.records||[]).some(x=>x.id===r.id)?'checked':''}><span>${socialEscape(r.date)} · ${socialEscape(r.crop)}<br>${socialEscape(r.note)}</span></label>`).join('')||'<p>目前沒有觀測紀錄。</p>';
   await loadSocialPage();
+  if(generation===socialGeneration)startPostFeed();
  } catch(error) { if(generation===socialGeneration)socialError(error); }
 }
 async function loadSocialPage() {
@@ -6296,18 +6333,91 @@ async function saveSocialProfile(btn) {
 async function withdrawSocialProfile(btn) {
  btn.disabled=true;try{await socialRef(socialRequireUser()).delete();await openCommunity();socialMessage('公開農場已撤下，你的原始照片與紀錄仍保留。')}catch(error){socialError(error)}finally{btn.disabled=false}
 }
-function visitSocialFarm(index) {
- clearSocialVisit(); const uid=socialProfiles[index].uid, generation=socialGeneration;const box=document.getElementById('socialVisit');box.hidden=false;box.textContent='正在拜訪農場…';box.scrollIntoView({behavior:'smooth',block:'start'});
+function visitSocialFarm(index) { visitSocialFarmUid(socialProfiles[index].uid); }
+function visitSocialFarmUid(uid) {
+ clearSocialVisit(); const generation=socialGeneration;const box=document.getElementById('socialVisit');box.hidden=false;box.textContent='正在拜訪農場…';box.scrollIntoView({behavior:'smooth',block:'start'});
  socialVisitUnsubscribe=socialRef(uid).onSnapshot(snap=>{
  if(generation!==socialGeneration)return;socialLikeUnsubscribes.forEach(fn=>fn());socialLikeUnsubscribes=[];
- if(!snap.exists||!snap.data().published){box.textContent='這座農場目前未公開。';return}
- const p=snap.data();box.innerHTML=`<h2>${socialEscape(p.name)}的農場</h2><p>${socialEscape(p.achievement)}</p><h3>公開照片</h3><div class="social-grid">${(p.photos||[]).map((photo,i)=>`<article><img class="social-photo" src="${socialEscape(socialImage(photo.img))}" alt="農友公開的植物照片"><p>${socialEscape(photo.date)}</p><button id="socialLike${i}" aria-pressed="false">載入按讚狀態…</button></article>`).join('')||'<p>農友尚未公開照片。</p>'}</div><h3>栽培紀錄</h3>${(p.records||[]).map(r=>`<article class="social-record"><b>${socialEscape(r.date)} · ${socialEscape(r.crop)}</b><p>溫度 ${socialEscape(r.temp??'—')}°C · 濕度 ${socialEscape(r.hum??'—')}% · pH ${socialEscape(r.ph??'—')}</p><p>${socialEscape(r.note)}</p></article>`).join('')||'<p>農友尚未公開栽培紀錄。</p>'}`;
+ if(!snap.exists||!snap.data().published){box.textContent='這位農友尚未公開農場履歷；可以在貼文下方交流。';return}
+ const p=snap.data();box.innerHTML=`<h2>${socialEscape(p.name)}的農場</h2><p>${socialEscape(p.achievement)}</p><h3>公開照片</h3><div class="social-grid">${(p.photos||[]).map((photo,i)=>`<article><img class="social-photo" src="${socialEscape(socialImage(photo.img))}" alt="農友公開的植物照片"><p>${socialEscape(photo.date)}</p><button id="socialLike${i}" aria-pressed="false">載入按讚狀態…</button></article>`).join('')||'<p>農友尚未公開照片。</p>'}</div><h3>最近公開的栽培紀錄</h3><p>只顯示農友選擇公開的資料。</p>${[...(p.records||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(r=>`<article class="social-record"><b>${socialEscape(r.date)} · ${socialEscape(r.crop)}</b><p>溫度 ${socialEscape(r.temp??'—')}°C · 濕度 ${socialEscape(r.hum??'—')}% · pH ${socialEscape(r.ph??'—')}</p><p>${socialEscape(r.note)}</p></article>`).join('')||'<p>農友尚未公開栽培紀錄。</p>'}`;
  (p.photos||[]).forEach((photo,i)=>{
  const ref=socialRef(uid).collection('photoLikes').doc(photo.id).collection('users');const btn=document.getElementById(`socialLike${i}`);
  socialLikeUnsubscribes.push(ref.onSnapshot(likes=>{const liked=likes.docs.some(d=>d.id===socialUser);btn.textContent=`${liked?'♥ 已按讚':'♡ 按讚'} · ${likes.size}`;btn.setAttribute('aria-pressed',String(liked));btn.onclick=async()=>{btn.disabled=true;try{const mine=ref.doc(socialRequireUser());if(liked)await mine.delete();else await mine.set({createdAt:firebase.firestore.FieldValue.serverTimestamp()})}catch(error){socialError(error)}finally{btn.disabled=false}}},error=>{btn.textContent='按讚服務尚未開通';btn.disabled=true;socialError(error)}));
  });box.focus({preventScroll:true});
- },error=>{box.textContent='農場已撤下或目前無法讀取。';socialError(error)});
+ },error=>{box.textContent='這位農友的農場尚未公開、已撤下或暫時無法讀取。';});
 }
+</script>
+<script>let postImages=[],postUploading=false,postPublishing=false,postDocuments=[],postLimit=12,postStream=null,postWatchers=[],postSession=0,postDraftUid=null;
+const postRef=id=>_fbDb.collection('communityPosts').doc(id);
+const postMessage=message=>document.getElementById('postStatus').textContent=message;
+function updatePostCounter(){document.getElementById('postCounter').textContent=`${document.getElementById('postText').value.length} / 2000`}
+function stopPostFeed(){postSession++;if(postStream)postStream();postStream=null;postWatchers.forEach(fn=>fn());postWatchers=[];}
+function resetPosts(){stopPostFeed();postDocuments=[];document.getElementById('postFeed').replaceChildren();
+ const uid=_fbAuth?.currentUser?.uid||null;
+ if(uid!==postDraftUid){postImages=[];document.getElementById('postText').value='';document.getElementById('postFiles').value='';postDraftUid=uid;renderPostPhotos();updatePostCounter();}
+}
+function renderPostPhotos(){document.getElementById('postPhotos').innerHTML=postImages.map((img,i)=>`<div class="post-preview"><img class="social-photo" src="${socialEscape(img)}" alt="待發布照片 ${i+1}"><button type="button" onclick="removePostPhoto(${i})">移除照片 ${i+1}</button></div>`).join('');}
+function removePostPhoto(index){if(postUploading||postPublishing)return;postImages.splice(index,1);renderPostPhotos();}
+async function selectPostPhotos(input){
+ if(postUploading||postPublishing)return;const files=[...input.files];const uid=_fbAuth?.currentUser?.uid;input.value='';
+ if(files.length+postImages.length>3){postMessage('一則貼文最多加入 3 張照片。');return;}
+ if(files.some(f=>!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>15*1024*1024)){postMessage('請選擇 JPG、PNG 或 WebP 圖片，每張不超過 15 MB。');return;}
+ postUploading=true;input.disabled=true;document.getElementById('publishPost').disabled=true;postMessage('正在處理照片…');
+ try {const prepared=[];for(const file of files){const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('照片讀取失敗'));reader.readAsDataURL(file)});const compressed=await socialCompress(data);if(compressed.length>250000)throw new Error('照片內容較大，請裁切或縮小後重試。');prepared.push(compressed);}
+ if(_fbAuth?.currentUser?.uid!==uid)return;postImages.push(...prepared);renderPostPhotos();postMessage('照片已準備好，按發布才會分享。');
+ }catch(error){postMessage(error.message||'照片處理失敗，請換一張圖片。')}finally{postUploading=false;input.disabled=false;document.getElementById('publishPost').disabled=false;}
+}
+async function socialAuthorName(uid){const snap=await socialRef(uid).get();return String(snap.exists?snap.data().name:document.getElementById('socialName').value||farmProfile.farmer||'農友').trim().slice(0,40)||'農友';}
+async function publishSocialPost(btn){
+ if(postUploading||postPublishing)return;postPublishing=true;btn.disabled=true;
+ try{const uid=socialRequireUser(),text=document.getElementById('postText').value.trim();if(!text&&!postImages.length)throw new Error('請輸入文字或加入照片再發布。');if(text.length>2000)throw new Error('貼文最多 2000 字。');
+ const payload={authorUid:uid,authorName:await socialAuthorName(uid),text,photos:[...postImages],createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+ if(new TextEncoder().encode(JSON.stringify(payload)).length>750000)throw new Error('照片總容量較大，請減少張數再發布。');
+ if(socialRequireUser()!==uid)throw new Error('帳號已變更，請重新開啟農友頁面。');
+ await _fbDb.collection('communityPosts').add(payload);
+ if(_fbAuth?.currentUser?.uid!==uid)return;
+ postImages=[];document.getElementById('postText').value='';renderPostPhotos();updatePostCounter();postMessage('貼文已發布，農友可以按讚、留言或點你的名字拜訪農場。');
+ }catch(error){postMessage(error.code==='permission-denied'?'貼文尚未取得權限，請先發布新版 Firestore 規則。':error.message||'發布失敗，內容已保留，可稍後重試。')}finally{postPublishing=false;btn.disabled=false;}
+}
+function postDate(ts){return ts?.toDate?ts.toDate().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'剛剛';}
+function startPostFeed(){stopPostFeed();const generation=postSession;document.getElementById('postFeed').textContent='正在載入貼文…';
+ try{socialRequireUser();postStream=_fbDb.collection('communityPosts').orderBy('createdAt','desc').limit(postLimit).onSnapshot(snap=>{
+ if(generation!==postSession)return;postDocuments=snap.docs.map(d=>({id:d.id,...d.data()}));document.getElementById('postMore').hidden=snap.size<postLimit;renderPosts();
+ },error=>{document.getElementById('postFeed').textContent=error.code==='permission-denied'?'貼文功能尚未開通，請先發布新版 Firebase 規則。':'貼文暫時無法載入，請重新整理再試。';});}catch(error){postMessage(error.message)}
+}
+function loadMorePosts(){postLimit+=12;startPostFeed()}
+function renderPosts(){
+ // Keep typed comments and expanded threads across live feed updates.
+ const drafts=new Map([...document.querySelectorAll('[data-comment-draft]')].map(el=>[el.dataset.commentDraft,el.value]));
+ const expanded=new Set([...document.querySelectorAll('[data-comment-panel]:not([hidden])')].map(el=>el.dataset.commentPanel));
+ postWatchers.forEach(fn=>fn());postWatchers=[];
+ document.getElementById('postFeed').innerHTML=postDocuments.map((p,i)=>`<article class="social-card"><div class="post-header"><button class="post-author" onclick="visitSocialFarmUid(postDocuments[${i}].authorUid)">${socialEscape(p.authorName)}</button><time class="post-date">${socialEscape(postDate(p.createdAt))}</time></div><p class="post-body">${socialEscape(p.text)}</p><div class="social-grid">${(p.photos||[]).map(img=>`<img class="social-photo" src="${socialEscape(socialImage(img))}" alt="農友分享的照片" loading="lazy">`).join('')}</div><div class="social-actions"><button id="postLike-${i}" disabled>載入按讚…</button><button id="postCommentToggle-${i}" onclick="togglePostComments(${i})" aria-expanded="false">留言</button>${p.authorUid===_fbAuth?.currentUser?.uid?`<button onclick="deleteSocialPost(${i},this)">刪除我的貼文</button>`:''}</div><div id="postComments-${i}" data-comment-panel="${socialEscape(p.id)}" class="post-comments" hidden><div id="postCommentList-${i}"></div><button id="postOlder-${i}" hidden onclick="showOlderComments(${i})">顯示較早留言</button><form class="post-comment-form" onsubmit="event.preventDefault();submitPostComment(${i},this)"><textarea data-comment-draft="${socialEscape(p.id)}" rows="2" maxlength="500" aria-label="留言內容" placeholder="分享你的想法…" required></textarea><button type="submit">送出</button></form><div id="postCommentStatus-${i}" role="status"></div></div></article>`).join('')||'<div class="social-card"><h3>還沒有貼文</h3><p>分享一張照片或一句心情，開始第一段農友交流。</p></div>';
+ postDocuments.forEach((p,i)=>{
+ const draft=document.querySelector(`[data-comment-draft="${CSS.escape(p.id)}"]`);if(drafts.has(p.id))draft.value=drafts.get(p.id);
+ const btn=document.getElementById(`postLike-${i}`);
+ postWatchers.push(postRef(p.id).collection('likes').onSnapshot(snap=>{const liked=snap.docs.some(d=>d.id===_fbAuth?.currentUser?.uid);btn.disabled=false;btn.setAttribute('aria-pressed',String(liked));btn.textContent=`${liked?'♥ 已按讚':'♡ 按讚'} · ${snap.size}`;btn.onclick=()=>togglePostLike(p.id,liked,btn)},()=>{btn.textContent='按讚暫時無法使用';btn.disabled=true;}));
+ if(expanded.has(p.id))togglePostComments(i);
+ });
+}
+async function togglePostLike(id,liked,btn){btn.disabled=true;try{const mine=postRef(id).collection('likes').doc(socialRequireUser());if(liked)await mine.delete();else await mine.set({createdAt:firebase.firestore.FieldValue.serverTimestamp()})}catch(error){postMessage(error.code==='permission-denied'?'無法按讚，貼文可能已刪除或尚未設定權限。':error.message)}finally{btn.disabled=false}}
+const commentStreams=new Map(),commentLimits=new Map();
+function togglePostComments(index){const p=postDocuments[index],panel=document.getElementById(`postComments-${index}`);panel.hidden=!panel.hidden;document.getElementById(`postCommentToggle-${index}`).setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)watchPostComments(index);}
+function showOlderComments(index){const id=postDocuments[index].id;commentLimits.set(id,(commentLimits.get(id)||20)+20);watchPostComments(index)}
+function watchPostComments(index){
+ const p=postDocuments[index];if(commentStreams.has(p.id))commentStreams.get(p.id)();
+ const limit=commentLimits.get(p.id)||20;
+ const unsub=postRef(p.id).collection('comments').orderBy('createdAt','desc').limit(limit).onSnapshot(snap=>{
+ const list=document.getElementById(`postCommentList-${index}`);if(!list)return;
+ list.replaceChildren();if(!snap.size){list.textContent='還沒有留言，來打聲招呼吧。'}
+ [...snap.docs].reverse().forEach(doc=>{const c=doc.data(),row=document.createElement('article');row.className='post-comment';const author=document.createElement('button');author.className='post-author';author.textContent=c.authorName;author.onclick=()=>visitSocialFarmUid(c.authorUid);const time=document.createElement('p');time.className='post-date';time.textContent=postDate(c.createdAt);const text=document.createElement('p');text.className='post-comment-text';text.textContent=c.text;row.append(author,time,text);
+ if(c.authorUid===_fbAuth?.currentUser?.uid||p.authorUid===_fbAuth?.currentUser?.uid){const remove=document.createElement('button');remove.textContent='刪除留言';remove.onclick=async()=>{remove.disabled=true;try{await postRef(p.id).collection('comments').doc(doc.id).delete()}catch(error){postMessage(error.message)}finally{remove.disabled=false}};row.append(remove)}list.append(row);});
+ document.getElementById(`postOlder-${index}`).hidden=snap.size<limit;
+ },()=>{const list=document.getElementById(`postCommentList-${index}`);if(list)list.textContent='留言暫時無法載入，貼文可能已撤下。';});
+ commentStreams.set(p.id,unsub);postWatchers.push(unsub);
+}
+async function submitPostComment(index,form){const targetPostId=postDocuments[index].id,input=form.querySelector('textarea'),btn=form.querySelector('button'),status=document.getElementById(`postCommentStatus-${index}`);btn.disabled=true;
+ try{const uid=socialRequireUser(),text=input.value.trim();if(!text||text.length>500)throw new Error('請輸入 1～500 字的留言。');const payload={authorUid:uid,authorName:await socialAuthorName(uid),text,createdAt:firebase.firestore.FieldValue.serverTimestamp()};if(socialRequireUser()!==uid)throw new Error('帳號已變更。');await postRef(targetPostId).collection('comments').add(payload);input.value='';status.textContent='留言已送出';}catch(error){status.textContent=error.code==='permission-denied'?'留言無法送出，請確認規則已更新且貼文仍存在。':error.message}finally{btn.disabled=false}}
+async function deleteSocialPost(index,btn){if(!confirm('確定刪除這則貼文？刪除後農友無法再查看或留言。'))return;btn.disabled=true;try{socialRequireUser();await postRef(postDocuments[index].id).delete();postMessage('貼文已刪除。')}catch(error){postMessage(error.message);btn.disabled=false;}}
 </script>
 </body>
 </html>
