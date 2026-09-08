@@ -3871,7 +3871,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
    <div class="social-actions"><button type="button" onclick="saveSocialProfile(this)">儲存公開範圍</button><button type="button" onclick="withdrawSocialProfile(this)">撤下我的公開農場</button></div>
   </details>
 <section class="social-card" id="postComposer">
- <h2>分享你的田間日常</h2><p>聊聊心情、分享資訊，或直接上傳今天拍的照片。</p>
+ <h2>分享你的田間日常</h2><p id="postAccountIdentity" style="color:#244d32;font-weight:700;overflow-wrap:anywhere"></p><p>聊聊心情、分享資訊，或直接上傳今天拍的照片。</p>
  <label for="postText">想分享什麼？</label><textarea id="postText" maxlength="2000" rows="4" placeholder="今天的農場有什麼新鮮事？" oninput="updatePostCounter()"></textarea><div id="postCounter">0 / 2000</div>
  <label class="post-upload" for="postFiles">＋ 加入照片（最多 3 張）</label><input id="postFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple onchange="selectPostPhotos(this)">
  <div id="postPhotos" class="social-grid"></div>
@@ -4040,7 +4040,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
       </div>
     </div>
     <div class="login-row2">
-      <span class="remember" id="rememberToggle" onclick="toggleRememberMe()"><span class="rchk" id="rememberChk"><svg width="11" height="9" viewBox="0 0 14 11"><polyline points="1,5 5,10 13,1" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>記住我</span>
+<span style="font-size:12px;color:#52695a;">登入狀態僅保留在此分頁</span>
       <button type="button" id="loginForgotLink" class="login-link" onclick="setLoginMode('forgot')">忘記密碼？</button>
     </div>
     <div class="login-err" id="loginErr" role="status" aria-live="polite" style="color:#D9534F;"></div>
@@ -5777,6 +5777,7 @@ function _syncMuteBtn() {
 let _loginMode = 'login'; // 'login' | 'register' | 'forgot'
 
 let _authUnsubscribe = null;
+let _authInitPending = false;
 let _authBusy = false;
 let _authStartedUid = null;
 function showLogin(message = '') {
@@ -5789,7 +5790,7 @@ function hideLogin() {
   document.getElementById('loginOverlay').classList.add('hidden');
   document.querySelectorAll('.view-screen, #bottomTabbar').forEach(el => el.inert = false);
 }
-function initAuth() {
+async function initAuth() {
   const publicView = new URLSearchParams(location.search).get('view') === 'consumer' || location.hash === '#consumer';
   showLogin();
   if (publicView) {
@@ -5805,7 +5806,16 @@ function initAuth() {
     if (!publicView) showLogin('登入服務無法載入，請確認網路連線後重新整理。');
     return;
   }
-  if (_authUnsubscribe) return;
+  if (_authUnsubscribe || _authInitPending) return;
+  _authInitPending = true;
+  try {
+    await _fbAuth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+  } catch(error) {
+    _authInitPending = false;
+    showLogin('無法建立此分頁的獨立登入狀態，請允許瀏覽器儲存功能後重新整理。');
+    return;
+  }
+  _authInitPending = false;
   _authUnsubscribe = _fbAuth.onAuthStateChanged(async user => {
     _authStartedUid = null;
     clearAccountSession();
@@ -5903,7 +5913,7 @@ async function doLogin() {
       err.style.color = '#278F50';
       err.textContent = '若此信箱已註冊，將收到重設密碼信件，請檢查收件匣及垃圾郵件。';
     } else {
-      await _fbAuth.setPersistence(_rememberMe ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION);
+      await _fbAuth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
       if (mode === 'login') await _fbAuth.signInWithEmailAndPassword(email, password);
       else await _fbAuth.createUserWithEmailAndPassword(email, password);
     }
@@ -6419,7 +6429,7 @@ const postRef=id=>_fbDb.collection('communityPosts').doc(id);
 const postMessage=message=>document.getElementById('postStatus').textContent=message;
 function updatePostCounter(){document.getElementById('postCounter').textContent=`${document.getElementById('postText').value.length} / 2000`}
 function stopPostFeed(){postSession++;if(postStream)postStream();postStream=null;postWatchers.forEach(fn=>fn());postWatchers=[];}
-function resetPosts(){stopPostFeed();postDocuments=[];document.getElementById('postFeed').replaceChildren();
+function resetPosts(){document.getElementById('postAccountIdentity').textContent='';stopPostFeed();postDocuments=[];document.getElementById('postFeed').replaceChildren();
  const uid=_fbAuth?.currentUser?.uid||null;
  if(uid!==postDraftUid){postImages=[];document.getElementById('postText').value='';document.getElementById('postFiles').value='';postDraftUid=uid;renderPostPhotos();updatePostCounter();}
 }
@@ -6447,9 +6457,9 @@ async function publishSocialPost(btn){
  }catch(error){postMessage(error.code==='permission-denied'?'貼文尚未取得權限，請先發布新版 Firestore 規則。':error.message||'發布失敗，內容已保留，可稍後重試。')}finally{postPublishing=false;btn.disabled=false;}
 }
 function postDate(ts){return ts?.toDate?ts.toDate().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'剛剛';}
-function startPostFeed(){stopPostFeed();const generation=postSession;document.getElementById('postFeed').textContent='正在載入貼文…';
+function startPostFeed(){document.getElementById('postAccountIdentity').textContent='目前登入：'+(_fbAuth?.currentUser?.email||'未登入');stopPostFeed();const generation=postSession;document.getElementById('postFeed').textContent='正在載入貼文…';
  try{socialRequireUser();postStream=_fbDb.collection('communityPosts').orderBy('createdAt','desc').limit(postLimit).onSnapshot(snap=>{
- if(generation!==postSession)return;postDocuments=snap.docs.map(d=>({id:d.id,...d.data()}));document.getElementById('postMore').hidden=snap.size<postLimit;renderPosts();
+ if(generation!==postSession)return;postDocuments=snap.docs.map(d=>({...d.data(),id:d.id}));document.getElementById('postMore').hidden=snap.size<postLimit;renderPosts();
  },error=>{document.getElementById('postFeed').textContent=error.code==='permission-denied'?'貼文功能尚未開通，請先發布新版 Firebase 規則。':'貼文暫時無法載入，請重新整理再試。';});}catch(error){postMessage(error.message)}
 }
 function loadMorePosts(){postLimit+=12;startPostFeed()}
@@ -6477,14 +6487,31 @@ function watchPostComments(index){
  const list=document.getElementById(`postCommentList-${index}`);if(!list)return;
  list.replaceChildren();if(!snap.size){list.textContent='還沒有留言，來打聲招呼吧。'}
  [...snap.docs].reverse().forEach(doc=>{const c=doc.data(),row=document.createElement('article');row.className='post-comment';const author=document.createElement('button');author.className='post-author';author.textContent=c.authorName;author.onclick=()=>visitSocialFarmUid(c.authorUid);const time=document.createElement('p');time.className='post-date';time.textContent=postDate(c.createdAt);const text=document.createElement('p');text.className='post-comment-text';text.textContent=c.text;row.append(author,time,text);
- if(c.authorUid===_fbAuth?.currentUser?.uid||p.authorUid===_fbAuth?.currentUser?.uid){const remove=document.createElement('button');remove.textContent='刪除留言';remove.onclick=async()=>{remove.disabled=true;try{await postRef(p.id).collection('comments').doc(doc.id).delete()}catch(error){postMessage(error.message)}finally{remove.disabled=false}};row.append(remove)}list.append(row);});
+ if(c.authorUid===_fbAuth?.currentUser?.uid){const remove=document.createElement('button');remove.textContent='刪除我的留言';remove.onclick=async()=>{const uid=_fbAuth?.currentUser?.uid;if(uid!==c.authorUid){postMessage('只能刪除自己的留言。');return;}remove.disabled=true;try{await postRef(p.id).collection('comments').doc(doc.id).delete()}catch(error){postMessage(error.message)}finally{remove.disabled=false}};row.append(remove)}list.append(row);});
  document.getElementById(`postOlder-${index}`).hidden=snap.size<limit;
  },()=>{const list=document.getElementById(`postCommentList-${index}`);if(list)list.textContent='留言暫時無法載入，貼文可能已撤下。';});
  commentStreams.set(p.id,unsub);postWatchers.push(unsub);
 }
 async function submitPostComment(index,form){const targetPostId=postDocuments[index].id,input=form.querySelector('textarea'),btn=form.querySelector('button'),status=document.getElementById(`postCommentStatus-${index}`);btn.disabled=true;
  try{const uid=socialRequireUser(),text=input.value.trim();if(!text||text.length>500)throw new Error('請輸入 1～500 字的留言。');const payload={authorUid:uid,authorName:await socialAuthorName(uid),text,createdAt:firebase.firestore.FieldValue.serverTimestamp()};if(socialRequireUser()!==uid)throw new Error('帳號已變更。');await postRef(targetPostId).collection('comments').add(payload);input.value='';status.textContent='留言已送出';}catch(error){status.textContent=error.code==='permission-denied'?'留言無法送出，請確認規則已更新且貼文仍存在。':error.message}finally{btn.disabled=false}}
-async function deleteSocialPost(index,btn){if(!confirm('確定刪除這則貼文？刪除後農友無法再查看或留言。'))return;btn.disabled=true;try{socialRequireUser();await postRef(postDocuments[index].id).delete();postMessage('貼文已刪除。')}catch(error){postMessage(error.message);btn.disabled=false;}}
+async function deleteSocialPost(index,btn){
+ const post=postDocuments[index],uid=_fbAuth?.currentUser?.uid,epoch=accountEpoch;
+ if(!post||!uid||post.authorUid!==uid||!privateSessionValid(epoch)){postMessage('這不是目前帳號的貼文，無法刪除。');return;}
+ const id=post.id;
+ if(!confirm('確定刪除目前帳號發布的這則貼文？'))return;
+ btn.disabled=true;
+ try{
+  await _fbDb.runTransaction(async tx=>{
+   const target=postRef(id),snapshot=await tx.get(target);
+   if(!privateSessionValid(epoch)||_fbAuth.currentUser.uid!==uid)throw new Error('登入帳號已變更，已取消刪除。');
+   if(!snapshot.exists)throw new Error('這則貼文已不存在。');
+   if(snapshot.data().authorUid!==uid)throw new Error('只有發布這則貼文的帳號可以刪除。');
+   tx.delete(target);
+  });
+  if(privateSessionValid(epoch))postMessage('你的貼文已刪除。');
+ }catch(error){postMessage(error.code==='permission-denied'?'無權刪除這則貼文。':error.message)}finally{btn.disabled=false;}
+}
+
 </script>
 </body>
 </html>
