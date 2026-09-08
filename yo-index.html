@@ -3442,9 +3442,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 .post-preview button { margin:6px 0; }
 #viewCommunity .social-choice input { width:20px; }
 #viewCommunity [hidden] { display:none !important; }
-</style><style>body:has(#viewCommunity.active) .ticket-fab, body:has(#viewCommunity.active) .settings-fab { display:none; }</style><style>
-[hidden]{display:none!important}.my-social-counts{display:flex;justify-content:center;gap:60px;margin:18px 0 4px}.my-social-counts div{display:flex;flex-direction:column;gap:5px;color:#274832}.my-social-counts b{font-size:24px}.my-social-counts span{font-size:14px}.avatar-upload{display:block;color:#245b35;cursor:pointer;font-size:14px}.avatar-upload input{display:block;max-width:260px;margin:10px auto;font-size:13px}.avatar-hint{font-size:12px;color:#52695a}#avatarStatus{font-size:13px;color:#7b3927}.social-identity{display:inline-flex;align-items:center;gap:9px;max-width:100%;vertical-align:middle}.social-identity>span{overflow-wrap:anywhere}.social-avatar{width:38px!important;height:38px!important;object-fit:cover;border-radius:50%;flex-shrink:0}#socialVisitClose{position:sticky;top:8px;z-index:10;align-self:flex-end;background:#fff;border:1px solid #759b7a;box-shadow:0 2px 8px #0001}
-</style></head>
+</style><style>body:has(#viewCommunity.active) .ticket-fab, body:has(#viewCommunity.active) .settings-fab { display:none; }</style></head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
@@ -3619,14 +3617,9 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <img class="me-avatar" id="meAvatar" src="" alt="">
     <div class="me-name" id="meName">在地小農</div>
     <div class="me-mail" id="meMail"></div>
-<label class="avatar-upload">更換大頭照<input id="myAvatarUpload" type="file" accept="image/jpeg,image/png,image/webp" onchange="uploadMyAvatar(this)"></label><p class="avatar-hint">大頭照會顯示在你的農友名稱旁。</p><p id="avatarStatus" role="status"></p>
-<div class="my-social-counts"><div><b id="myFollowingCount">—</b><span>追蹤中</span></div><div><b id="myFollowerCount">—</b><span>粉絲</span></div></div>
   </div>
   <div class="me-card">
-    <div id="accountSyncStatus" role="status" aria-live="polite" style="padding:12px;font-size:14px;overflow-wrap:anywhere"></div>
-<button id="accountRetry" hidden class="btn-secondary" onclick="retryPrivateAccount()">重試儲存帳號資料</button>
-
-<div class="me-row" onclick="openSettings()"><span>⚙️ 農場設定</span><span>›</span></div>
+    <div class="me-row" onclick="openSettings()"><span>⚙️ 農場設定</span><span>›</span></div>
     <div class="me-row" onclick="switchView('viewTask')"><span>⭐ 任務與成就</span><span>›</span></div>
     <div class="me-row" onclick="switchView('viewGallery')"><span>📖 我的圖鑑</span><span>›</span></div>
   </div>
@@ -3888,7 +3881,6 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 
   <section><h2>本週精選農場</h2><p>從已公開農場每週輪換展示，讓不同農友被看見。</p><div id="socialFeatured" class="social-grid"></div></section>
   <section><div class="social-actions"><h2>探索農友</h2><button id="socialFollowFilter" type="button" aria-pressed="false" onclick="socialFollowingOnly=!socialFollowingOnly; renderSocialFeed()">只看已追蹤</button></div><div id="socialFeed" class="social-grid"></div><button id="socialMore" type="button" hidden onclick="loadSocialPage()">載入更多農友</button></section>
-  <button id="socialVisitClose" type="button" hidden onclick="collapseSocialFarm()">收起農場資訊 ✕</button>
   <section id="socialVisit" class="social-card" hidden tabindex="-1"></section>
  </div>
 </section>
@@ -4053,9 +4045,6 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <div class="login-err" id="loginErr" role="status" aria-live="polite" style="color:#D9534F;"></div>
     <button type="submit" class="login-btn" id="loginBtn">登入</button>
     <div class="login-links">
-<button type="button" class="login-link" onclick="retryPrivateAccount()">重試帳號資料</button>
-<button type="button" class="login-link" onclick="exportPendingAccount()">下載此帳號待同步備份</button>
-<button type="button" class="login-link" onclick="doLogout()">登出目前帳號</button>
       <button type="button" id="loginBackLink" class="login-link" onclick="setLoginMode('login')" style="display:none">← 返回登入</button>
       <button type="button" id="loginToggleLink" class="login-link" onclick="toggleLoginMode()">還沒有帳號？建立帳號 →</button>
     </div>
@@ -4063,113 +4052,6 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 </div>
 
 <script>
-// Private state is scoped to Firebase UID. Legacy unscoped localStorage is never imported.
-const privateKeys = new Set(['puli_dynamic_resume','puli_farm_profile','puli_daily_photos','puli_plant_photo','skysef_exp','skysef_tickets','skysef_gallery','skysef_daily_tasks','skysef_task_history','skysef_ticket_task_date','skysef_ticket_milestones']);
-let accountUid=null,accountReady=false,accountEpoch=0,accountValues={},accountVersions={},accountDirty={},accountFlushTimer=null,accountFlushPromise=null,accountLoadError=false;
-const pendingKey=uid=>'skysef.private.v1.pending.'+uid;
-function accountNotice(message,error=false){const el=document.getElementById('accountSyncStatus');if(el){el.hidden=!error;el.textContent=error?'帳號資料尚未儲存完成。請檢查連線後重試。':'';}const retry=document.getElementById('accountRetry');if(retry)retry.hidden=!error;}
-function privateSessionValid(epoch){return accountReady&&epoch===accountEpoch&&_fbAuth?.currentUser?.uid===accountUid;}
-const accountStorage={
- getItem(key){return accountReady?(accountValues[key]??null):null},
- setItem(key,value){
-  if(!privateKeys.has(key))return;
-  if(!accountReady||_fbAuth?.currentUser?.uid!==accountUid)throw new Error('帳號資料尚未載入，請稍後再試。');
-  const string=String(value);const next={...accountDirty,[key]:{value:string,base:accountDirty[key]?.base??accountVersions[key]??null}};
-  // Durable UID-specific outbox before changing in-memory data.
-  try{localStorage.setItem(pendingKey(accountUid),JSON.stringify(next))}catch(error){accountNotice('本機暫存空間不足，這次變更未儲存。',true);throw error}
-  accountValues[key]=string;accountDirty=next;accountNotice('尚未同步，正在儲存至自己的帳號…');
-  clearTimeout(accountFlushTimer);accountFlushTimer=setTimeout(()=>flushAccount().catch(()=>{}),400);
- },
- removeItem(key){this.setItem(key,'null');delete accountValues[key];}
-};
-function hydrateAccountGlobals(){
- const read=(key,fallback)=>{try{return JSON.parse(accountStorage.getItem(key))??fallback}catch{return fallback}};
- logs=read('puli_dynamic_resume',[]);farmProfile=read('puli_farm_profile',{farmer:'',location:''});gallery=read('skysef_gallery',[]);
- _exp=Number(accountStorage.getItem('skysef_exp'))||0;_tickets=Number(accountStorage.getItem('skysef_tickets'))||0;
- editingIndex=-1;timelineSelectedYear=null;timelineSelectedMonth=null;timelineSelectedDay=null;
-}
-function clearAccountSession(){
- resetIdentity();
- accountEpoch++;accountReady=false;accountUid=null;accountValues={};accountVersions={};accountDirty={};accountLoadError=false;
- clearTimeout(accountFlushTimer);accountFlushTimer=null;accountFlushPromise=null;
- logs=[];farmProfile={farmer:'',location:''};gallery=[];_exp=0;_tickets=0;editingIndex=-1;
- window._lastGachaChar=null;isGachaSpinning=false;
- const drawButton=document.getElementById('gachaButton');if(drawButton){drawButton.disabled=false;drawButton.textContent='🎟 無抽獎券';}
- const drawResult=document.getElementById('lotteryResult');if(drawResult)drawResult.textContent='';
- if(lineChart){lineChart.destroy();lineChart=null}
- if(typeof stopCamera==='function')stopCamera();
- if(typeof closeGachaModal==='function')closeGachaModal();
- if(typeof resetCommunity==='function')resetCommunity();
- document.querySelectorAll('.view-screen').forEach(el=>{el.classList.remove('active');el.inert=true});
- document.querySelectorAll('input:not([type=button]):not([type=submit]),textarea').forEach(el=>{if(!el.id.startsWith('login')){if(el.type==='checkbox')el.checked=false;else el.value=''}});
- for(const id of ['farmerPhotoGrid','dailyTimeline','galleryGrid','meName','meMail','photoDisplayConsumer','photoDisplayFarmer']){const el=document.getElementById(id);if(el)el.replaceChildren()}
- renderHomeWidgets();renderMePage();accountNotice('');
-}
-async function loadAccount(uid){
- clearAccountSession();const epoch=accountEpoch;accountUid=uid;accountNotice('正在讀取自己的帳號資料…');
- const root=_fbDb.collection('privateAccounts').doc(uid);
- const snap=await root.collection('state').doc('manifest').get({source:'server'});
- if(epoch!==accountEpoch||_fbAuth?.currentUser?.uid!==uid)return false;
- const entries=snap.exists?(snap.data().entries||{}):{};const values={};
- await Promise.all(Object.entries(entries).filter(([key])=>privateKeys.has(key)).map(async([key,entry])=>{
-  const parts=await Promise.all(entry.parts.map(id=>root.collection('chunks').doc(id).get({source:'server'})));
-  if(parts.some(p=>!p.exists))throw new Error('帳號資料不完整，請稍後重試，不會載入其他帳號資料。');
-  const value=parts.map(p=>p.data().value).join('');if(value!=='null')values[key]=value;
- }));
- if(epoch!==accountEpoch||_fbAuth?.currentUser?.uid!==uid)return false;
- let pending={};try{pending=JSON.parse(localStorage.getItem(pendingKey(uid))||'{}')}catch{throw new Error('本機待同步資料無法讀取，請保留瀏覽器資料並聯絡管理員。')}
- for(const [key,item] of Object.entries(pending)){
-  if(!privateKeys.has(key))continue;
-  if((entries[key]?.version??null)!==item.base)throw new Error('另一個裝置已更新資料。本機尚有未同步變更，已暫停載入以避免覆蓋；請先匯出待同步備份。');
-  if(item.value==='null')delete values[key];else values[key]=item.value;
- }
- accountValues=values;accountVersions=Object.fromEntries(Object.entries(entries).map(([key,e])=>[key,e.version]));accountDirty=pending;accountReady=true;hydrateAccountGlobals();
- accountNotice(Object.keys(pending).length?'找到此帳號待同步資料，正在補存…':'已載入自己的帳號資料');
- if(Object.keys(pending).length)flushAccount().catch(()=>{});
- return true;
-}
-async function flushAccount(){
- if(accountFlushPromise){await accountFlushPromise;if(Object.keys(accountDirty).length)return flushAccount();return;}
- if(!accountReady||!Object.keys(accountDirty).length)return;
- const uid=accountUid,epoch=accountEpoch;const changes={...accountDirty};const root=_fbDb.collection('privateAccounts').doc(uid),manifest=root.collection('state').doc('manifest');
- const version=crypto.randomUUID();const prepared={};let count=0;
- for(const [key,item] of Object.entries(changes)){const parts=[];for(let i=0;i<item.value.length;i+=150000){const id=version+'_'+key+'_'+parts.length;parts.push({id,value:item.value.slice(i,i+150000)});count++;}prepared[key]=parts;}
- if(count>300 || Object.values(changes).reduce((total,item)=>total+new TextEncoder().encode(item.value).length,0)>7000000){accountNotice('待同步資料量過大，請匯出備份並聯絡管理員。',true);throw new Error('待同步資料量超過本次批次上限。')}
- accountFlushPromise=(async()=>{
- try{
- await _fbDb.runTransaction(async tx=>{
-  const current=await tx.get(manifest);if(!privateSessionValid(epoch))throw new Error('帳號已變更，已停止原帳號的儲存。');
-  const entries=current.exists?{...current.data().entries}:{};
-  for(const [key,item] of Object.entries(changes)){if((entries[key]?.version??null)!==item.base)throw new Error('另一個裝置已更新資料，已停止覆蓋。請匯出待同步備份。');
-   for(const part of prepared[key])tx.set(root.collection('chunks').doc(part.id),{value:part.value});
-   entries[key]={version,parts:prepared[key].map(p=>p.id)};
-  }
-  tx.set(manifest,{entries,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
- });
- if(!privateSessionValid(epoch))return;
- for(const [key,item] of Object.entries(changes)){
-  accountVersions[key]=version;
-  if(accountDirty[key]?.value===item.value)delete accountDirty[key];else if(accountDirty[key])accountDirty[key].base=version;
- }
- if(Object.keys(accountDirty).length)localStorage.setItem(pendingKey(uid),JSON.stringify(accountDirty));else localStorage.removeItem(pendingKey(uid));
- accountNotice(Object.keys(accountDirty).length?'正在同步後續變更…':'✓ 已儲存至自己的帳號');
- }catch(error){if(epoch===accountEpoch)accountNotice(error.code==='permission-denied'?'尚未同步：請先更新帳號專屬 Firebase 規則。資料保留在此帳號的本機待同步備份。':'尚未同步：'+error.message,true);throw error}
- finally{if(epoch===accountEpoch)accountFlushPromise=null;}
- })();
- await accountFlushPromise;if(epoch===accountEpoch&&Object.keys(accountDirty).length)return flushAccount();
-}
-async function retryPrivateAccount(){
- const user=_fbAuth?.currentUser;if(!user){showLogin('請先登入');return;}
- try{if(accountReady){await flushAccount();return}showLogin('正在載入自己的資料…');if(await loadAccount(user.uid)){_authStartedUid=user.uid;hideLogin();startApp();}}
- catch(error){showLogin(error.code==='permission-denied'?'帳號資料權限尚未設定，請發布新版 Firebase 規則後再按「重試帳號資料」。':error.message);accountLoadError=true;}
-}
-function exportPendingAccount(){
- const uid=_fbAuth?.currentUser?.uid;if(!uid)return;
- const data=localStorage.getItem(pendingKey(uid))||'{}';const url=URL.createObjectURL(new Blob([data],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='my-pending-farm-data.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-window.addEventListener('online',()=>{if(accountReady)flushAccount().catch(()=>{})});
-window.addEventListener('beforeunload',event=>{if(Object.keys(accountDirty).length){event.preventDefault();event.returnValue=''}});
-
 const consumerWikiDB = {
 "筊白筍": "埔里名產「美人腿」！含有豐富纖維質與維生素，熱量低，是健康料理的絕佳選擇。",
 "百香果": "埔里大坪頂特產！果汁被譽為「果汁之王」，富含維他命C，表皮變皺時甜度最高。",
@@ -4193,8 +4075,8 @@ const consumerWikiImages = {
 "地瓜葉": "https://jun2009980303-bot.github.io/SKYSEF/assets/images/knowledge/knowledge-sweet-potato-leaf.png"
 };
 
-let logs = JSON.parse(accountStorage.getItem('puli_dynamic_resume')) || [];
-let farmProfile = JSON.parse(accountStorage.getItem('puli_farm_profile')) || { location: '', farmer: '' };
+let logs = JSON.parse(localStorage.getItem('puli_dynamic_resume')) || [];
+let farmProfile = JSON.parse(localStorage.getItem('puli_farm_profile')) || { location: '', farmer: '' };
 let lineChart;
 let consumerChartMetric = 'temp';
 let editingIndex = -1; // 追蹤目前正在修改哪一筆資料 (-1 代表新增模式)
@@ -4282,8 +4164,6 @@ function launchConfetti() {
 }
 
 function drawLotteryCharacter() {
-  const drawEpoch = accountEpoch;
-  if (!privateSessionValid(drawEpoch)) return;
   if (characterPool.length === 0) {
     document.getElementById('lotteryResult').innerText = "目前尚未有角色可抽。";
     return;
@@ -4341,7 +4221,6 @@ function drawLotteryCharacter() {
     svg.classList.remove('spinning');
     balls.forEach(b => { b.el.setAttribute('opacity', '0'); b.shine.setAttribute('opacity', '0'); });
 
-    if (!privateSessionValid(drawEpoch)) return;
     const randomCharacter = TINY_GALLERY_CATALOG[Math.floor(Math.random() * TINY_GALLERY_CATALOG.length)];
     if (!saveGachaReward(randomCharacter)) { _tickets++; _saveTickets(); button.disabled = false; button.innerText = "重試抽獎"; isGachaSpinning = false; return; }
     window._lastGachaChar = randomCharacter;
@@ -4353,7 +4232,6 @@ function drawLotteryCharacter() {
 
     screenFlash();
     setTimeout(() => {
-      if (!privateSessionValid(drawEpoch)) return;
       showGachaModal(randomCharacter);
       balls.forEach(b => { b.el.setAttribute('opacity', '0.92'); b.shine.setAttribute('opacity', '1'); });
       document.getElementById('resultCircle').setAttribute('opacity', '0');
@@ -4408,8 +4286,8 @@ const ACHIEVEMENTS = [
   { id:'log1',   icon:'📝', name:'農事新手',   desc:'記錄第1筆觀測日誌',    max:1,  getVal:()=>logs.length },
   { id:'log10',  icon:'📋', name:'農事達人',   desc:'累計記錄10筆農事',     max:10, getVal:()=>logs.length },
   { id:'log50',  icon:'🏅', name:'農場老手',   desc:'累計記錄50筆農事',     max:50, getVal:()=>logs.length },
-  { id:'photo1', icon:'📸', name:'愛記錄',     desc:'上傳第1張植物照片',    max:1,  getVal:()=>JSON.parse(accountStorage.getItem('puli_daily_photos')||'[]').length },
-  { id:'photo7', icon:'🌿', name:'植物攝影師', desc:'累計上傳7張植物照片',  max:7,  getVal:()=>JSON.parse(accountStorage.getItem('puli_daily_photos')||'[]').length },
+  { id:'photo1', icon:'📸', name:'愛記錄',     desc:'上傳第1張植物照片',    max:1,  getVal:()=>JSON.parse(localStorage.getItem('puli_daily_photos')||'[]').length },
+  { id:'photo7', icon:'🌿', name:'植物攝影師', desc:'累計上傳7張植物照片',  max:7,  getVal:()=>JSON.parse(localStorage.getItem('puli_daily_photos')||'[]').length },
   { id:'gacha1', icon:'🎴', name:'收藏入門',   desc:'獲得第1個扭蛋角色',    max:1,  getVal:()=>gallery.length },
   { id:'gacha5', icon:'✨', name:'角色收藏家', desc:'收集5個不同角色',       max:5,  getVal:()=>gallery.length },
   { id:'gacha15',icon:'🌟', name:'收藏大師',   desc:'收集15個不同角色',      max:15, getVal:()=>gallery.length },
@@ -4436,9 +4314,9 @@ const EXP_REWARDS = {
   streak3: 50, streak7: 100, streak14: 150, streak30: 200,
 };
 
-let _exp = parseInt(accountStorage.getItem('skysef_exp') || '0', 10);
+let _exp = parseInt(localStorage.getItem('skysef_exp') || '0', 10);
 
-function _saveExp() { accountStorage.setItem('skysef_exp', String(_exp)); if (typeof syncPublicProfile === 'function') syncPublicProfile(); }
+function _saveExp() { localStorage.setItem('skysef_exp', String(_exp)); if (typeof syncPublicProfile === 'function') syncPublicProfile(); }
 
 function _getCurrentTitle() {
   let t = TITLES[0];
@@ -4501,10 +4379,10 @@ function renderTitles() {
 }
 
 // ── 抽獎券系統 ───────────────────────────────────────────
-let _tickets = parseInt(accountStorage.getItem('skysef_tickets') || '0', 10);
+let _tickets = parseInt(localStorage.getItem('skysef_tickets') || '0', 10);
 
 function _saveTickets() {
-  accountStorage.setItem('skysef_tickets', String(_tickets));
+  localStorage.setItem('skysef_tickets', String(_tickets));
   _renderTicketBadge();
   const tc = document.getElementById('homeTicketCount');
   if (tc) tc.textContent = _tickets;
@@ -4527,16 +4405,16 @@ function showTicketToast(msg) {
 
 function _tryAwardDailyTaskTicket() {
   const today = _getTodayStr();
-  if (accountStorage.getItem('skysef_ticket_task_date') === today) return;
+  if (localStorage.getItem('skysef_ticket_task_date') === today) return;
   const state = _getDailyTaskState();
-  const dailyPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   const todayPhoto = dailyPhotos.some(p => p.date === today);
   const dateMD = today.slice(5);
   const todayLog = logs.some(l => l.fullDate === today || (l.date && l.date.startsWith(dateMD)));
   const manualDone = MANUAL_TASKS.every(n => !!state.manual[n]);
   if (todayPhoto && todayLog && manualDone) {
     _tickets++;
-    accountStorage.setItem('skysef_ticket_task_date', today);
+    localStorage.setItem('skysef_ticket_task_date', today);
     _saveTickets();
     showTicketToast('🎟 完成今日全部任務！獲得 1 張抽獎券');
     setTimeout(() => addExp(EXP_REWARDS.allTaskBonus, '完成今日全部任務'), 800);
@@ -4545,16 +4423,16 @@ function _tryAwardDailyTaskTicket() {
 
 function _tryAwardStreakTicket() {
   const streak = _getConsecutiveDays();
-  const milestones = JSON.parse(accountStorage.getItem('skysef_ticket_milestones') || '[]');
+  const milestones = JSON.parse(localStorage.getItem('skysef_ticket_milestones') || '[]');
   [3, 7, 14, 30].forEach(m => {
     if (streak >= m && !milestones.includes(m)) {
       milestones.push(m);
-      accountStorage.setItem('skysef_ticket_milestones', JSON.stringify(milestones));
+      localStorage.setItem('skysef_ticket_milestones', JSON.stringify(milestones));
       _tickets++;
       _saveTickets();
       showTicketToast(`🎟 連續 ${m} 天打卡！獲得 1 張抽獎券`);
       const expKey = { 3:'streak3', 7:'streak7', 14:'streak14', 30:'streak30' }[m];
-      if (expKey) addExp(EXP_REWARDS[expKey], `連續 ${m} 天打卡`);
+      if (expKey) setTimeout(() => addExp(EXP_REWARDS[expKey], `連續 ${m} 天打卡`), 800);
     }
   });
 }
@@ -4566,13 +4444,13 @@ function _getTodayStr() {
 
 function _getDailyTaskState() {
   const today = _getTodayStr();
-  const saved = JSON.parse(accountStorage.getItem('skysef_daily_tasks') || '{}');
+  const saved = JSON.parse(localStorage.getItem('skysef_daily_tasks') || '{}');
   if (saved.date !== today) return { date: today, manual: {} };
   return saved;
 }
 
 function _saveDailyTaskState(state) {
-  accountStorage.setItem('skysef_daily_tasks', JSON.stringify(state));
+  localStorage.setItem('skysef_daily_tasks', JSON.stringify(state));
 }
 
 function toggleManualTask(name) {
@@ -4580,13 +4458,13 @@ function toggleManualTask(name) {
   const wasUndone = !state.manual[name];
   state.manual[name] = !state.manual[name];
   _saveDailyTaskState(state);
-  const history = JSON.parse(accountStorage.getItem('skysef_task_history') || '[]');
+  const history = JSON.parse(localStorage.getItem('skysef_task_history') || '[]');
   const id = `${state.date}:${name}`;
   const next = history.filter(item => item.taskId !== id);
   if (state.manual[name]) next.unshift({taskId:id, fullDate:state.date,
     date:new Date().toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
     type:'農場任務', name, note:`已完成：${name}`, temp:null, hum:null, ph:null});
-  accountStorage.setItem('skysef_task_history', JSON.stringify(next));
+  localStorage.setItem('skysef_task_history', JSON.stringify(next));
   refreshObservationViews(true);
   if (wasUndone) addExp(EXP_REWARDS.manualTask, `完成任務：${name}`);
   renderTaskView();
@@ -4594,7 +4472,7 @@ function toggleManualTask(name) {
 }
 
 function _getConsecutiveDays() {
-  const photos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  const photos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   const dates = new Set(photos.map(p => p.date));
   logs.forEach(l => { if (l.fullDate) dates.add(l.fullDate); });
   const sorted = [...dates].sort((a,b) => b.localeCompare(a));
@@ -4613,7 +4491,7 @@ function renderDailyTasks() {
   if (!el) return;
   const today = _getTodayStr();
   const state = _getDailyTaskState();
-  const dailyPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   const todayPhoto = dailyPhotos.some(p => p.date === today);
   const dateMD = today.slice(5);
   const todayLog = logs.some(l => l.fullDate === today || (l.date && l.date.startsWith(dateMD)));
@@ -4745,7 +4623,7 @@ const GALLERY_DECORATIONS = {
 };
 let currentGalleryTab = '全部';
 
-let gallery = JSON.parse(accountStorage.getItem('skysef_gallery') || '[]');
+let gallery = JSON.parse(localStorage.getItem('skysef_gallery') || '[]');
 
 function switchGalleryTab(btn) {
   currentGalleryTab = btn.dataset.series;
@@ -4758,7 +4636,7 @@ function saveGachaReward(char) {
   const item = findCatalogItem(char);
   if (!item) return false;
   const next = [...gallery, {id:item.id, name:item.name, series:item.category}];
-  try { accountStorage.setItem('skysef_gallery', JSON.stringify(next)); }
+  try { localStorage.setItem('skysef_gallery', JSON.stringify(next)); }
   catch (error) { alert('收藏無法儲存，請釋放瀏覽器儲存空間後重試。'); return false; }
   gallery = next;
   renderGallery();
@@ -4889,7 +4767,7 @@ function initProfile() {
 function saveProfile() {
 farmProfile.location = document.getElementById('settingLocation').value || '未設定產地';
 farmProfile.farmer = document.getElementById('settingFarmer').value || '';
-accountStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
+localStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
   syncPublicProfile();
 updateProfileDisplay();
 alert("農場基本資訊已更新成功！");
@@ -4909,11 +4787,10 @@ function updateProfileDisplay() {
 }
 
 function handleFarmerPhoto(event) {
-  const uploadEpoch = accountEpoch;
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) { if(privateSessionValid(uploadEpoch)) applyFarmerPhoto(e.target.result); };
+  reader.onload = function(e) { applyFarmerPhoto(e.target.result); };
   reader.readAsDataURL(file);
 }
 
@@ -5042,8 +4919,8 @@ document.addEventListener('click', event => {
 function renderDailyTimeline() {
   const el = document.getElementById('dailyTimeline');
   if (!el) return;
-  const dailyPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
-  const taskRecords = JSON.parse(accountStorage.getItem('skysef_task_history') || '[]');
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
+  const taskRecords = JSON.parse(localStorage.getItem('skysef_task_history') || '[]');
   const timelineLogs = [...logs, ...taskRecords];
   const fallbackYear = new Date().getFullYear();
   const photosByDate = {};
@@ -5186,7 +5063,9 @@ function startCamera() {
 
 function stopCamera() {
   if (_cameraStream) { _cameraStream.getTracks().forEach(t => t.stop()); _cameraStream = null; }
-  for (const [id,display] of [['cameraViewport','none'],['farmerPhotoPreview','flex'],['photoButtons','flex']]) { const el=document.getElementById(id);if(el)el.style.display=display; }
+  document.getElementById('cameraViewport').style.display = 'none';
+  document.getElementById('farmerPhotoPreview').style.display = 'flex';
+  document.getElementById('photoButtons').style.display = 'flex';
 }
 
 function capturePhoto() {
@@ -5201,8 +5080,6 @@ function capturePhoto() {
 }
 
 function applyFarmerPhoto(dataUrl) {
-  const photoEpoch = accountEpoch;
-  if (!privateSessionValid(photoEpoch)) return;
   // Compress to max 800px / 75% before storing to avoid localStorage quota issues
   const img = new Image();
   img.onload = function() {
@@ -5214,9 +5091,9 @@ function applyFarmerPhoto(dataUrl) {
     cv.width = w; cv.height = h;
     cv.getContext('2d').drawImage(img, 0, 0, w, h);
     const compressed = cv.toDataURL('image/jpeg', 0.75);
-    if (privateSessionValid(photoEpoch)) _storePhoto(compressed);
+    _storePhoto(compressed);
   };
-  img.onerror = function() { if(privateSessionValid(photoEpoch)) alert('照片無法處理，請重新選取圖片。'); }; // fallback: store as-is
+  img.onerror = function() { _storePhoto(dataUrl); }; // fallback: store as-is
   img.src = dataUrl;
 }
 
@@ -5224,17 +5101,25 @@ function _storePhoto(dataUrl) {
   const now = new Date();
   const dateKey = now.toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
   const timeKey = now.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit',hour12:false});
-  let dailyPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   dailyPhotos.unshift({ date: dateKey, time: timeKey, img: dataUrl });
-  try {
-    accountStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
-    accountStorage.setItem('puli_plant_photo', dataUrl);
-  } catch(error) { alert('照片尚未完整儲存，請確認同步狀態。既有照片不會自動刪除。'); return; }
+  let saved = false;
+  while (dailyPhotos.length > 0 && !saved) {
+    try {
+      localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
+      localStorage.setItem('puli_plant_photo', dataUrl);
+      saved = true;
+    } catch(e) {
+      // Storage full — drop oldest photo and retry
+      dailyPhotos.pop();
+    }
+  }
+  if (!saved) { alert('儲存空間已滿，照片無法儲存。請先刪除部分舊照片。'); return; }
   renderFarmerPhotoGrid();
   refreshObservationViews(true);
   // 今天第一次上傳照片才給 EXP
   const _todayForExp = _getTodayStr();
-  const _existingPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  const _existingPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   const _todayPhotoCount = _existingPhotos.filter(p => p.date === _todayForExp).length;
   if (_todayPhotoCount <= 1) addExp(EXP_REWARDS.dailyPhoto, '上傳今日植物照片');
   renderTaskView();
@@ -5245,11 +5130,11 @@ function _storePhoto(dataUrl) {
 
 function deleteFarmerPhoto(index) {
   if (!confirm('確定刪除這張照片？')) return;
-  let dailyPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  let dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   dailyPhotos.splice(index, 1);
-  accountStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
-  if (dailyPhotos.length > 0) accountStorage.setItem('puli_plant_photo', dailyPhotos[0].img);
-  else accountStorage.removeItem('puli_plant_photo');
+  localStorage.setItem('puli_daily_photos', JSON.stringify(dailyPhotos));
+  if (dailyPhotos.length > 0) localStorage.setItem('puli_plant_photo', dailyPhotos[0].img);
+  else localStorage.removeItem('puli_plant_photo');
   renderFarmerPhotoGrid();
   renderDailyTimeline();
 }
@@ -5257,7 +5142,7 @@ function deleteFarmerPhoto(index) {
 function renderFarmerPhotoGrid() {
   const grid = document.getElementById('farmerPhotoGrid');
   if (!grid) return;
-  const dailyPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   if (dailyPhotos.length === 0) {
     grid.innerHTML = '<div class="farmer-photo-empty">尚無照片，請使用上方按鈕拍攝或上傳</div>';
     return;
@@ -5329,7 +5214,7 @@ function saveQuickLog() {
     type: crop, name: batch || '今日批次', temp, hum, ph, note
   };
   logs.unshift(newLog);
-  accountStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+  localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
   ['quickCrop','quickBatch','quickTemp','quickHum','quickPH','quickNote'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -5348,7 +5233,7 @@ function saveQuickLog() {
 }
 
 function switchView(viewId) {
-  if (viewId !== 'viewConsumer' && (!_fbAuth || !_fbAuth.currentUser || !accountReady)) { showLogin('請先登入以使用農場管理功能'); return; }
+  if (viewId !== 'viewConsumer' && (!_fbAuth || !_fbAuth.currentUser)) { showLogin('請先登入以使用農場管理功能'); return; }
   const targetView = document.getElementById(viewId);
   if (!targetView) { console.error('找不到 viewId：', viewId); return; }
   const vp = document.querySelector('meta[name="viewport"]');
@@ -5363,7 +5248,7 @@ function switchView(viewId) {
   if (activeTab) activeTab.classList.add('active');
 
   if (viewId === 'viewFarmer')  { renderFarmerPhotoGrid(); renderHomeWidgets(); }
-  if (viewId === 'viewMe') { renderMePage(); loadMySocialCounts(); }
+  if (viewId === 'viewMe') { renderMePage(); }
   if (viewId === 'viewConsumer') { initChart(); renderDailyTimeline(); generateRandomWiki(); setTimeout(loadConsumerPublicProfile, 400); }
   if (viewId === 'viewTask') { renderTaskView(); }
   if (viewId === 'viewCommunity') openCommunity();
@@ -5436,7 +5321,7 @@ logs.unshift(newLog);
 alert("紀錄已成功發佈！掃描 QR Code 即可看到最新履歷。");
 }
 
-accountStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
 refreshObservationViews(true);
 clearForm();
 resetFormUI();
@@ -5462,7 +5347,7 @@ function deleteLog(index) {
 if(confirm("確定要刪除這筆紀錄嗎？此動作無法復原。")) {
 if(editingIndex === index) cancelEdit(); // 如果正在編輯這筆，強制退出編輯模式
 logs.splice(index, 1);
-accountStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
+localStorage.setItem('puli_dynamic_resume', JSON.stringify(logs));
 refreshObservationViews();
 renderFarmerLogs();
 }
@@ -5617,8 +5502,16 @@ function initChart(metric = consumerChartMetric) {
 }
 
 function uploadPlantPhoto() {
-  const input=document.getElementById('photoUpload');
-  handleFarmerPhoto({target:input});
+  const file = document.getElementById('photoUpload').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    document.getElementById('photoDisplayFarmer').innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    localStorage.setItem('puli_plant_photo', dataUrl);
+  };
+  reader.readAsDataURL(file);
 }
 
 const MUSIC_TRACKS = [
@@ -5720,7 +5613,44 @@ function _tryInitFirebase() {
   }
 }
 
-// Private state is loaded only by loadAccount(uid), never from shared settings/logs.
+async function loadFarmDataFromFirebase() {
+  if (!_fbDb) return;
+  try {
+    // Load farm profile
+    const profileSnap = await _fbDb.collection('settings').doc('profile').get();
+    if (profileSnap.exists) {
+      const p = profileSnap.data();
+      if (p.location) { farmProfile.location = p.location; }
+      if (p.farmer && !farmProfile.farmer) { farmProfile.farmer = p.farmer; }
+      updateProfileDisplay();
+    }
+    // Load farm logs
+    const logsSnap = await _fbDb.collection('logs').orderBy('timestamp', 'desc').limit(20).get();
+    if (!logsSnap.empty && logs.length === 0) {
+      logs = logsSnap.docs.map(d => {
+        const data = d.data();
+        return {
+          fullDate: data.fullDate || '',
+          date: data.date || new Date(data.timestamp?.toDate?.() || Date.now()).toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+          type: data.type || data.cropType || '未知作物',
+          name: data.name || data.batchId || '批次',
+          temp: data.temp ?? null,
+          hum:  data.hum ?? null,
+          ph:   data.ph   || '--',
+          note: data.note || ''
+        };
+      });
+      renderDailyTimeline();
+      initChart();
+    }
+    // Load plant photo
+    const photoSnap = await _fbDb.collection('settings').doc('photo').get();
+    if (photoSnap.exists && photoSnap.data().url) {
+      const url = photoSnap.data().url;
+      document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${url}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
+    }
+  } catch(e) { console.log('Firebase load failed, using local data:', e.message); }
+}
 // ──────────────────────────────────────────────────────────
 
 // ── 設定 ─────────────────────────────────────────────────
@@ -5744,7 +5674,7 @@ function saveSettingsFarmProfile() {
   const name = document.getElementById('settingsFarmerName').value.trim();
   if (loc)  farmProfile.location = loc;
   if (name) farmProfile.farmer   = name;
-  accountStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
+  localStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
   updateProfileDisplay();
   const btn = document.querySelector('#settingsOverlay .btn-settings-save');
   if (btn) { const orig = btn.textContent; btn.textContent = '✓ 已儲存'; setTimeout(() => btn.textContent = orig, 1500); }
@@ -5814,31 +5744,28 @@ function initAuth() {
     return;
   }
   if (_authUnsubscribe) return;
-  _authUnsubscribe = _fbAuth.onAuthStateChanged(async user => {
-    _authStartedUid = null;
-    clearAccountSession();
-    document.getElementById('profileSetupOverlay').style.display = 'none';
-    closeSettings(); closeQuickLogModal(); closeQrModal();
+  _authUnsubscribe = _fbAuth.onAuthStateChanged(user => {
     if (user) {
-      showLogin('正在載入自己的帳號資料…');
-      const uid = user.uid;
+      hideLogin();
       document.getElementById('loginPassword').value = '';
       document.getElementById('loginConfirm').value = '';
-      try {
-        if (await loadAccount(uid)) {
-          _authStartedUid = uid; hideLogin(); startApp(); renderMePage();
-        }
-      } catch(error) {
-        if (_fbAuth?.currentUser?.uid !== uid) return;
-        accountReady = false; accountLoadError = true;
-        showLogin(error.code === 'permission-denied' ? '帳號資料權限尚未設定。請發布新版 Firebase 規則，再按「重試帳號資料」。' : error.message);
+      if (_authStartedUid !== user.uid) {
+        _authStartedUid = user.uid;
+        startApp();
       }
+      renderMePage();
     } else {
+      _authStartedUid = null;
+      resetCommunity();
+      document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('active'));
+      document.getElementById('profileSetupOverlay').style.display = 'none';
+      closeSettings();
+      closeQuickLogModal();
+      closeQrModal();
       if (publicView && !_loggingOut) { hideLogin(); switchView('viewConsumer'); loadConsumerPublicProfile(); }
       else { setLoginMode('login'); showLogin(); }
     }
   }, () => showLogin('無法確認登入狀態，請重新整理再試。'));
-
 }
 
 let _rememberMe = true;
@@ -5943,8 +5870,6 @@ async function doLogout() {
   _loggingOut = true;
   try {
     if (!_fbAuth) throw new Error('登入服務尚未連線，請重新整理後再試。');
-    if (isGachaSpinning || postUploading || postPublishing) throw new Error('操作處理中，請完成後再登出。');
-    await flushAccount();
     await _fbAuth.signOut();
     resetCommunity();
     if (_musicAudio) { _musicAudio.pause(); _setPlayBtn(false); }
@@ -6008,7 +5933,7 @@ function renderHomeWidgets() {
   // 今日任務環狀進度 + 完整清單（6 項）
   const today = _getTodayStr();
   const state = _getDailyTaskState();
-  const dailyPhotos = JSON.parse(accountStorage.getItem('puli_daily_photos') || '[]');
+  const dailyPhotos = JSON.parse(localStorage.getItem('puli_daily_photos') || '[]');
   const todayPhoto = dailyPhotos.some(p => p.date === today);
   const dateMD = today.slice(5);
   const todayLog = logs.some(l => l.fullDate === today || (l.date && l.date.startsWith(dateMD)));
@@ -6041,7 +5966,7 @@ function renderHomeWidgets() {
   const av = document.getElementById('homeAvatarImg');
   const fb = document.getElementById('homeAvatarFallback');
   if (av) {
-    if (farmProfile.avatar || farmProfile.photo) { av.src = farmProfile.avatar || farmProfile.photo; av.style.display = 'block'; if (fb) fb.style.display = 'none'; }
+    if (farmProfile.photo) { av.src = farmProfile.photo; av.style.display = 'block'; if (fb) fb.style.display = 'none'; }
     else { av.style.display = 'none'; if (fb) fb.style.display = 'block'; }
   }
 }
@@ -6071,7 +5996,7 @@ function renderMePage() {
   if (nm) nm.textContent = farmProfile.farmer || '在地小農';
   if (ml) ml.textContent = (_fbAuth && _fbAuth.currentUser) ? (_fbAuth.currentUser.email || '') : '';
   if (av) {
-    av.src = farmProfile.avatar || farmProfile.photo || ('data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#d7e8dc"/><circle cx="32" cy="24" r="11" fill="#9bb8a5"/><ellipse cx="32" cy="54" rx="18" ry="12" fill="#9bb8a5"/></svg>'));
+    av.src = farmProfile.photo || ('data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#d7e8dc"/><circle cx="32" cy="24" r="11" fill="#9bb8a5"/><ellipse cx="32" cy="54" rx="18" ry="12" fill="#9bb8a5"/></svg>'));
   }
 }
 
@@ -6092,15 +6017,14 @@ function saveProfileSetup() {
   if (!loc)  { err.textContent = '請填寫農場產地'; return; }
   farmProfile.farmer = name;
   farmProfile.location = loc;
-  accountStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
+  localStorage.setItem('puli_farm_profile', JSON.stringify(farmProfile));
   document.getElementById('profileSetupOverlay').style.display = 'none';
   updateProfileDisplay();
   if (typeof syncPublicProfile === 'function') syncPublicProfile();
 }
 
 function startApp() {
-  if (!accountReady) return;
-  loadMySocialCounts();
+  loadFarmDataFromFirebase();
   renderHomeWidgets();
   setTimeout(syncPublicProfile, 2000);
   updateProfileDisplay();
@@ -6210,7 +6134,7 @@ async function loadConsumerPublicProfile() {
     if (likeEl) likeEl.textContent = likeSnap.exists ? (likeSnap.data().count || 0) : 0;
 
     // Check if already liked
-    _consumerHasLiked = !!accountStorage.getItem('liked_' + uid);
+    _consumerHasLiked = !!localStorage.getItem('liked_' + uid);
     _updateLikeBtnState();
 
     // Load comments
@@ -6241,13 +6165,13 @@ async function toggleFarmerLike() {
   if (_consumerHasLiked) {
     // Unlike
     _consumerHasLiked = false;
-    accountStorage.removeItem(likedKey);
+    localStorage.removeItem(likedKey);
     await likeRef.set({ count: firebase.firestore.FieldValue.increment(-1) }, { merge: true });
     if (likeEl) likeEl.textContent = Math.max(0, parseInt(likeEl.textContent) - 1);
   } else {
     // Like
     _consumerHasLiked = true;
-    accountStorage.setItem(likedKey, '1');
+    localStorage.setItem(likedKey, '1');
     await likeRef.set({ count: firebase.firestore.FieldValue.increment(1) }, { merge: true });
     if (likeEl) likeEl.textContent = parseInt(likeEl.textContent) + 1;
   }
@@ -6324,7 +6248,7 @@ function resetCommunity() {
  resetPosts();
  socialGeneration++; clearSocialVisit(); socialUser=null; socialProfiles=[]; socialFollowing.clear(); socialCursor=null; socialLoading=false;
  for(const id of ['socialFeed','socialFeatured','socialVisit','socialPhotoChoices','socialLogChoices']) document.getElementById(id).replaceChildren();
- document.getElementById('socialVisit').hidden=true;document.getElementById('socialVisitClose').hidden=true;
+ document.getElementById('socialVisit').hidden=true;
  document.getElementById('socialPublic').checked=false; document.getElementById('socialAchievement').checked=false;
 }
 async function socialKey(value) {
@@ -6342,7 +6266,7 @@ async function openCommunity() {
   document.getElementById('socialName').value=own.name || farmProfile.farmer || '';
   document.getElementById('socialPublic').checked=own.published===true;
   document.getElementById('socialAchievement').checked=!!own.achievement;
-  const photos=JSON.parse(accountStorage.getItem('puli_daily_photos')||'[]').slice(0,20);
+  const photos=JSON.parse(localStorage.getItem('puli_daily_photos')||'[]').slice(0,20);
   socialPhotos=(await Promise.all(photos.map(async p=>({id:await socialKey(p.img),date:p.date||'',img:socialImage(p.img)})))).filter(p=>p.img);
   socialPhotos=[...new Map([...(own.photos||[]),...socialPhotos].map(p=>[p.id,p])).values()];
   socialLogs=await Promise.all(logs.slice(0,20).map(async log=>({id:await socialKey(JSON.stringify(log)),date:String(log.fullDate||log.date||''),crop:String(log.type||''),note:String(log.note||'').slice(0,1000),temp:log.temp??null,hum:log.hum??null,ph:log.ph??null})));
@@ -6368,7 +6292,7 @@ async function loadSocialPage() {
 }
 function socialFarmCard(p) {
  const i=socialProfiles.findIndex(x=>x.uid===p.uid);
- return `<article class="social-card"><h3>${identityMarkup(p.uid,p.name)}</h3><p>${socialEscape(p.achievement||'一起分享田間日常')}</p><p>${(p.photos||[]).length} 張公開照片 · ${(p.records||[]).length} 筆栽培紀錄</p><div class="social-actions"><button onclick="visitSocialFarm(${i})">拜訪農場</button>${p.uid!==socialUser?`<button aria-pressed="${socialFollowing.has(p.uid)}" onclick="toggleSocialFollow(${i},this)">${socialFollowing.has(p.uid)?'已追蹤 · 取消':'追蹤農友'}</button>`:'<span>我的農場</span>'}</div></article>`;
+ return `<article class="social-card"><h3>${socialEscape(p.name)}</h3><p>${socialEscape(p.achievement||'一起分享田間日常')}</p><p>${(p.photos||[]).length} 張公開照片 · ${(p.records||[]).length} 筆栽培紀錄</p><div class="social-actions"><button onclick="visitSocialFarm(${i})">拜訪農場</button>${p.uid!==socialUser?`<button aria-pressed="${socialFollowing.has(p.uid)}" onclick="toggleSocialFollow(${i},this)">${socialFollowing.has(p.uid)?'已追蹤 · 取消':'追蹤農友'}</button>`:'<span>我的農場</span>'}</div></article>`;
 }
 function renderSocialFeed() {
  document.getElementById('socialFollowFilter').setAttribute('aria-pressed',String(socialFollowingOnly));
@@ -6378,15 +6302,12 @@ function renderSocialFeed() {
  const week=Math.floor((Date.now()-Date.UTC(1970,0,5))/604800000);
  const score=uid=>{let n=week;for(const c of uid)n=(Math.imul(n,31)+c.charCodeAt(0))|0;return n>>>0};
  document.getElementById('socialFeatured').innerHTML=[...farms].sort((a,b)=>score(a.uid)-score(b.uid)||a.uid.localeCompare(b.uid)).slice(0,3).map(socialFarmCard).join('')||'<p>等待農友分享第一座公開農場。</p>';
- bindIdentities();
 }
 async function toggleSocialFollow(index,btn) {
  btn.disabled=true;
  try {const uid=socialRequireUser(),target=socialProfiles[index].uid;if(uid===target)return;
  const ref=_fbDb.collection('communityFollowing').doc(uid).collection('farms').doc(target);
- const mirror=_fbDb.collection('communityFollowers').doc(target).collection('users').doc(uid);const batch=_fbDb.batch();
- if(socialFollowing.has(target)){batch.delete(ref);batch.delete(mirror);await batch.commit();socialFollowing.delete(target)}else{const data={createdAt:firebase.firestore.FieldValue.serverTimestamp()};batch.set(ref,data);batch.set(mirror,data);await batch.commit();socialFollowing.add(target)}renderSocialFeed();
-
+ if(socialFollowing.has(target)){await ref.delete();socialFollowing.delete(target)}else{await ref.set({createdAt:firebase.firestore.FieldValue.serverTimestamp()});socialFollowing.add(target)}renderSocialFeed();
  }catch(error){socialError(error)}finally{btn.disabled=false}
 }
 async function socialCompress(source) {
@@ -6414,8 +6335,7 @@ async function withdrawSocialProfile(btn) {
 }
 function visitSocialFarm(index) { visitSocialFarmUid(socialProfiles[index].uid); }
 function visitSocialFarmUid(uid) {
- clearSocialVisit(); const generation=socialGeneration;const box=document.getElementById('socialVisit');box.hidden=false;document.getElementById('socialVisitClose').hidden=false;box.textContent='正在拜訪農場…';box.scrollIntoView({behavior:'smooth',block:'start'});
- document.getElementById('socialVisitClose').scrollIntoView({behavior:'smooth',block:'start'});
+ clearSocialVisit(); const generation=socialGeneration;const box=document.getElementById('socialVisit');box.hidden=false;box.textContent='正在拜訪農場…';box.scrollIntoView({behavior:'smooth',block:'start'});
  socialVisitUnsubscribe=socialRef(uid).onSnapshot(snap=>{
  if(generation!==socialGeneration)return;socialLikeUnsubscribes.forEach(fn=>fn());socialLikeUnsubscribes=[];
  if(!snap.exists||!snap.data().published){box.textContent='這位農友尚未公開農場履歷；可以在貼文下方交流。';return}
@@ -6471,8 +6391,7 @@ function renderPosts(){
  const drafts=new Map([...document.querySelectorAll('[data-comment-draft]')].map(el=>[el.dataset.commentDraft,el.value]));
  const expanded=new Set([...document.querySelectorAll('[data-comment-panel]:not([hidden])')].map(el=>el.dataset.commentPanel));
  postWatchers.forEach(fn=>fn());postWatchers=[];
- document.getElementById('postFeed').innerHTML=postDocuments.map((p,i)=>`<article class="social-card"><div class="post-header"><button class="post-author" onclick="visitSocialFarmUid(postDocuments[${i}].authorUid)">${identityMarkup(p.authorUid,p.authorName)}</button><time class="post-date">${socialEscape(postDate(p.createdAt))}</time></div><p class="post-body">${socialEscape(p.text)}</p><div class="social-grid">${(p.photos||[]).map(img=>`<img class="social-photo" src="${socialEscape(socialImage(img))}" alt="農友分享的照片" loading="lazy">`).join('')}</div><div class="social-actions"><button id="postLike-${i}" disabled>載入按讚…</button><button id="postCommentToggle-${i}" onclick="togglePostComments(${i})" aria-expanded="false">留言</button>${p.authorUid===_fbAuth?.currentUser?.uid?`<button onclick="deleteSocialPost(${i},this)">刪除我的貼文</button>`:''}</div><div id="postComments-${i}" data-comment-panel="${socialEscape(p.id)}" class="post-comments" hidden><div id="postCommentList-${i}"></div><button id="postOlder-${i}" hidden onclick="showOlderComments(${i})">顯示較早留言</button><form class="post-comment-form" onsubmit="event.preventDefault();submitPostComment(${i},this)"><textarea data-comment-draft="${socialEscape(p.id)}" rows="2" maxlength="500" aria-label="留言內容" placeholder="分享你的想法…" required></textarea><button type="submit">送出</button></form><div id="postCommentStatus-${i}" role="status"></div></div></article>`).join('')||'<div class="social-card"><h3>還沒有貼文</h3><p>分享一張照片或一句心情，開始第一段農友交流。</p></div>';
- bindIdentities();
+ document.getElementById('postFeed').innerHTML=postDocuments.map((p,i)=>`<article class="social-card"><div class="post-header"><button class="post-author" onclick="visitSocialFarmUid(postDocuments[${i}].authorUid)">${socialEscape(p.authorName)}</button><time class="post-date">${socialEscape(postDate(p.createdAt))}</time></div><p class="post-body">${socialEscape(p.text)}</p><div class="social-grid">${(p.photos||[]).map(img=>`<img class="social-photo" src="${socialEscape(socialImage(img))}" alt="農友分享的照片" loading="lazy">`).join('')}</div><div class="social-actions"><button id="postLike-${i}" disabled>載入按讚…</button><button id="postCommentToggle-${i}" onclick="togglePostComments(${i})" aria-expanded="false">留言</button>${p.authorUid===_fbAuth?.currentUser?.uid?`<button onclick="deleteSocialPost(${i},this)">刪除我的貼文</button>`:''}</div><div id="postComments-${i}" data-comment-panel="${socialEscape(p.id)}" class="post-comments" hidden><div id="postCommentList-${i}"></div><button id="postOlder-${i}" hidden onclick="showOlderComments(${i})">顯示較早留言</button><form class="post-comment-form" onsubmit="event.preventDefault();submitPostComment(${i},this)"><textarea data-comment-draft="${socialEscape(p.id)}" rows="2" maxlength="500" aria-label="留言內容" placeholder="分享你的想法…" required></textarea><button type="submit">送出</button></form><div id="postCommentStatus-${i}" role="status"></div></div></article>`).join('')||'<div class="social-card"><h3>還沒有貼文</h3><p>分享一張照片或一句心情，開始第一段農友交流。</p></div>';
  postDocuments.forEach((p,i)=>{
  const draft=document.querySelector(`[data-comment-draft="${CSS.escape(p.id)}"]`);if(drafts.has(p.id))draft.value=drafts.get(p.id);
  const btn=document.getElementById(`postLike-${i}`);
@@ -6490,8 +6409,8 @@ function watchPostComments(index){
  const unsub=postRef(p.id).collection('comments').orderBy('createdAt','desc').limit(limit).onSnapshot(snap=>{
  const list=document.getElementById(`postCommentList-${index}`);if(!list)return;
  list.replaceChildren();if(!snap.size){list.textContent='還沒有留言，來打聲招呼吧。'}
- [...snap.docs].reverse().forEach(doc=>{const c=doc.data(),row=document.createElement('article');row.className='post-comment';const author=document.createElement('button');author.className='post-author';author.innerHTML=identityMarkup(c.authorUid,c.authorName);author.onclick=()=>visitSocialFarmUid(c.authorUid);const time=document.createElement('p');time.className='post-date';time.textContent=postDate(c.createdAt);const text=document.createElement('p');text.className='post-comment-text';text.textContent=c.text;row.append(author,time,text);
- if(c.authorUid===_fbAuth?.currentUser?.uid||p.authorUid===_fbAuth?.currentUser?.uid){const remove=document.createElement('button');remove.textContent='刪除留言';remove.onclick=async()=>{remove.disabled=true;try{await postRef(p.id).collection('comments').doc(doc.id).delete()}catch(error){postMessage(error.message)}finally{remove.disabled=false}};row.append(remove)}list.append(row);});bindIdentities();
+ [...snap.docs].reverse().forEach(doc=>{const c=doc.data(),row=document.createElement('article');row.className='post-comment';const author=document.createElement('button');author.className='post-author';author.textContent=c.authorName;author.onclick=()=>visitSocialFarmUid(c.authorUid);const time=document.createElement('p');time.className='post-date';time.textContent=postDate(c.createdAt);const text=document.createElement('p');text.className='post-comment-text';text.textContent=c.text;row.append(author,time,text);
+ if(c.authorUid===_fbAuth?.currentUser?.uid||p.authorUid===_fbAuth?.currentUser?.uid){const remove=document.createElement('button');remove.textContent='刪除留言';remove.onclick=async()=>{remove.disabled=true;try{await postRef(p.id).collection('comments').doc(doc.id).delete()}catch(error){postMessage(error.message)}finally{remove.disabled=false}};row.append(remove)}list.append(row);});
  document.getElementById(`postOlder-${index}`).hidden=snap.size<limit;
  },()=>{const list=document.getElementById(`postCommentList-${index}`);if(list)list.textContent='留言暫時無法載入，貼文可能已撤下。';});
  commentStreams.set(p.id,unsub);postWatchers.push(unsub);
@@ -6500,30 +6419,5 @@ async function submitPostComment(index,form){const targetPostId=postDocuments[in
  try{const uid=socialRequireUser(),text=input.value.trim();if(!text||text.length>500)throw new Error('請輸入 1～500 字的留言。');const payload={authorUid:uid,authorName:await socialAuthorName(uid),text,createdAt:firebase.firestore.FieldValue.serverTimestamp()};if(socialRequireUser()!==uid)throw new Error('帳號已變更。');await postRef(targetPostId).collection('comments').add(payload);input.value='';status.textContent='留言已送出';}catch(error){status.textContent=error.code==='permission-denied'?'留言無法送出，請確認規則已更新且貼文仍存在。':error.message}finally{btn.disabled=false}}
 async function deleteSocialPost(index,btn){if(!confirm('確定刪除這則貼文？刪除後農友無法再查看或留言。'))return;btn.disabled=true;try{socialRequireUser();await postRef(postDocuments[index].id).delete();postMessage('貼文已刪除。')}catch(error){postMessage(error.message);btn.disabled=false;}}
 </script>
-<script>let identityStreams=new Map(),identityCache=new Map(),myCountStreams=[],myCountUid=null;
-const defaultAvatar='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="#e2efe0"/><circle cx="32" cy="24" r="11" fill="#6a9176"/><ellipse cx="32" cy="57" rx="21" ry="19" fill="#6a9176"/></svg>');
-function identityMarkup(uid,name){return `<span class="social-identity" data-identity="${socialEscape(uid)}"><img class="social-avatar" src="${defaultAvatar}" alt=""><span>${socialEscape(name)}</span></span>`;}
-function bindIdentities(){document.querySelectorAll('[data-identity]').forEach(el=>{
- const uid=el.dataset.identity;
- const apply=()=>{const profile=identityCache.get(uid);document.querySelectorAll('[data-identity]').forEach(node=>{if(node.dataset.identity!==uid)return;node.querySelector('img').src=socialImage(profile?.avatar)||defaultAvatar;if(profile?.name)node.querySelector('span').textContent=profile.name;});};
- if(identityCache.has(uid))apply();
- if(!identityStreams.has(uid)&&_fbDb&&_fbAuth?.currentUser){identityStreams.set(uid,()=>{});const unsub=_fbDb.collection('communityIdentities').doc(uid).onSnapshot(snap=>{identityCache.set(uid,snap.exists?snap.data():{});apply()},()=>{});identityStreams.set(uid,unsub);}
- });}
-function resetIdentity(){identityStreams.forEach(fn=>fn());identityStreams.clear();identityCache.clear();myCountStreams.forEach(fn=>fn());myCountStreams=[];myCountUid=null;for(const id of ['myFollowingCount','myFollowerCount']){const el=document.getElementById(id);if(el)el.textContent='—';}}
-async function uploadMyAvatar(input){const file=input.files[0];input.value='';if(!file)return;const epoch=accountEpoch,uid=_fbAuth?.currentUser?.uid;input.disabled=true;const status=document.getElementById('avatarStatus');
- try{if(!privateSessionValid(epoch))throw new Error('請先登入。');if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>15*1024*1024)throw new Error('請選擇 15 MB 以下的 JPG、PNG 或 WebP 圖片。');
- const source=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('圖片讀取失敗'));r.readAsDataURL(file)});
- const img=new Image();img.src=source;await img.decode();const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;const side=Math.min(img.width,img.height);canvas.getContext('2d').drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,256,256);const avatar=canvas.toDataURL('image/jpeg',0.8);
- if(!privateSessionValid(epoch))return;const updated={...farmProfile,avatar};accountStorage.setItem('puli_farm_profile',JSON.stringify(updated));farmProfile=updated;renderMePage();renderHomeWidgets();await flushAccount();
- if(!privateSessionValid(epoch))return;
- await _fbDb.collection('communityIdentities').doc(uid).set({name:(farmProfile.farmer||'農友').slice(0,40),avatar,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});status.textContent='大頭照已更新。';
- }catch(error){status.textContent=error.code==='permission-denied'?'大頭照尚未完整更新，請先發布新版帳號與社群規則，再重新上傳。':error.message}finally{input.disabled=false;}}
-function loadMySocialCounts(){const uid=_fbAuth?.currentUser?.uid;if(!uid||!_fbDb||myCountUid===uid)return;myCountStreams.forEach(fn=>fn());myCountStreams=[];myCountUid=uid;
- const following=_fbDb.collection('communityFollowing').doc(uid).collection('farms');const followers=_fbDb.collection('communityFollowers').doc(uid).collection('users');
- for(const [ref,id] of [[following,'myFollowingCount'],[followers,'myFollowerCount']])myCountStreams.push(ref.onSnapshot(snap=>{if(myCountUid===uid)document.getElementById(id).textContent=String(snap.size)},()=>{if(myCountUid===uid)document.getElementById(id).textContent='暫不可用'}));
- // Backfill this user's existing following edges without exposing private follow lists.
- following.get().then(async snap=>{for(const doc of snap.docs){if(_fbAuth?.currentUser?.uid!==uid)return;const mirror=_fbDb.collection('communityFollowers').doc(doc.id).collection('users').doc(uid);const exists=await mirror.get();if(!exists.exists)await mirror.set({createdAt:firebase.firestore.FieldValue.serverTimestamp()});}}).catch(()=>{});
-}
-function collapseSocialFarm(){clearSocialVisit();const box=document.getElementById('socialVisit');box.hidden=true;box.replaceChildren();document.getElementById('socialVisitClose').hidden=true;}
-</script></body>
+</body>
 </html>
