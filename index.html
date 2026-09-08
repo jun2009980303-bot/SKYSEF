@@ -195,24 +195,32 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 .achieve-progress-fill { height:100%; background:linear-gradient(90deg,#80e5a0,#64b5f6); border-radius:3px; transition:width 0.8s ease; }
 .achieve-desc { font-size:11px; color:rgba(255,255,255,0.38); }
 /* ── 任務頁：農場遊戲化主題（2026 重製） ───────────────── */
-#viewTask.task-light { color:#233b2d; position:relative; background:linear-gradient(180deg,#dff2fb 0%,#e8f6e6 30%,#f5fbe4 62%,#fdfbe9 100%); }
-/* 農場裝飾背景層（僅任務頁、不影響其他頁） */
-#viewTask.task-light::before { content:''; position:fixed; left:0; right:0; bottom:0; height:120px; background:url('assets/images/decorations/grass.png') repeat-x bottom center / auto 120px; opacity:0.55; pointer-events:none; z-index:0; }
+#viewTask.task-light { color:#233b2d; position:relative; background:#dff0e6; }
+/* 使用上傳的農場背景圖，固定鋪滿整個視窗（僅任務頁，不影響其他頁） */
+#viewTask.task-light::before { content:''; position:fixed; inset:0; background:url('assets/images/task-farm-bg.png') center top / cover no-repeat; pointer-events:none; z-index:0; }
 #viewTask.task-light .container { position:relative; z-index:1; }
 #viewTask .tk-header { display:flex; align-items:flex-start; justify-content:space-between; padding:46px 2px 14px; }
 #viewTask .tk-h2 { font-size:24px; font-weight:800; margin:0; color:#1c2b22 !important; letter-spacing:0.5px; text-shadow:none; }
 #viewTask .tk-sub { font-size:13px; color:rgba(30,50,40,0.55); margin-top:4px; }
 #viewTask .tk-gear { width:44px; height:44px; border-radius:50%; border:none; background:#fff; color:#5a6b60; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(44,87,55,0.14); flex-shrink:0; transition:transform 0.15s; }
 #viewTask .tk-gear:hover { transform:scale(1.06) rotate(20deg); }
-#viewTask .tk-card { box-sizing:border-box; min-width:0; background:#ffffff; border:1px solid rgba(210,225,205,0.9); border-radius:24px; padding:20px 20px 18px; box-shadow:0 10px 30px rgba(60,95,60,0.10); }
-#viewTask .tk-card-head { font-size:19px; font-weight:800; color:#182a20; margin-bottom:14px; display:flex; align-items:center; gap:9px; }
+#viewTask .tk-card { box-sizing:border-box; min-width:0; background:#ffffff; border:1px solid rgba(255,255,255,0.9); border-radius:28px; padding:18px 18px 16px; box-shadow:0 14px 34px rgba(40,80,45,0.16); }
+#viewTask .tk-card-head { font-size:19px; font-weight:800; color:#182a20; margin-bottom:12px; display:flex; align-items:center; gap:9px; }
 #viewTask .tk-head-emoji { font-size:23px; line-height:1; }
 #viewTask .tk-card-count { margin-left:auto; font-size:13px; font-weight:600; color:rgba(30,50,40,0.42); }
-#viewTask .tk-footnote { font-size:12px; color:rgba(30,50,40,0.4); margin-top:14px; text-align:center; }
-#viewTask .task-two-col { display:flex; flex-direction:column; gap:16px; margin-bottom:16px; }
-#viewTask #achievementPanel { display:block; }
-#viewTask #achievementList { max-height:none; overflow:visible; }
-#viewTask.task-light .container > .tk-card:last-child { margin-bottom:90px; }
+#viewTask .tk-footnote { font-size:12px; color:rgba(30,50,40,0.4); margin-top:12px; text-align:center; }
+/* 桌機／大畫面：今日任務 + 成就 並排；窄螢幕自動堆疊 */
+#viewTask .task-two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px; align-items:start; }
+#viewTask #achievementPanel { display:flex; flex-direction:column; }
+#viewTask #achievementList { flex:1; min-height:0; max-height:560px; overflow-y:auto; scrollbar-width:thin; padding-right:2px; }
+#viewTask #achievementList::-webkit-scrollbar { width:6px; }
+#viewTask #achievementList::-webkit-scrollbar-thumb { background:rgba(120,170,120,0.4); border-radius:6px; }
+#viewTask.task-light .container { gap:14px; padding-bottom:24px; }
+#viewTask.task-light .container > .tk-card:last-child { margin-bottom:84px; }
+@media (max-width:820px) {
+  #viewTask .task-two-col { grid-template-columns:1fr; }
+  #viewTask #achievementList { max-height:none; overflow:visible; }
+}
 
 /* EXP 面板 */
 #viewTask #expPanel { position:relative; overflow:visible; }
@@ -230,7 +238,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask #dailyTaskPanel { border:2px solid #9adf9a; box-shadow:0 10px 30px rgba(90,180,90,0.16); position:relative; overflow:hidden; }
 #viewTask #dailyTaskPanel::after { content:''; position:absolute; left:-6px; right:-6px; bottom:-6px; height:60px; background:url('assets/images/decorations/grass.png') repeat-x bottom center / auto 60px; opacity:0.28; pointer-events:none; }
 #viewTask .tk-hint { font-size:13px; font-weight:700; color:#2e9e5b; margin:-6px 0 12px; }
-#viewTask .tk-task { position:relative; z-index:1; display:grid; grid-template-columns:34px 1fr auto; column-gap:12px; align-items:center; padding:13px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
+#viewTask .tk-task { position:relative; z-index:1; display:grid; grid-template-columns:34px 1fr auto; column-gap:12px; align-items:center; padding:11px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
 #viewTask .tk-task:last-of-type { border-bottom:none; }
 #viewTask .tk-check { width:32px; height:32px; border-radius:10px; border:2.5px solid #cdd6cd; background:#fff; grid-column:1; grid-row:1 / span 2; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.15s; }
 #viewTask .tk-check svg { width:16px; height:13px; }
@@ -245,7 +253,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask .tk-exp-tag { grid-column:3; grid-row:1 / span 2; align-self:center; font-size:15px; font-weight:800; color:#e08a12; background:#fff0d0; border-radius:12px; padding:9px 15px; }
 
 /* 成就 */
-#viewTask .tk-ach { display:flex; align-items:center; gap:13px; padding:13px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
+#viewTask .tk-ach { display:flex; align-items:center; gap:13px; padding:11px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
 #viewTask .tk-ach:last-of-type { border-bottom:none; }
 #viewTask .tk-ach-icon { width:52px; height:52px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; background:#e4f6e7; }
 #viewTask .tk-ach:nth-child(7n+2) .tk-ach-icon { background:#fff1cc; }
