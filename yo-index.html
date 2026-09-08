@@ -3396,7 +3396,28 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 #viewFarmer.home-v2 .hb-taskcard button.hb-tkrow { border:0; background:transparent; font-family:inherit; cursor:pointer; padding:4px 2px; min-height:32px; width:100%; text-align:left; }
 #viewFarmer.home-v2 .hb-taskcard button.hb-tkrow:focus-visible { outline:2px solid #278F50; border-radius:6px; }
 </style>
-</head>
+<style>#viewCommunity { background:#f3f8f0; color:#203c2a; }
+.social-wrap { padding-top:12px; gap:24px; }
+.social-wrap h1 { margin:0 0 8px; font-size:28px; }
+.social-wrap h2 { font-size:20px; margin:12px 0; }
+.social-wrap h3 { font-size:16px; }
+.social-wrap p { font-size:14px; line-height:1.7; color:#56705d; }
+.social-card { background:#fff; border:1px solid #dce8d9; border-radius:22px; padding:20px; min-width:0; overflow-wrap:anywhere; }
+.social-card summary { cursor:pointer; font-size:17px; font-weight:700; }
+.social-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:14px; }
+.social-wrap button { border:1px solid #bcd6bd; background:#eaf5e8; color:#245936; padding:10px 14px; border-radius:12px; cursor:pointer; min-height:44px; font:inherit; font-size:14px; }
+.social-wrap button:disabled { opacity:.5; cursor:wait; }
+.social-wrap button[aria-pressed=true] { background:#286f42; color:#fff; }
+.social-wrap label { color:#36543f; font-size:14px; }
+.social-wrap input[type=checkbox] { width:20px; height:20px; flex:0 0 20px; accent-color:#278F50; }
+.social-choice { display:flex; align-items:center; gap:10px; padding:10px 0; }
+.social-photo { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:14px; display:block; }
+.social-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:12px; }
+#socialStatus { color:#9b442f; white-space:pre-line; }
+.social-record { border-top:1px solid #e3ecdf; padding:12px 0; }
+#bottomTabbar .tab-btn { min-width:0; flex:1; }
+@media(max-width:400px) { #bottomTabbar .tab-label { font-size:10px; } .social-card { padding:14px; } }
+</style></head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
@@ -3809,7 +3830,28 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 </div>
 </div>
 
+<section id="viewCommunity" class="view-screen">
+ <div class="container social-wrap">
+  <header><h1>農友交流</h1><p>看看彼此的田間日常，分享栽培的收穫。</p></header>
+  <div id="socialStatus" role="status" aria-live="polite"></div>
+  <details class="social-card" id="socialPrivacy"><summary>我的農場 · 公開範圍</summary>
+   <p>預設不公開。只有你勾選並儲存的內容會分享給其他已登入農友；新照片和新紀錄不會自動公開。</p>
+   <label>社群顯示名稱<input id="socialName" maxlength="40" placeholder="想讓農友怎麼稱呼你"></label>
+   <label class="social-choice"><input type="checkbox" id="socialPublic">讓農友找到我的農場</label>
+   <label class="social-choice"><input type="checkbox" id="socialAchievement">公開目前成就稱號</label>
+   <h3>選擇公開照片</h3><p>最多 3 張。請確認照片不含不想公開的人物、地址或其他資訊。</p><div id="socialPhotoChoices" class="social-grid"></div>
+   <h3>選擇公開栽培紀錄</h3><div id="socialLogChoices"></div>
+   <p>信箱、精確農場位置與未選取的資料不會加入社群。取消公開並儲存後，其他農友將無法再從社群讀取；他人先前保存的副本無法收回。</p>
+   <div class="social-actions"><button type="button" onclick="saveSocialProfile(this)">儲存公開範圍</button><button type="button" onclick="withdrawSocialProfile(this)">撤下我的公開農場</button></div>
+  </details>
+  <section><h2>本週精選農場</h2><p>從已公開農場每週輪換展示，讓不同農友被看見。</p><div id="socialFeatured" class="social-grid"></div></section>
+  <section><div class="social-actions"><h2>探索農友</h2><button id="socialFollowFilter" type="button" aria-pressed="false" onclick="socialFollowingOnly=!socialFollowingOnly; renderSocialFeed()">只看已追蹤</button></div><div id="socialFeed" class="social-grid"></div><button id="socialMore" type="button" hidden onclick="loadSocialPage()">載入更多農友</button></section>
+  <section id="socialVisit" class="social-card" hidden tabindex="-1"></section>
+ </div>
+</section>
+
 <div class="bottom-tabbar" id="bottomTabbar">
+<button class="tab-btn" id="tab-community" onclick="switchView('viewCommunity')"><span class="tab-icon-wrap">🌱</span><span class="tab-label">農友</span></button>
   <button class="tab-btn" id="tab-farmer" onclick="switchView('viewFarmer')">
     <div class="tab-icon-wrap">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -5165,7 +5207,7 @@ function switchView(viewId) {
   targetView.classList.add('active');
 
   // Sync bottom tab bar
-  const tabMap = { viewFarmer:'tab-farmer', viewConsumer:'tab-consumer', viewGallery:'tab-gallery', viewTask:'tab-task', viewMe:'tab-me' };
+  const tabMap = { viewFarmer:'tab-farmer', viewConsumer:'tab-consumer', viewGallery:'tab-gallery', viewTask:'tab-task', viewMe:'tab-me', viewCommunity:'tab-community' };
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const activeTab = document.getElementById(tabMap[viewId]);
   if (activeTab) activeTab.classList.add('active');
@@ -5174,6 +5216,8 @@ function switchView(viewId) {
   if (viewId === 'viewMe') { renderMePage(); }
   if (viewId === 'viewConsumer') { initChart(); renderDailyTimeline(); generateRandomWiki(); setTimeout(loadConsumerPublicProfile, 400); }
   if (viewId === 'viewTask') { renderTaskView(); }
+  if (viewId === 'viewCommunity') openCommunity();
+  else clearSocialVisit();
 }
 
 function generateRandomWiki() {
@@ -5677,6 +5721,7 @@ function initAuth() {
       renderMePage();
     } else {
       _authStartedUid = null;
+      resetCommunity();
       document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('active'));
       document.getElementById('profileSetupOverlay').style.display = 'none';
       closeSettings();
@@ -5791,6 +5836,7 @@ async function doLogout() {
   try {
     if (!_fbAuth) throw new Error('登入服務尚未連線，請重新整理後再試。');
     await _fbAuth.signOut();
+    resetCommunity();
     if (_musicAudio) { _musicAudio.pause(); _setPlayBtn(false); }
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginConfirm').value = '';
@@ -6139,28 +6185,129 @@ async function submitFarmerComment() {
 }
 
 async function syncPublicProfile() {
-  // Called when farmer saves profile — writes a public snapshot to Firestore
-  const user = _fbAuth && _fbAuth.currentUser;
-  if (!user || !_fbDb) return;
-  try {
-    const photoSnap = await _fbDb.collection('settings').doc('photo').get();
-    const photo = photoSnap.exists ? (photoSnap.data().url || '') : '';
-    const curTitle = _getCurrentTitle ? _getCurrentTitle().name : '農場新人';
-    await _fbDb.collection('public_profiles').doc(user.uid).set({
-      farmer: farmProfile.farmer,
-      location: farmProfile.location,
-      currentTitle: curTitle,
-      exp: _exp,
-      photo: photo,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  } catch(e) { console.warn('syncPublicProfile:', e); }
+  // Public sharing is now explicitly saved in the community privacy panel.
 }
+
 
 window.onload = function() {
   _tryInitFirebase(); // ensure CDN fully loaded before auth check
   initAuth();
 };
+</script>
+<script>// Community only stores explicitly selected, public snapshots; never the full private profile.
+let socialUser = null, socialProfiles = [], socialFollowing = new Set(), socialFollowingOnly = false;
+let socialPhotos = [], socialLogs = [], socialCursor = null, socialGeneration = 0, socialLoading = false;
+let socialVisitUnsubscribe = null, socialLikeUnsubscribes = [];
+const socialEscape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const socialImage = value => /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value || '') ? value : '';
+const socialMessage = message => document.getElementById('socialStatus').textContent = message;
+const socialRef = uid => _fbDb.collection('communityFarms').doc(uid);
+function socialRequireUser() {
+ const user = _fbAuth && _fbAuth.currentUser;
+ if (!user || !_fbDb) throw new Error('請先登入並確認農友交流服務已連線。');
+ return user.uid;
+}
+function socialError(error) { socialMessage(error.code === 'permission-denied' ? '社群尚未取得存取權限。請先完成 Firebase 社群規則設定。' : (error.message || '連線失敗，請稍後再試。')); }
+function clearSocialVisit() { if(socialVisitUnsubscribe) socialVisitUnsubscribe(); socialVisitUnsubscribe=null; socialLikeUnsubscribes.forEach(fn=>fn()); socialLikeUnsubscribes=[]; }
+function resetCommunity() {
+ socialGeneration++; clearSocialVisit(); socialUser=null; socialProfiles=[]; socialFollowing.clear(); socialCursor=null; socialLoading=false;
+ for(const id of ['socialFeed','socialFeatured','socialVisit','socialPhotoChoices','socialLogChoices']) document.getElementById(id).replaceChildren();
+ document.getElementById('socialVisit').hidden=true;
+ document.getElementById('socialPublic').checked=false; document.getElementById('socialAchievement').checked=false;
+}
+async function socialKey(value) {
+ const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));
+ return Array.from(new Uint8Array(bytes)).map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+async function openCommunity() {
+ resetCommunity(); const generation=socialGeneration;
+ try {
+  const uid=socialRequireUser(); socialUser=uid; socialMessage('正在載入農友…');
+  const [profile, follows]=await Promise.all([socialRef(uid).get(),_fbDb.collection('communityFollowing').doc(uid).collection('farms').get()]);
+  if(generation!==socialGeneration)return;
+  socialFollowing=new Set(follows.docs.map(d=>d.id));
+  const own=profile.exists?profile.data():{};
+  document.getElementById('socialName').value=own.name || farmProfile.farmer || '';
+  document.getElementById('socialPublic').checked=own.published===true;
+  document.getElementById('socialAchievement').checked=!!own.achievement;
+  const photos=JSON.parse(localStorage.getItem('puli_daily_photos')||'[]').slice(0,20);
+  socialPhotos=(await Promise.all(photos.map(async p=>({id:await socialKey(p.img),date:p.date||'',img:socialImage(p.img)})))).filter(p=>p.img);
+  socialPhotos=[...new Map([...(own.photos||[]),...socialPhotos].map(p=>[p.id,p])).values()];
+  socialLogs=await Promise.all(logs.slice(0,20).map(async log=>({id:await socialKey(JSON.stringify(log)),date:String(log.fullDate||log.date||''),crop:String(log.type||''),note:String(log.note||'').slice(0,1000),temp:log.temp??null,hum:log.hum??null,ph:log.ph??null})));
+  socialLogs=[...new Map([...(own.records||[]),...socialLogs].map(r=>[r.id,r])).values()];
+  if(generation!==socialGeneration)return;
+  document.getElementById('socialPhotoChoices').innerHTML=socialPhotos.map((p,i)=>`<label><img class="social-photo" src="${socialEscape(socialImage(p.img))}" alt="待選取的植物照片"><span class="social-choice"><input type="checkbox" data-photo-index="${i}" ${(own.photos||[]).some(x=>x.id===p.id)?'checked':''}>${socialEscape(p.date)} 公開此照片</span></label>`).join('')||'<p>目前沒有可選擇的照片，請先上傳植物照片。</p>';
+  document.getElementById('socialLogChoices').innerHTML=socialLogs.map((r,i)=>`<label class="social-choice"><input type="checkbox" data-log-index="${i}" ${(own.records||[]).some(x=>x.id===r.id)?'checked':''}><span>${socialEscape(r.date)} · ${socialEscape(r.crop)}<br>${socialEscape(r.note)}</span></label>`).join('')||'<p>目前沒有觀測紀錄。</p>';
+  await loadSocialPage();
+ } catch(error) { if(generation===socialGeneration)socialError(error); }
+}
+async function loadSocialPage() {
+ if(socialLoading)return; socialLoading=true; const generation=socialGeneration;
+ try {
+  socialRequireUser(); let query=_fbDb.collection('communityFarms').where('published','==',true).orderBy(firebase.firestore.FieldPath.documentId()).limit(24);
+  if(socialCursor)query=query.startAfter(socialCursor);
+  const snap=await query.get(); if(generation!==socialGeneration)return;
+  socialCursor=snap.docs.at(-1)||socialCursor;
+  socialProfiles=[...new Map([...socialProfiles,...snap.docs.map(d=>({uid:d.id,...d.data()}))].map(p=>[p.uid,p])).values()];
+  document.getElementById('socialMore').hidden=snap.size<24;
+  renderSocialFeed(); socialMessage('');
+ }catch(error){socialError(error)}finally{if(generation===socialGeneration)socialLoading=false}
+}
+function socialFarmCard(p) {
+ const i=socialProfiles.findIndex(x=>x.uid===p.uid);
+ return `<article class="social-card"><h3>${socialEscape(p.name)}</h3><p>${socialEscape(p.achievement||'一起分享田間日常')}</p><p>${(p.photos||[]).length} 張公開照片 · ${(p.records||[]).length} 筆栽培紀錄</p><div class="social-actions"><button onclick="visitSocialFarm(${i})">拜訪農場</button>${p.uid!==socialUser?`<button aria-pressed="${socialFollowing.has(p.uid)}" onclick="toggleSocialFollow(${i},this)">${socialFollowing.has(p.uid)?'已追蹤 · 取消':'追蹤農友'}</button>`:'<span>我的農場</span>'}</div></article>`;
+}
+function renderSocialFeed() {
+ document.getElementById('socialFollowFilter').setAttribute('aria-pressed',String(socialFollowingOnly));
+ const farms=socialProfiles.filter(p=>p.published);
+ document.getElementById('socialFeed').innerHTML=farms.filter(p=>!socialFollowingOnly||socialFollowing.has(p.uid)).map(socialFarmCard).join('')||'<p>目前沒有符合的公開農場。可以先設定自己的公開範圍，或載入更多農友。</p>';
+ // Monday-based weekly rotation among loaded, consenting public farms.
+ const week=Math.floor((Date.now()-Date.UTC(1970,0,5))/604800000);
+ const score=uid=>{let n=week;for(const c of uid)n=(Math.imul(n,31)+c.charCodeAt(0))|0;return n>>>0};
+ document.getElementById('socialFeatured').innerHTML=[...farms].sort((a,b)=>score(a.uid)-score(b.uid)||a.uid.localeCompare(b.uid)).slice(0,3).map(socialFarmCard).join('')||'<p>等待農友分享第一座公開農場。</p>';
+}
+async function toggleSocialFollow(index,btn) {
+ btn.disabled=true;
+ try {const uid=socialRequireUser(),target=socialProfiles[index].uid;if(uid===target)return;
+ const ref=_fbDb.collection('communityFollowing').doc(uid).collection('farms').doc(target);
+ if(socialFollowing.has(target)){await ref.delete();socialFollowing.delete(target)}else{await ref.set({createdAt:firebase.firestore.FieldValue.serverTimestamp()});socialFollowing.add(target)}renderSocialFeed();
+ }catch(error){socialError(error)}finally{btn.disabled=false}
+}
+async function socialCompress(source) {
+ const img=new Image(); img.src=source; await img.decode(); const scale=Math.min(1,600/Math.max(img.width,img.height));
+ const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+ return canvas.toDataURL('image/jpeg',0.65);
+}
+async function saveSocialProfile(btn) {
+ btn.disabled=true;
+ try {
+ const uid=socialRequireUser();const name=document.getElementById('socialName').value.trim();if(!name)throw new Error('請填寫社群顯示名稱。');
+ const photos=[...document.querySelectorAll('[data-photo-index]:checked')].map(el=>socialPhotos[Number(el.dataset.photoIndex)]);
+ const records=[...document.querySelectorAll('[data-log-index]:checked')].map(el=>socialLogs[Number(el.dataset.logIndex)]);
+ if(photos.length>3||records.length>10)throw new Error('每次公開最多 3 張照片及 10 筆栽培紀錄。');
+ const published=document.getElementById('socialPublic').checked;
+ const selected=published?await Promise.all(photos.map(async p=>({id:p.id,date:p.date,img:await socialCompress(p.img)}))):[];
+ const payload={name,published,photos:selected,photoIds:selected.map(p=>p.id),records:published?records:[],achievement:published&&document.getElementById('socialAchievement').checked?_getCurrentTitle().name:'',updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+ if(new TextEncoder().encode(JSON.stringify(payload)).length>750000)throw new Error('照片內容較大，請減少照片張數後再儲存。');
+ if(socialRequireUser()!==uid)throw new Error('登入帳號已變更，請重新開啟社群頁面。');
+ await socialRef(uid).set(payload);await openCommunity();socialMessage(published?'公開範圍已儲存。只有選取內容會顯示給農友。':'已設為不公開，社群分享內容已撤下。');
+ }catch(error){socialError(error)}finally{btn.disabled=false}
+}
+async function withdrawSocialProfile(btn) {
+ btn.disabled=true;try{await socialRef(socialRequireUser()).delete();await openCommunity();socialMessage('公開農場已撤下，你的原始照片與紀錄仍保留。')}catch(error){socialError(error)}finally{btn.disabled=false}
+}
+function visitSocialFarm(index) {
+ clearSocialVisit(); const uid=socialProfiles[index].uid, generation=socialGeneration;const box=document.getElementById('socialVisit');box.hidden=false;box.textContent='正在拜訪農場…';box.scrollIntoView({behavior:'smooth',block:'start'});
+ socialVisitUnsubscribe=socialRef(uid).onSnapshot(snap=>{
+ if(generation!==socialGeneration)return;socialLikeUnsubscribes.forEach(fn=>fn());socialLikeUnsubscribes=[];
+ if(!snap.exists||!snap.data().published){box.textContent='這座農場目前未公開。';return}
+ const p=snap.data();box.innerHTML=`<h2>${socialEscape(p.name)}的農場</h2><p>${socialEscape(p.achievement)}</p><h3>公開照片</h3><div class="social-grid">${(p.photos||[]).map((photo,i)=>`<article><img class="social-photo" src="${socialEscape(socialImage(photo.img))}" alt="農友公開的植物照片"><p>${socialEscape(photo.date)}</p><button id="socialLike${i}" aria-pressed="false">載入按讚狀態…</button></article>`).join('')||'<p>農友尚未公開照片。</p>'}</div><h3>栽培紀錄</h3>${(p.records||[]).map(r=>`<article class="social-record"><b>${socialEscape(r.date)} · ${socialEscape(r.crop)}</b><p>溫度 ${socialEscape(r.temp??'—')}°C · 濕度 ${socialEscape(r.hum??'—')}% · pH ${socialEscape(r.ph??'—')}</p><p>${socialEscape(r.note)}</p></article>`).join('')||'<p>農友尚未公開栽培紀錄。</p>'}`;
+ (p.photos||[]).forEach((photo,i)=>{
+ const ref=socialRef(uid).collection('photoLikes').doc(photo.id).collection('users');const btn=document.getElementById(`socialLike${i}`);
+ socialLikeUnsubscribes.push(ref.onSnapshot(likes=>{const liked=likes.docs.some(d=>d.id===socialUser);btn.textContent=`${liked?'♥ 已按讚':'♡ 按讚'} · ${likes.size}`;btn.setAttribute('aria-pressed',String(liked));btn.onclick=async()=>{btn.disabled=true;try{const mine=ref.doc(socialRequireUser());if(liked)await mine.delete();else await mine.set({createdAt:firebase.firestore.FieldValue.serverTimestamp()})}catch(error){socialError(error)}finally{btn.disabled=false}}},error=>{btn.textContent='按讚服務尚未開通';btn.disabled=true;socialError(error)}));
+ });box.focus({preventScroll:true});
+ },error=>{box.textContent='農場已撤下或目前無法讀取。';socialError(error)});
+}
 </script>
 </body>
 </html>
