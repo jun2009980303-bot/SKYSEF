@@ -3589,7 +3589,27 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 #viewMemoryGame .memory-front small{color:#294f32!important;font-weight:800}
 @media(max-width:420px){#viewMemoryGame .memory-wrap>h1{font-size:24px;padding:12px 6px;letter-spacing:0}#viewMemoryGame .memory-instructions{padding:9px 12px}}
 </style>
-</head>
+<style id="memory-photo-cover">
+#viewConsumerGames .memory-cover{position:relative;isolation:isolate;min-height:190px;padding:18px;align-items:flex-start;gap:12px;border:2px solid #fff1bd;border-radius:24px;overflow:hidden;box-shadow:0 8px 24px #79983c20;transition:transform .22s,box-shadow .22s;background:#c6e699}
+.memory-cover-photo{position:absolute;inset:0;z-index:-1;width:100%;height:100%;object-fit:cover;object-position:center 56%;transition:transform .5s}
+#viewConsumerGames .memory-cover-label{display:flex;flex-direction:column;align-self:center;gap:5px;max-width:53%;padding:12px 16px;border:2px solid white;background:#fffbea;border-radius:23px 23px 23px 8px;box-shadow:0 5px 0 #e4ca7980;transform:rotate(-2deg);transition:transform .22s}
+#viewConsumerGames .memory-cover-label b{color:#285d37!important;font-size:clamp(18px,2.5vw,24px);font-weight:900;line-height:1.4}
+#viewConsumerGames .memory-cover-label small{color:#53623a!important;font-size:12px;line-height:1.5;margin:0}
+#viewConsumerGames .memory-cover-icons{font-size:21px;letter-spacing:4px;line-height:1.2}
+#viewConsumerGames .memory-cover-cta{display:flex;align-items:center;gap:12px;align-self:flex-start;margin-top:5px;padding:7px 13px;border-radius:999px;background:#ffe398;color:#684517!important;font-size:12px;font-weight:800}
+#viewConsumerGames #memoryCoverBest{color:#395937!important;position:relative;max-width:110px;margin-left:auto;text-align:center;line-height:1.5;background:#fffbea;border:2px solid white;border-radius:16px;padding:10px;font-size:12px;box-shadow:0 4px 0 #e4ca7940}
+#viewConsumerGames .memory-cover:hover{transform:translateY(-3px);box-shadow:0 13px 28px #79983c35}
+.memory-cover:hover .memory-cover-photo{transform:scale(1.025)}
+#viewConsumerGames .memory-cover:hover .memory-cover-label{transform:rotate(0deg) translateY(-2px)}
+#viewConsumerGames .memory-cover:active{transform:scale(.98)}
+.memory-cover:focus-visible{outline:3px solid #287442;outline-offset:4px}
+#viewMemoryGame .consumer-back{border-radius:999px;background:#fffbea;border:2px solid white;color:#315a35;box-shadow:0 3px 0 #d4e1ba;cursor:pointer;transition:transform .18s}
+#viewMemoryGame .consumer-game-start{border:2px solid white;border-radius:999px;background:linear-gradient(135deg,#347b43,#548e39);color:white;box-shadow:0 5px 0 #b7cf95;min-height:48px}
+#viewMemoryGame button:active{transform:scale(.97)}
+#viewMemoryGame button:focus-visible{outline:3px solid #2b7042;outline-offset:3px}
+@media(max-width:420px){#viewConsumerGames .memory-cover{min-height:190px;padding:12px;gap:6px}#viewConsumerGames .memory-cover-label{padding:10px;max-width:58%}#viewConsumerGames .memory-cover-label b{font-size:18px}#viewConsumerGames .memory-cover-label small{font-size:10px}#viewConsumerGames #memoryCoverBest{font-size:11px;padding:8px;max-width:85px}.memory-cover-photo{object-position:65% center}}
+@media(prefers-reduced-motion:reduce){#viewConsumerGames .memory-cover,#viewConsumerGames .memory-cover-label,.memory-cover-photo,#viewMemoryGame .consumer-back{transition:none}#viewConsumerGames .memory-cover:hover,#viewConsumerGames .memory-cover:hover .memory-cover-label,.memory-cover:hover .memory-cover-photo{transform:none}}
+</style></head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
@@ -3956,7 +3976,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
           <span class="consumer-game-tile-score">最高分 <strong id="veggieTileHighScore">0</strong></span><span class="consumer-game-tile-arrow" aria-hidden="true">›</span>
         </button>
       </article>
-      <button class="consumer-game-tile memory-cover" onclick="switchView('viewMemoryGame')"><span aria-hidden="true">🌱 🌻</span><span><b>植物記憶翻翻樂</b><small>翻開小菜圃，找出植物好朋友</small></span><strong id="memoryCoverBest">等你挑戰</strong></button>
+      <button type="button" class="consumer-game-tile memory-cover" onclick="switchView('viewMemoryGame')"><img class="memory-cover-photo" src="assets/images/memory-garden-cover.jpg" alt=""><span class="memory-cover-label"><span class="memory-cover-icons" aria-hidden="true">🌱 🌻 🍓</span><b>植物記憶翻翻樂</b><small>翻開小菜圃，找出植物好朋友</small><span class="memory-cover-cta">開始挑戰 <span aria-hidden="true">↗</span></span></span><strong id="memoryCoverBest">等你挑戰</strong></button>
       <article class="consumer-game-tile consumer-game-tile-coming"><span class="consumer-game-coming-icon" aria-hidden="true">🌾</span><div><b>田野配對挑戰</b><small>即將推出</small></div><span aria-hidden="true">🔒</span></article>
       <article class="consumer-game-tile consumer-game-tile-coming"><span class="consumer-game-coming-icon" aria-hidden="true">🧑‍🌾</span><div><b>農場知識快問快答</b><small>即將推出</small></div><span aria-hidden="true">🔒</span></article>
     </div>
