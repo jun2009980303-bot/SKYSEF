@@ -3411,7 +3411,7 @@ input, select, textarea { min-width:0; max-width:100%; }
 </style>
 <style id="consumer-responsive">
 /* 消費者頁面：依手機、平板與桌面寬度自動伸縮。 */
-#viewConsumerHome.view-screen,#viewConsumer.view-screen{width:100%;max-width:min(1100px,100vw);}
+#viewConsumerHome.view-screen,#viewConsumer.view-screen,#viewConsumerGames.view-screen{width:100%;max-width:min(1100px,100vw);}
 .consumer-home-wrap{width:min(100%,760px);margin-inline:auto;padding:clamp(18px,3vw,38px) clamp(16px,4vw,42px) 0;box-sizing:border-box}
 .consumer-action-grid{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
 .consumer-trace-toolbar{width:min(100%,860px);margin-inline:auto;padding:clamp(14px,3vw,26px) clamp(16px,4vw,42px) 0;box-sizing:border-box}
@@ -3444,6 +3444,12 @@ input, select, textarea { min-width:0; max-width:100%; }
 .consumer-game-score-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0 10px}.consumer-game-score-row span{background:#fff;border:1px solid #e1ede0;border-radius:11px;padding:8px 4px;text-align:center;color:#5b7560;font-size:11px}.consumer-game-score-row b{display:block;color:#2f7044;font-size:17px;margin-top:2px}
 .consumer-game-board{height:clamp(230px,58vw,330px);position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,#bfe9ed 0%,#e8f6d5 68%,#8fc66e 68%,#6baa55 100%);box-shadow:inset 0 0 0 1px rgba(56,113,64,.12);touch-action:none;outline:none}.consumer-game-board:before{content:'☁︎   ☁︎';position:absolute;left:12%;top:9%;color:rgba(255,255,255,.7);font-size:27px;letter-spacing:34px;pointer-events:none}.consumer-game-board:after{content:'🌿  🌱  🌿  🌱  🌿';position:absolute;left:4%;right:4%;bottom:3%;font-size:20px;letter-spacing:10px;opacity:.7;pointer-events:none}.veggie-game-idle{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;color:#47704e;z-index:2;pointer-events:none}.veggie-game-idle span{font-size:29px;letter-spacing:5px}.veggie-game-idle b{font-size:14px}.veggie-game-idle small{font-size:11px;color:#608165}.veggie-game-item{position:absolute;z-index:4;font-size:30px;line-height:1;filter:drop-shadow(0 4px 3px rgba(42,75,39,.2));user-select:none;will-change:transform}.veggie-basket{position:absolute;z-index:5;bottom:10px;left:50%;transform:translateX(-50%);font-size:42px;line-height:1;filter:drop-shadow(0 5px 3px rgba(39,73,37,.26));pointer-events:none;transition:left .08s linear}.consumer-game-target{min-height:20px;text-align:center;color:#446d4d;font-size:13px;font-weight:700;margin:10px 0}.consumer-game-start{width:100%;border:0;border-radius:14px;padding:12px;background:linear-gradient(135deg,#398d4e,#73bd67);color:#fff;font:inherit;font-weight:800;box-shadow:0 6px 14px rgba(48,125,65,.2);cursor:pointer;transition:transform .16s,box-shadow .16s}.consumer-game-start:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(48,125,65,.28)}.consumer-game-start:active{transform:scale(.97)}.consumer-game-start.game-running{background:#eaf4e9;color:#3b6b45;box-shadow:none}.veggie-hit-good{animation:veggieGood .34s ease}.veggie-hit-bad{animation:veggieBad .34s ease}@keyframes veggieGood{50%{box-shadow:inset 0 0 0 4px rgba(63,169,78,.55)}}@keyframes veggieBad{50%{box-shadow:inset 0 0 0 4px rgba(210,83,55,.55)}}
 @media (max-width:400px){.consumer-game-card{padding:14px}.consumer-game-head h2{font-size:18px}.consumer-game-trophy{font-size:28px;padding:7px 8px}.consumer-game-board{height:230px}.veggie-game-item{font-size:26px}.veggie-basket{font-size:37px}}
+.consumer-games-view{min-height:100vh;background:linear-gradient(180deg,#f2fbf4 0%,#fffdf8 48%,#f4faf4 100%);padding-bottom:108px;box-sizing:border-box}
+.consumer-games-wrap{width:min(100%,760px);margin:0 auto;padding:clamp(18px,3vw,38px) clamp(16px,4vw,42px) 0;box-sizing:border-box}
+.consumer-games-top{display:flex;flex-direction:column;gap:16px;margin-bottom:18px}.consumer-games-title h1{margin:6px 0 4px;color:#285638;font-size:clamp(26px,5vw,34px)}.consumer-games-title p{margin:0;color:#506b58;font-size:13px}.consumer-games-list{display:flex;flex-direction:column;gap:14px}
+.consumer-game-tile{position:relative;overflow:hidden;border:1px solid #dbeadf;border-radius:24px;background:#fff;box-shadow:0 10px 24px rgba(46,91,56,.09)}.consumer-game-tile-cover{width:100%;display:flex;align-items:center;gap:12px;min-height:108px;padding:18px 16px;border:0;background:linear-gradient(135deg,#fff7d4,#dcf3d8);text-align:left;cursor:pointer;position:relative;overflow:hidden;font:inherit}.consumer-game-tile-feature .consumer-game-tile-cover:after{content:'☁︎  ✦  ☁︎';position:absolute;right:31%;top:12px;color:rgba(255,255,255,.72);font-size:18px;letter-spacing:9px;pointer-events:none}.consumer-game-cartoon{position:absolute;pointer-events:none}.consumer-game-cartoon.monkey{right:84px;bottom:-2px;font-size:52px;transform:scaleX(-1)}.consumer-game-cartoon.bananas{right:18px;top:14px;font-size:22px;transform:rotate(-12deg)}.consumer-game-tile-copy{position:relative;z-index:1;display:flex;flex-direction:column;gap:5px;max-width:46%}.consumer-game-tile-copy b{font-size:18px;color:#285638}.consumer-game-tile-copy small{color:#58705e;line-height:1.45}.consumer-game-tile-score{position:relative;z-index:1;margin-left:auto;align-self:flex-start;color:#54705b;font-size:11px;background:rgba(255,255,255,.84);border-radius:12px;padding:8px 10px;text-align:center}.consumer-game-tile-score strong{display:block;font-size:21px;color:#2f7044}.consumer-game-tile-arrow{position:absolute;right:14px;bottom:10px;color:#3d8650;font-size:26px}.consumer-game-tile-cover:active{transform:scale(.985)}.consumer-game-panel{padding:0 14px 16px;border-top:1px solid #e7f0e6}.consumer-game-panel[hidden]{display:none}.consumer-game-panel .consumer-game-card{margin-top:14px}
+.consumer-game-tile-coming{display:flex;align-items:center;gap:12px;padding:18px 16px;min-height:80px;background:linear-gradient(135deg,#fff,#f7fbf6)}.consumer-game-coming-icon{font-size:30px;line-height:1}.consumer-game-tile-coming b{color:#40634a;font-size:16px}.consumer-game-tile-coming small{display:block;color:#738b77;margin-top:4px}.consumer-game-tile-coming>span:last-child{margin-left:auto;color:#91a694}
+@media (max-width:480px){.consumer-games-wrap{padding-inline:14px}.consumer-game-cartoon.monkey{right:68px;font-size:44px}.consumer-game-cartoon.bananas{right:10px;font-size:19px}.consumer-game-tile-copy{max-width:45%}.consumer-game-tile-copy b{font-size:16px}.consumer-game-tile-copy small{font-size:11px}.consumer-game-tile-score{padding:7px 8px}}
 </style>
 <style>
 .login-links .login-link { display:block; width:100%; padding:12px; border:1px solid #CDE0CE; border-radius:12px; background:#F0F8EF; font:inherit; font-size:14px; cursor:pointer; box-sizing:border-box; }
@@ -3451,7 +3457,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 </style>
 <style id="consumer-readable-text">
 /* 提高消費者頁面在白色背景上的文字對比。 */
-#viewConsumerHome,#viewConsumer,#viewCommunity{color:#294635}
+#viewConsumerHome,#viewConsumer,#viewConsumerGames,#viewCommunity{color:#294635}
 #viewConsumerHome .consumer-brand span,#viewConsumerHome .consumer-section-title span{color:#55705c}
 #viewConsumerHome .consumer-action b,#viewConsumerHome .consumer-tip-card h3{color:#285638}
 #viewConsumerHome .consumer-action small,#viewConsumerHome .consumer-tip-card p{color:#506b58}
@@ -3475,6 +3481,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 .consumer-tab.active span:first-child{transform:translateY(-2px) scale(1.08);text-shadow:0 2px 5px rgba(45,119,64,.18)}
 .consumer-tab span:first-child{transition:transform .2s ease}
 .consumer-tab.active:after{content:'';position:absolute;bottom:3px;left:50%;width:5px;height:5px;border-radius:50%;background:#32864b;transform:translateX(-50%);box-shadow:0 1px 4px rgba(50,134,75,.35)}
+.consumer-tabbar .consumer-tab{flex:1;min-width:0}
 @keyframes navPop{0%{transform:scale(.9)}55%{transform:scale(1.05)}100%{transform:scale(1)}}
 .nav-pop{animation:navPop .28s ease}
 @media (max-width:480px){#bottomTabbar,.consumer-tabbar{width:calc(100% - 24px);left:50%;right:auto;transform:translateX(-50%)}.consumer-tab{padding-inline:7px}}
@@ -3878,15 +3885,39 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
       <button class="consumer-action" onclick="switchView('viewCommunity')"><span class="ico">💬</span><b>消費者交流</b><small>分享問題、心情與選購心得</small></button>
       <button class="consumer-action" onclick="switchView('viewConsumer')"><span class="ico">📖</span><b>最近查看的履歷</b><small id="consumerLastTraceHint">尚未掃描農場</small></button>
       <button class="consumer-action" onclick="generateRandomWiki();switchView('viewConsumer')"><span class="ico">🌱</span><b>今日植物知識</b><small>認識更多在地作物</small></button>
+      <button class="consumer-action" onclick="switchView('viewConsumerGames')"><span class="ico">🎮</span><b>小遊戲</b><small>休息一下，玩點農場互動</small></button>
     </div>
-    <section class="consumer-game-card" aria-labelledby="veggieGameTitle">
-      <div class="consumer-game-head"><div><div class="consumer-game-kicker">FORMOYA PLAY</div><h2 id="veggieGameTitle">蔬果接接樂</h2><p>接住指定種類的蔬果，挑戰你的最高分！</p></div><div class="consumer-game-trophy">🏆</div></div>
-      <div class="consumer-game-score-row"><span>本局 <b id="veggieGameScore">0</b> 分</span><span>最高 <b id="veggieGameHighScore">0</b> 分</span><span>剩餘 <b id="veggieGameTime">30</b> 秒</span></div>
-      <div id="veggieGameBoard" class="consumer-game-board" tabindex="0" aria-label="蔬果接接樂遊戲區"><div class="veggie-game-idle"><span>🥕 🥬 🍅</span><b>準備好接蔬果了嗎？</b><small>每局會隨機指定一種蔬菜類別</small></div><div id="veggieBasket" class="veggie-basket" aria-hidden="true">🧺</div></div>
-      <div class="consumer-game-target" id="veggieGameTarget">新的一局會告訴你今天要接哪一類</div>
-      <button type="button" class="consumer-game-start" id="veggieGameStart" onclick="startVeggieGame()">開始新遊戲</button>
-    </section>
     <section class="consumer-tip-card"><div class="tip-label">FORMOYA NOTE</div><h3>從產地開始認識食物</h3><p>每一筆公開履歷都來自農夫的實際紀錄，讓你買得安心，也更了解土地。</p></section>
+  </div>
+</div>
+
+<div id="viewConsumerGames" class="view-screen consumer-games-view">
+  <div class="consumer-games-wrap">
+    <div class="consumer-games-top">
+      <button class="consumer-back" onclick="switchView('viewConsumerHome')">‹ 回到消費者首頁</button>
+      <div class="consumer-games-title"><div class="consumer-game-kicker">FORMOYA PLAY</div><h1>小遊戲</h1><p>用輕鬆的互動認識植物與農場。</p></div>
+    </div>
+    <div class="consumer-games-list">
+      <article class="consumer-game-tile consumer-game-tile-feature" id="veggieGameTile">
+        <button class="consumer-game-tile-cover" type="button" onclick="toggleVeggieGamePanel()" aria-expanded="false" aria-controls="veggieGamePanel">
+          <span class="consumer-game-cartoon monkey" aria-hidden="true">🐒</span><span class="consumer-game-cartoon bananas" aria-hidden="true">🍌 🍌</span>
+          <span class="consumer-game-tile-copy"><b>蔬果接接樂</b><small>猴子接香蕉，接住指定蔬菜來得分</small></span>
+          <span class="consumer-game-tile-score">最高分 <strong id="veggieTileHighScore">0</strong></span><span class="consumer-game-tile-arrow" aria-hidden="true">›</span>
+        </button>
+        <div id="veggieGamePanel" class="consumer-game-panel" hidden>
+          <section class="consumer-game-card" aria-labelledby="veggieGameTitle">
+            <div class="consumer-game-head"><div><div class="consumer-game-kicker">FORMOYA PLAY</div><h2 id="veggieGameTitle">蔬果接接樂</h2><p>接住指定種類的蔬果，挑戰你的最高分！</p></div><div class="consumer-game-trophy">🏆</div></div>
+            <div class="consumer-game-score-row"><span>本局 <b id="veggieGameScore">0</b> 分</span><span>最高 <b id="veggieGameHighScore">0</b> 分</span><span>剩餘 <b id="veggieGameTime">30</b> 秒</span></div>
+            <div id="veggieGameBoard" class="consumer-game-board" tabindex="0" aria-label="蔬果接接樂遊戲區"><div class="veggie-game-idle"><span>🥕 🥬 🍅</span><b>準備好接蔬果了嗎？</b><small>每局會隨機指定一種蔬菜類別</small></div><div id="veggieBasket" class="veggie-basket" aria-hidden="true">🧺</div></div>
+            <div class="consumer-game-target" id="veggieGameTarget">新的一局會告訴你今天要接哪一類</div>
+            <button type="button" class="consumer-game-start" id="veggieGameStart" onclick="startVeggieGame()">開始新遊戲</button>
+          </section>
+        </div>
+      </article>
+      <article class="consumer-game-tile consumer-game-tile-coming"><span class="consumer-game-coming-icon" aria-hidden="true">🌱</span><div><b>植物記憶翻翻樂</b><small>即將推出</small></div><span aria-hidden="true">🔒</span></article>
+      <article class="consumer-game-tile consumer-game-tile-coming"><span class="consumer-game-coming-icon" aria-hidden="true">🌾</span><div><b>田野配對挑戰</b><small>即將推出</small></div><span aria-hidden="true">🔒</span></article>
+      <article class="consumer-game-tile consumer-game-tile-coming"><span class="consumer-game-coming-icon" aria-hidden="true">🧑‍🌾</span><div><b>農場知識快問快答</b><small>即將推出</small></div><span aria-hidden="true">🔒</span></article>
+    </div>
   </div>
 </div>
 
@@ -4072,6 +4103,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 <nav class="consumer-tabbar" aria-label="消費者導覽">
   <button class="consumer-tab active" id="consumer-tab-home" onclick="switchView('viewConsumerHome')"><span>⌂</span><span>主頁</span></button>
   <button class="consumer-tab" id="consumer-tab-scan" onclick="openConsumerScanner()"><span>▣</span><span>掃描履歷</span></button>
+  <button class="consumer-tab" id="consumer-tab-games" onclick="switchView('viewConsumerGames')"><span>🎮</span><span>遊戲</span></button>
   <button class="consumer-tab" id="consumer-tab-community" onclick="switchView('viewCommunity')"><span>💬</span><span>交流</span></button>
   <button class="consumer-tab" id="consumer-tab-me" onclick="switchView('viewMe')"><span>♙</span><span>我的</span></button>
 </nav>
@@ -4447,7 +4479,8 @@ const veggieGameCatalog = {
 let veggieGame = {running:false,score:0,high:0,target:'',basketX:50,items:[],raf:0,timer:0,last:0,bound:false};
 function veggieGameStore(){return (typeof accountStorage!=='undefined' && accountReady)?accountStorage:localStorage;}
 function veggieRandomTarget(){const keys=Object.keys(veggieGameCatalog);return keys[Math.floor(Math.random()*keys.length)];}
-function renderVeggieHighScore(){const el=document.getElementById('veggieGameHighScore');if(el)el.textContent=veggieGameStore().getItem('skysef_consumer_veggie_highscore')||'0';}
+function renderVeggieHighScore(){const high=veggieGameStore().getItem('skysef_consumer_veggie_highscore')||'0';const el=document.getElementById('veggieGameHighScore');if(el)el.textContent=high;const tile=document.getElementById('veggieTileHighScore');if(tile)tile.textContent=high;}
+function toggleVeggieGamePanel(){const panel=document.getElementById('veggieGamePanel'),tile=document.getElementById('veggieGameTile'),cover=tile&&tile.querySelector('.consumer-game-tile-cover');if(!panel)return;const open=panel.hidden;panel.hidden=!open;if(cover)cover.setAttribute('aria-expanded',String(open));if(open){initVeggieGameUI();renderVeggieHighScore();}}
 function initVeggieGameUI(){
   if(veggieGame.bound)return; const board=document.getElementById('veggieGameBoard'); if(!board)return; veggieGame.bound=true;
   const move=e=>{if(!veggieGame.running)return;const r=board.getBoundingClientRect();veggieGame.basketX=Math.max(8,Math.min(92,((e.clientX-r.left)/r.width)*100));const basket=document.getElementById('veggieBasket');if(basket)basket.style.left=veggieGame.basketX+'%';};
@@ -5584,8 +5617,8 @@ function saveQuickLog() {
 }
 
 function switchView(viewId) {
-  if (viewId !== 'viewConsumer' && viewId !== 'viewConsumerHome' && (!_fbAuth || !_fbAuth.currentUser || !accountReady)) { showLogin('請先登入以使用農場管理功能'); return; }
-  if (viewId !== 'viewConsumerHome' && typeof veggieGame !== 'undefined' && veggieGame.running) endVeggieGame();
+  if (!['viewConsumer','viewConsumerHome','viewConsumerGames'].includes(viewId) && (!_fbAuth || !_fbAuth.currentUser || !accountReady)) { showLogin('請先登入以使用農場管理功能'); return; }
+  if (!['viewConsumerHome','viewConsumerGames'].includes(viewId) && typeof veggieGame !== 'undefined' && veggieGame.running) endVeggieGame();
   const targetView = document.getElementById(viewId);
   if (!targetView) { console.error('找不到 viewId：', viewId); return; }
   const vp = document.querySelector('meta[name="viewport"]');
@@ -5599,7 +5632,7 @@ function switchView(viewId) {
   const activeTab = document.getElementById(tabMap[viewId]);
   if (activeTab) activeTab.classList.add('active');
   document.querySelectorAll('.consumer-tab').forEach(b => b.classList.remove('active'));
-  const consumerTabMap = {viewConsumerHome:'consumer-tab-home',viewConsumer:'consumer-tab-scan',viewCommunity:'consumer-tab-community',viewMe:'consumer-tab-me'};
+  const consumerTabMap = {viewConsumerHome:'consumer-tab-home',viewConsumer:'consumer-tab-scan',viewConsumerGames:'consumer-tab-games',viewCommunity:'consumer-tab-community',viewMe:'consumer-tab-me'};
   const consumerTab = document.getElementById(consumerTabMap[viewId]);
   if (consumerTab) consumerTab.classList.add('active');
   const selectedNav = consumerTab || activeTab;
@@ -5607,7 +5640,8 @@ function switchView(viewId) {
 
   if (viewId === 'viewFarmer')  { renderFarmerPhotoGrid(); renderHomeWidgets(); }
   if (viewId === 'viewMe') { renderMePage(); }
-  if (viewId === 'viewConsumerHome') { generateRandomWiki(); initVeggieGameUI(); renderVeggieHighScore(); }
+  if (viewId === 'viewConsumerHome') { generateRandomWiki(); renderVeggieHighScore(); }
+  if (viewId === 'viewConsumerGames') { renderVeggieHighScore(); initVeggieGameUI(); }
   if (viewId === 'viewConsumer') { initChart(); renderDailyTimeline(); generateRandomWiki(); setTimeout(loadConsumerPublicProfile, 120); }
   if (viewId === 'viewTask') { renderTaskView(); }
   if (viewId === 'viewCommunity') openCommunity();
