@@ -3460,6 +3460,20 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 #viewCommunity .social-wrap label{color:#31523b}
 #viewCommunity #socialStatus{color:#99452f}
 </style>
+<style id="floating-interactive-nav">
+/* 懸浮導覽列與按壓回饋。 */
+#bottomTabbar,.consumer-tabbar{bottom:max(12px,env(safe-area-inset-bottom,0px));border:1px solid rgba(191,216,194,.9);border-radius:27px;background:rgba(255,255,255,.94);box-shadow:0 14px 34px rgba(34,73,45,.2),0 3px 8px rgba(34,73,45,.08);backdrop-filter:blur(18px) saturate(1.1);-webkit-backdrop-filter:blur(18px) saturate(1.1)}
+#bottomTabbar .tab-btn,.consumer-tab{position:relative;overflow:hidden;transition:transform .18s ease,color .18s ease,background-color .18s ease,box-shadow .18s ease}
+#bottomTabbar .tab-btn:active,.consumer-tab:active{transform:scale(.92)}
+.consumer-tab{border-radius:19px;padding:8px 10px 7px;min-height:48px}
+.consumer-tab.active{background:linear-gradient(180deg,rgba(57,157,82,.14),rgba(57,157,82,.055));box-shadow:inset 0 1px 0 rgba(255,255,255,.88),0 3px 9px rgba(45,119,64,.1)}
+.consumer-tab.active span:first-child{transform:translateY(-2px) scale(1.08);text-shadow:0 2px 5px rgba(45,119,64,.18)}
+.consumer-tab span:first-child{transition:transform .2s ease}
+.consumer-tab.active:after{content:'';position:absolute;bottom:3px;left:50%;width:5px;height:5px;border-radius:50%;background:#32864b;transform:translateX(-50%);box-shadow:0 1px 4px rgba(50,134,75,.35)}
+@keyframes navPop{0%{transform:scale(.9)}55%{transform:scale(1.05)}100%{transform:scale(1)}}
+.nav-pop{animation:navPop .28s ease}
+@media (max-width:480px){#bottomTabbar,.consumer-tabbar{width:calc(100% - 24px);left:50%;right:auto;transform:translateX(-50%)}.consumer-tab{padding-inline:7px}}
+</style>
 <style>
 #viewFarmer.home-v2 .hb-taskcard button.hb-tkrow { border:0; background:transparent; font-family:inherit; cursor:pointer; padding:4px 2px; min-height:32px; width:100%; text-align:left; }
 #viewFarmer.home-v2 .hb-taskcard button.hb-tkrow:focus-visible { outline:2px solid #278F50; border-radius:6px; }
@@ -5546,6 +5560,8 @@ function switchView(viewId) {
   const consumerTabMap = {viewConsumerHome:'consumer-tab-home',viewConsumer:'consumer-tab-scan',viewCommunity:'consumer-tab-community',viewMe:'consumer-tab-me'};
   const consumerTab = document.getElementById(consumerTabMap[viewId]);
   if (consumerTab) consumerTab.classList.add('active');
+  const selectedNav = consumerTab || activeTab;
+  if (selectedNav) { selectedNav.classList.remove('nav-pop'); void selectedNav.offsetWidth; selectedNav.classList.add('nav-pop'); setTimeout(() => selectedNav.classList.remove('nav-pop'), 320); }
 
   if (viewId === 'viewFarmer')  { renderFarmerPhotoGrid(); renderHomeWidgets(); }
   if (viewId === 'viewMe') { renderMePage(); }
