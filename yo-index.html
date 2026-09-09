@@ -3409,9 +3409,56 @@ input, select, textarea { min-width:0; max-width:100%; }
 }
 
 </style>
+<style id="consumer-responsive">
+/* 消費者頁面：依手機、平板與桌面寬度自動伸縮。 */
+#viewConsumerHome.view-screen,#viewConsumer.view-screen{width:100%;max-width:min(1100px,100vw);}
+.consumer-home-wrap{width:min(100%,760px);margin-inline:auto;padding:clamp(18px,3vw,38px) clamp(16px,4vw,42px) 0;box-sizing:border-box}
+.consumer-action-grid{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.consumer-trace-toolbar{width:min(100%,860px);margin-inline:auto;padding:clamp(14px,3vw,26px) clamp(16px,4vw,42px) 0;box-sizing:border-box}
+.consumer-trace-empty,.consumer-trace-profile{width:min(calc(100% - 32px),860px);margin-inline:auto;box-sizing:border-box}
+.consumer-trace-profile{padding-top:18px}
+#viewConsumer .container{width:min(calc(100% - 32px),860px);margin-inline:auto}
+#viewConsumer .cs-hero{min-height:clamp(184px,24vw,300px);border-radius:0 0 clamp(28px,4vw,42px) clamp(28px,4vw,42px)}
+#viewConsumer .cs-header{padding:clamp(24px,5vw,56px) clamp(20px,6vw,72px) 0}
+.consumer-tabbar{width:100%;max-width:760px}
+.consumer-scan-card{width:min(640px,100%)}
+@media (max-width:480px){
+  .consumer-home-wrap{padding-inline:14px}
+  .consumer-action-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .consumer-action{padding:14px 12px;border-radius:17px}
+  .consumer-action .ico{font-size:24px;margin-bottom:7px}
+  .consumer-action b{font-size:14px}
+  .consumer-action small{font-size:11px}
+  .consumer-trace-toolbar{padding-inline:12px}
+  .consumer-trace-toolbar .consumer-back{padding:8px 9px;font-size:12px}
+  .consumer-scan-card{padding:16px;border-radius:24px}
+}
+@media (min-width:700px){
+  .consumer-welcome{padding:32px 34px}
+  .consumer-welcome h1{font-size:31px}
+  .consumer-section-title{margin-top:30px}
+  .consumer-tip-card{padding:22px}
+}
+</style>
 <style>
 .login-links .login-link { display:block; width:100%; padding:12px; border:1px solid #CDE0CE; border-radius:12px; background:#F0F8EF; font:inherit; font-size:14px; cursor:pointer; box-sizing:border-box; }
 button.login-link { font:inherit; font-size:13px; border:0; background:none; cursor:pointer; }
+</style>
+<style id="consumer-readable-text">
+/* 提高消費者頁面在白色背景上的文字對比。 */
+#viewConsumerHome,#viewConsumer,#viewCommunity{color:#294635}
+#viewConsumerHome .consumer-brand span,#viewConsumerHome .consumer-section-title span{color:#55705c}
+#viewConsumerHome .consumer-action b,#viewConsumerHome .consumer-tip-card h3{color:#285638}
+#viewConsumerHome .consumer-action small,#viewConsumerHome .consumer-tip-card p{color:#506b58}
+#viewConsumerHome .consumer-tip-card .tip-label{color:#52765b}
+#viewConsumer .cs-sub,#viewConsumer .cs-chart-sub{color:#496653!important}
+#viewConsumer .daily-card,#viewConsumer .panel{color:#294635}
+#viewConsumer #wikiText,#viewConsumer .tl-card-note{color:#4e6655!important}
+#viewConsumer .cs-chart-meta,#viewConsumer .tl-date-sub,#viewConsumer .tl-year{color:#5a7561!important}
+#viewConsumer .tl-empty-text{color:#58705e!important}
+#viewCommunity .social-wrap p{color:#46634e}
+#viewCommunity .social-wrap label{color:#31523b}
+#viewCommunity #socialStatus{color:#99452f}
 </style>
 <style>
 #viewFarmer.home-v2 .hb-taskcard button.hb-tkrow { border:0; background:transparent; font-family:inherit; cursor:pointer; padding:4px 2px; min-height:32px; width:100%; text-align:left; }
