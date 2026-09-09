@@ -217,12 +217,12 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask #achievementList::-webkit-scrollbar { width:6px; }
 #viewTask #achievementList::-webkit-scrollbar-thumb { background:rgba(120,170,120,0.4); border-radius:6px; }
 #viewTask.task-light .container { gap:12px; padding-bottom:0; }
-/* 底部保留：固定導覽列 + 音樂播放器 所需空間 */
-#viewTask.task-light.view-screen { padding-bottom:170px; }
-/* 音樂播放器：僅在任務頁顯示，固定於底部導覽列上方（沿用既有真實播放功能） */
-body:has(#viewTask.active) #musicPlayer { display:block !important; position:fixed; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom,0px) + 98px); width:min(92%,440px); z-index:160; }
-body:has(#viewTask.active) #musicPlayer .music-player-bar { max-width:none; width:100%; }
-body:has(#viewTask.active) #musicPlayer .music-progress { display:block; }
+/* 底部僅保留剛好蓋過固定導覽列所需的最小距離 */
+#viewTask.task-light.view-screen { padding-bottom:104px; }
+/* 音樂播放器：在任務頁以「一般流排」顯示，位於稱號之下、導覽列之上（沿用既有真實播放功能） */
+#viewTask #musicPlayer { display:block !important; position:static; transform:none; width:100%; margin-top:4px; }
+#viewTask #musicPlayer .music-player-bar { max-width:none; width:100%; box-sizing:border-box; }
+#viewTask #musicPlayer .music-progress { display:block; }
 #viewTask.task-light .container > .tk-card:last-child { margin-bottom:0; }
 @media (max-width:820px) {
   #viewTask .task-two-col { grid-template-columns:1fr; }
@@ -4141,24 +4141,8 @@ body:has(#viewConsumer.active) #loginOverlay { display: none; }
 
 <button class="settings-fab" onclick="openSettings()" title="設定"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 
-<div class="music-player" id="musicPlayer">
-  <div class="music-player-bar" id="musicBar">
-    <div class="music-cover" onclick="toggleMusicPlayer()" title="收合"><img src="assets/images/music-cover.png" alt=""></div>
-    <div class="music-track-info" id="musicTrackInfo">
-      <div class="music-track-name" id="musicTrackName">載入中...</div>
-      <div class="music-track-sub" id="musicTrackSub">背景音樂</div>
-    </div>
-    <div class="music-controls">
-      <button class="music-ctrl-btn" onclick="musicPrev()" title="上一首">⏮</button>
-      <button class="music-ctrl-btn play" id="musicPlayBtn" onclick="togglePlay()">▶</button>
-      <button class="music-ctrl-btn" onclick="musicNext()" title="下一首">⏭</button>
-      <button class="music-ctrl-btn music-ctrl-list" title="播放清單（開發中）">☰</button>
-    </div>
-  </div>
-  <div class="music-progress" id="musicProgress" onclick="seekMusic(event)">
-    <div class="music-progress-fill" id="musicProgressFill"></div>
-  </div>
-</div>
+<!-- 音樂播放器已移入任務頁（在「稱號」區塊之下）以符合頁面結構 -->
+
 
 <div id="viewFarmer" class="view-screen home-v2">
 <div class="hb-wrap">
@@ -4434,6 +4418,26 @@ body:has(#viewConsumer.active) #loginOverlay { display: none; }
 <div class="tk-card" id="titlePanel">
   <div class="tk-card-head"><span class="tk-head-emoji">👑</span>稱號 <span id="titleCount" class="tk-card-count"></span></div>
   <div id="titleList" class="tk-title-row"></div>
+</div>
+
+<!-- 音樂播放器：位於「稱號」之下，使用既有真實播放功能 -->
+<div class="music-player" id="musicPlayer">
+  <div class="music-player-bar" id="musicBar">
+    <div class="music-cover" onclick="toggleMusicPlayer()" title="收合"><img src="assets/images/music-cover.png" alt=""></div>
+    <div class="music-track-info" id="musicTrackInfo">
+      <div class="music-track-name" id="musicTrackName">載入中...</div>
+      <div class="music-track-sub" id="musicTrackSub">背景音樂</div>
+    </div>
+    <div class="music-controls">
+      <button class="music-ctrl-btn" onclick="musicPrev()" title="上一首">⏮</button>
+      <button class="music-ctrl-btn play" id="musicPlayBtn" onclick="togglePlay()">▶</button>
+      <button class="music-ctrl-btn" onclick="musicNext()" title="下一首">⏭</button>
+      <button class="music-ctrl-btn music-ctrl-list" title="播放清單（開發中）">☰</button>
+    </div>
+  </div>
+  <div class="music-progress" id="musicProgress" onclick="seekMusic(event)">
+    <div class="music-progress-fill" id="musicProgressFill"></div>
+  </div>
 </div>
 
 </div>
