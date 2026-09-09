@@ -3555,7 +3555,25 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 #viewVeggieGame .consumer-game-kicker,#viewVeggieGame #veggieGameTarget{color:#245b38!important;text-shadow:none}
 @media(max-width:560px){#viewVeggieGame .veggie-farm-farmer{right:2%;bottom:6%;width:27%;height:55%}}
 </style>
-</head>
+<style id="bright-game-cover">
+#viewConsumerGames .consumer-game-kicker{color:#356747}
+#veggieGameTile{border:2px solid #fff1bd;box-shadow:0 8px 24px #79983c20;transition:transform .22s,box-shadow .22s}
+#veggieGameTile .consumer-game-tile-cover{min-height:190px;padding:18px;isolation:isolate}
+#veggieGameTile .consumer-game-tile-cover:before{background:linear-gradient(90deg,#fff6cf33,transparent 70%)}
+#veggieGameTile .consumer-game-tile-copy{max-width:48%;gap:5px;padding:12px 16px;background:#fffbea;border:2px solid #fff;border-radius:23px 23px 23px 8px;box-shadow:0 5px 0 #e4ca7980;transform:rotate(-2deg);transition:transform .22s}
+#veggieGameTile .consumer-game-tile-copy b{font-size:clamp(19px,3vw,26px);font-weight:900;color:#285d37;letter-spacing:.04em}
+#veggieGameTile .consumer-game-tile-copy small{font-size:12px;color:#53623a}
+#veggieGameTile .catch-label-icons{font-size:21px;letter-spacing:4px;line-height:1.2}
+#veggieGameTile .catch-label-cta{align-self:flex-start;display:flex;gap:12px;align-items:center;background:#ffe398;color:#684517;border-radius:999px;padding:7px 13px;margin-top:5px;font-size:12px;font-weight:800}
+#veggieGameTile .consumer-game-tile-score{color:#395937;background:#fffbea;border:2px solid white;box-shadow:0 4px 0 #e4ca7940}
+#veggieGameTile .consumer-game-tile-arrow{display:none}
+#veggieGameTile:hover{transform:translateY(-3px);box-shadow:0 13px 28px #79983c35}
+#veggieGameTile:hover .consumer-game-tile-copy{transform:rotate(0deg) translateY(-2px)}
+#veggieGameTile .consumer-game-tile-cover:focus-visible{outline:3px solid #287442;outline-offset:-5px}
+#veggieGameTile:active{transform:scale(.98)}
+@media(max-width:420px){#veggieGameTile .consumer-game-tile-cover{padding:12px;min-height:180px}#veggieGameTile .consumer-game-tile-copy{padding:10px;max-width:53%}#veggieGameTile .consumer-game-tile-copy small{font-size:10px}#veggieGameTile .consumer-game-tile-copy b{font-size:19px}#veggieGameTile .consumer-game-cover-farmer{right:12%;width:26%}}
+@media(prefers-reduced-motion:reduce){#veggieGameTile,#veggieGameTile .consumer-game-tile-copy{transition:none;transform:none}}
+</style></head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
@@ -3912,14 +3930,13 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 <div id="viewConsumerGames" class="view-screen consumer-games-view">
   <div class="consumer-games-wrap">
     <div class="consumer-games-top">
-      <button class="consumer-back" onclick="switchView('viewConsumerHome')">‹ 回到消費者首頁</button>
       <div class="consumer-games-title"><div class="consumer-game-kicker">FORMOYA PLAY</div><h1>小遊戲</h1><p>用輕鬆的互動認識植物與農場。</p></div>
     </div>
     <div class="consumer-games-list">
       <article class="consumer-game-tile consumer-game-tile-feature" id="veggieGameTile">
         <button class="consumer-game-tile-cover" type="button" onclick="switchView('viewVeggieGame')">
           <img class="consumer-game-cover-bg" src="assets/images/farm-landscape.jpg" alt="可愛農場風景"><img class="consumer-game-cover-farmer" src="assets/images/farmer-cutout-v2.png" alt="可愛農夫抱著蔬果">
-          <span class="consumer-game-tile-copy"><b>蔬果接接樂</b><small>跟農夫一起接住指定蔬果來得分</small></span>
+          <span class="consumer-game-tile-copy"><span class="catch-label-icons" aria-hidden="true">🥕 🥬 🍎</span><b>蔬果接接樂</b><small>接住新鮮，收集好心情！</small><span class="catch-label-cta">開始挑戰 <span aria-hidden="true">↗</span></span></span>
           <span class="consumer-game-tile-score">最高分 <strong id="veggieTileHighScore">0</strong></span><span class="consumer-game-tile-arrow" aria-hidden="true">›</span>
         </button>
       </article>
