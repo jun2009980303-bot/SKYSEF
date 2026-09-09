@@ -3663,7 +3663,61 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 #viewConsumerGames .quiz-photo-cover small{font-size:11px}
 #viewConsumerGames .quiz-photo-cover em{font-size:12px;padding:6px 11px;margin-top:7px}
 @media(max-width:420px){#viewConsumerGames .quiz-photo-cover{padding:12px!important;min-height:190px!important}#viewConsumerGames .quiz-photo-cover .quiz-cover-label{padding:9px;width:49%}#viewConsumerGames .quiz-photo-cover b{font-size:18px}#viewConsumerGames .quiz-photo-cover small{font-size:10px}}
-</style><style id="pest-photo-cover-style">#viewConsumerGames .pest-photo-cover .quiz-cover-art{object-position:65% 55%}#viewConsumerGames .pest-photo-cover .quiz-cover-label{background:#fffbeef5}#viewConsumerGames .pest-photo-cover:active{transform:scale(.98);box-shadow:0 2px 0 #d6dfba}</style></head>
+</style><style id="pest-photo-cover-style">#viewConsumerGames .pest-photo-cover .quiz-cover-art{object-position:65% 55%}#viewConsumerGames .pest-photo-cover .quiz-cover-label{background:#fffbeef5}#viewConsumerGames .pest-photo-cover:active{transform:scale(.98);box-shadow:0 2px 0 #d6dfba}</style><style id="memory-fit-screen">
+html:has(#viewMemoryGame.active),body:has(#viewMemoryGame.active){overflow:hidden;overscroll-behavior:none}
+#viewMemoryGame{height:100dvh;overflow:hidden;overscroll-behavior:none;box-sizing:border-box;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+#viewMemoryGame .memory-wrap{height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
+#viewMemoryGame .memory-header{flex-shrink:0;gap:6px}
+#viewMemoryGame .memory-header>div{padding:8px 10px}
+#viewMemoryGame .memory-header .consumer-back{margin:0;padding:8px 12px;min-height:40px;width:auto}
+#viewMemoryGame .memory-wrap>h1{flex-shrink:0;margin:0;padding:8px;font-size:clamp(20px,3.5vh,32px);line-height:1.2}
+#viewMemoryGame .memory-instructions{flex-shrink:0;margin:0;padding:6px 10px;font-size:12px;line-height:1.4}
+#viewMemoryGame .memory-play{flex:1;min-height:0;margin:0;grid-template-rows:minmax(0,1fr);align-items:stretch;gap:12px}
+#viewMemoryGame .memory-grid{height:100%;min-height:0;grid-template-rows:repeat(3,minmax(0,1fr));gap:9px;padding:5px}
+#viewMemoryGame .memory-card{min-height:0;min-width:0;aspect-ratio:auto}
+#viewMemoryGame .memory-face{overflow:hidden}
+#viewMemoryGame .memory-front>span,#viewMemoryGame .memory-back{font-size:clamp(22px,5dvh,44px)}
+#viewMemoryGame .memory-front{gap:2px}
+#viewMemoryGame .memory-friend{align-self:center}
+#viewMemoryGame .memory-friend img{max-height:28dvh}
+#viewMemoryGame #memoryStart{flex-shrink:0;margin:0;padding:10px;min-height:42px;font-size:18px}
+@media(max-width:600px){#viewMemoryGame .memory-play{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 52px;gap:6px}#viewMemoryGame .memory-friend{height:52px;gap:8px}#viewMemoryGame .memory-friend img{height:52px;width:36px}#viewMemoryGame .memory-friend p{padding:6px 10px;font-size:12px}#viewMemoryGame .memory-header b{font-size:18px}#viewMemoryGame .memory-header{font-size:11px}#viewMemoryGame .memory-header .consumer-back{font-size:12px}}
+@media(max-height:500px){#viewMemoryGame .memory-wrap{gap:4px}#viewMemoryGame .memory-wrap>h1{font-size:18px;padding:4px}#viewMemoryGame .memory-instructions{font-size:11px;padding:3px}#viewMemoryGame .memory-play{grid-template-columns:minmax(0,1fr) 110px;grid-template-rows:minmax(0,1fr)}#viewMemoryGame .memory-friend{display:block;height:auto}#viewMemoryGame .memory-friend img{height:60px;width:42px}#viewMemoryGame .memory-friend p{font-size:11px;padding:5px;margin:0}#viewMemoryGame .memory-grid{gap:6px}#viewMemoryGame .memory-front small{font-size:10px}#viewMemoryGame .memory-front>span,#viewMemoryGame .memory-back{font-size:22px}#viewMemoryGame #memoryStart{min-height:34px;padding:5px;font-size:15px}}
+</style><style id="pest-quiz-fit-screen">
+html:has(#viewPestGame.active),body:has(#viewPestGame.active),html:has(#viewFarmQuiz.active),body:has(#viewFarmQuiz.active){overflow:hidden;overscroll-behavior:none}
+#viewPestGame,#viewFarmQuiz{height:100dvh;overflow:hidden;box-sizing:border-box;overscroll-behavior:none;padding:max(8px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+#viewPestGame .pest-wrap,#viewFarmQuiz .quiz-wrap{height:100%;min-height:0;display:flex;flex-direction:column;gap:8px}
+#viewPestGame .pest-top,#viewFarmQuiz .quiz-header{flex-shrink:0;gap:6px}
+#viewPestGame .pest-title,#viewFarmQuiz .quiz-wrap>h1{flex-shrink:0;margin:0;padding:6px;font-size:clamp(20px,3.5dvh,32px);line-height:1.2}
+#viewPestGame .pest-helper{min-height:0;flex-shrink:0;height:56px}
+#viewPestGame .pest-helper img{height:56px;width:38px}
+#viewPestGame .pest-helper p{font-size:12px;padding:6px 10px;line-height:1.4}
+#viewPestGame .pest-board{flex:1;min-height:0;margin:0;padding:12px;gap:10px;grid-template-rows:repeat(3,minmax(0,1fr))}
+#viewPestGame .pest-plot{aspect-ratio:auto;min-height:0}
+#viewPestGame .pest-bug{font-size:clamp(28px,6dvh,64px)}
+#viewPestGame .pest-rules{flex-shrink:0;margin:0;padding:6px;font-size:12px;line-height:1.4}
+#viewPestGame .pest-button{padding:8px 14px;min-height:36px}
+#viewPestGame .pest-start{flex-shrink:0;font-size:18px}
+#viewPestGame .pest-stats{padding:6px 10px;gap:10px}
+#viewPestGame .pest-stats b{font-size:23px}
+#viewFarmQuiz .quiz-layout{flex:1;min-height:0;align-items:stretch;margin:0;gap:10px}
+#viewFarmQuiz .quiz-layout>main{display:flex;flex-direction:column;gap:8px;min-height:0}
+#viewFarmQuiz .quiz-question{min-height:0;padding:10px;flex-shrink:0}
+#viewFarmQuiz .quiz-question small{padding:4px 8px;font-size:11px}
+#viewFarmQuiz .quiz-question h2{font-size:clamp(17px,2.8dvh,25px);line-height:1.35;margin:6px 0}
+#viewFarmQuiz #quizExplanation{padding:7px;margin:5px 0 0;font-size:12px;line-height:1.4}
+#viewFarmQuiz .quiz-options{flex:1;min-height:0;margin:0;grid-template-rows:repeat(2,minmax(0,1fr));gap:10px}
+#viewFarmQuiz .quiz-option{aspect-ratio:auto;min-height:0;padding:8px;font-size:clamp(15px,2.8dvh,22px)}
+#viewFarmQuiz #quizIntro{padding:8px;margin:0;font-size:13px;line-height:1.5}
+#viewFarmQuiz #quizStart{flex-shrink:0;padding:8px;min-height:40px;margin:0;font-size:18px}
+#viewFarmQuiz .quiz-farmer{align-self:center}
+#viewFarmQuiz .quiz-farmer img{max-height:28dvh}
+#viewFarmQuiz .quiz-header>div{padding:6px 10px;font-size:12px}
+#viewFarmQuiz .quiz-header b{font-size:22px}
+#viewFarmQuiz .consumer-back{width:auto;margin:0;padding:8px 12px;min-height:36px;font-size:13px}
+@media(max-width:600px){#viewFarmQuiz .quiz-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) 52px;gap:6px}#viewFarmQuiz .quiz-farmer{height:52px}#viewFarmQuiz .quiz-farmer img{height:52px;width:36px}#viewFarmQuiz .quiz-farmer p{padding:6px 10px;margin:0;font-size:12px}#viewPestGame .pest-top>.pest-button{font-size:12px;padding:7px 10px}#viewPestGame .pest-stats span{font-size:11px}}
+@media(max-height:500px){#viewPestGame .pest-wrap,#viewFarmQuiz .quiz-wrap{gap:4px}#viewPestGame .pest-helper{height:30px}#viewPestGame .pest-helper img{height:30px}#viewPestGame .pest-rules{font-size:10px}#viewPestGame .pest-board{padding:6px;gap:6px}#viewPestGame .pest-title,#viewFarmQuiz .quiz-wrap>h1{font-size:18px;padding:3px}#viewFarmQuiz .quiz-layout{grid-template-columns:minmax(0,1fr) 105px;grid-template-rows:minmax(0,1fr)}#viewFarmQuiz .quiz-farmer{display:block;height:auto}#viewFarmQuiz .quiz-farmer img{height:65px;width:45px}#viewFarmQuiz .quiz-farmer p{font-size:11px;padding:5px}#viewFarmQuiz .quiz-question{padding:5px}#viewFarmQuiz .quiz-question h2{font-size:16px;margin:3px 0}#viewFarmQuiz .quiz-options{gap:6px}#viewFarmQuiz #quizIntro{font-size:11px;padding:4px}}
+</style></head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
