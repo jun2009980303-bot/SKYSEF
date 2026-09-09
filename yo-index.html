@@ -4051,13 +4051,11 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
       </div>
     </div>
     <div class="login-row2">
-<span style="font-size:12px;color:#52695a;">登入狀態僅保留在此分頁</span>
       <button type="button" id="loginForgotLink" class="login-link" onclick="setLoginMode('forgot')">忘記密碼？</button>
     </div>
     <div class="login-err" id="loginErr" role="status" aria-live="polite" style="color:#D9534F;"></div>
     <button type="submit" class="login-btn" id="loginBtn">登入</button>
     <div class="login-links">
-<button type="button" class="login-link" onclick="doLogout()">登出目前帳號</button>
       <button type="button" id="loginBackLink" class="login-link" onclick="setLoginMode('login')" style="display:none">← 返回登入</button>
       <button type="button" id="loginToggleLink" class="login-link" onclick="toggleLoginMode()">還沒有帳號？建立帳號 →</button>
     </div>
@@ -6017,7 +6015,7 @@ async function doLogout() {
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginConfirm').value = '';
     setLoginMode('login');
-    showLogin('已登出');
+    showLogin();
   } catch(e) { alert('登出失敗：' + (e.code ? _authErrMsg(e.code) : e.message)); }
   finally { _loggingOut = false; }
 }
