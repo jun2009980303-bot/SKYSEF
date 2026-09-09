@@ -3619,7 +3619,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <div class="me-mail" id="meMail"></div>
   </div>
   <div class="me-card">
-    <div id="accountSyncStatus" hidden role="status" style="padding:12px;color:#9b3020;font-size:14px"></div><button id="accountRetry" hidden onclick="retryPrivateAccount()">重試儲存帳號資料</button>
+    <div id="accountSyncStatus" hidden role="status" style="padding:12px;color:#245936;font-size:14px"></div>
 <div class="me-row" onclick="openSettings()"><span>⚙️ 農場設定</span><span>›</span></div>
     <div class="me-row" onclick="switchView('viewTask')"><span>⭐ 任務與成就</span><span>›</span></div>
     <div class="me-row" onclick="switchView('viewGallery')"><span>📖 我的圖鑑</span><span>›</span></div>
@@ -4057,8 +4057,6 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <div class="login-err" id="loginErr" role="status" aria-live="polite" style="color:#D9534F;"></div>
     <button type="submit" class="login-btn" id="loginBtn">登入</button>
     <div class="login-links">
-<button type="button" class="login-link" onclick="retryPrivateAccount()">重試帳號資料</button>
-<button type="button" class="login-link" onclick="exportPendingAccount()">下載此帳號待儲存備份</button>
 <button type="button" class="login-link" onclick="doLogout()">登出目前帳號</button>
       <button type="button" id="loginBackLink" class="login-link" onclick="setLoginMode('login')" style="display:none">← 返回登入</button>
       <button type="button" id="loginToggleLink" class="login-link" onclick="toggleLoginMode()">還沒有帳號？建立帳號 →</button>
@@ -4124,7 +4122,7 @@ async function loadAccount(uid){
  let pending={};try{pending=JSON.parse(localStorage.getItem(pendingKey(uid))||'{}')}catch{throw new Error('本機待同步資料無法讀取，請保留瀏覽器資料並聯絡管理員。')}
  for(const [key,item] of Object.entries(pending)){
   if(!privateKeys.has(key))continue;
-  if((entries[key]?.version??null)!==item.base)throw new Error('另一個裝置已更新資料。本機尚有未同步變更，已暫停載入以避免覆蓋；請先匯出待同步備份。');
+  if((entries[key]?.version??null)!==item.base)continue;
   if(item.value==='null')delete values[key];else values[key]=item.value;
  }
  accountValues=values;accountVersions=Object.fromEntries(Object.entries(entries).map(([key,e])=>[key,e.version]));accountDirty=pending;accountReady=true;hydrateAccountGlobals();
@@ -4144,7 +4142,7 @@ async function flushAccount(){
  await _fbDb.runTransaction(async tx=>{
   const current=await tx.get(manifest);if(!privateSessionValid(epoch))throw new Error('帳號已變更，已停止原帳號的儲存。');
   const entries=current.exists?{...current.data().entries}:{};
-  for(const [key,item] of Object.entries(changes)){if((entries[key]?.version??null)!==item.base)throw new Error('另一個裝置已更新資料，已停止覆蓋。請匯出待同步備份。');
+  for(const [key,item] of Object.entries(changes)){if((entries[key]?.version??null)!==item.base)continue;
    for(const part of prepared[key])tx.set(root.collection('chunks').doc(part.id),{value:part.value});
    entries[key]={version,parts:prepared[key].map(p=>p.id)};
   }
@@ -4157,7 +4155,7 @@ async function flushAccount(){
  }
  if(Object.keys(accountDirty).length)localStorage.setItem(pendingKey(uid),JSON.stringify(accountDirty));else localStorage.removeItem(pendingKey(uid));
  accountNotice(Object.keys(accountDirty).length?'正在同步後續變更…':'✓ 已儲存至自己的帳號');
- }catch(error){if(epoch===accountEpoch)accountNotice(error.code==='permission-denied'?'尚未同步：請先更新帳號專屬 Firebase 規則。資料保留在此帳號的本機待同步備份。':'尚未同步：'+error.message,true);throw error}
+ }catch(error){if(epoch===accountEpoch)accountNotice('帳號資料同步失敗，請稍後再試。',true);throw error}
  finally{if(epoch===accountEpoch)accountFlushPromise=null;}
  })();
  await accountFlushPromise;if(epoch===accountEpoch&&Object.keys(accountDirty).length)return flushAccount();
@@ -4165,7 +4163,7 @@ async function flushAccount(){
 async function retryPrivateAccount(){
  const user=_fbAuth?.currentUser;if(!user){showLogin('請先登入');return;}
  try{if(accountReady){await flushAccount();return}showLogin('正在載入自己的資料…');if(await loadAccount(user.uid)){_authStartedUid=user.uid;hideLogin();startApp();}}
- catch(error){showLogin(error.code==='permission-denied'?'帳號資料權限尚未設定，請發布新版 Firebase 規則後再按「重試帳號資料」。':error.message);accountLoadError=true;}
+ catch(error){showLogin('帳號資料載入失敗，請稍後再試。');accountLoadError=true;}
 }
 function exportPendingAccount(){
  const uid=_fbAuth?.currentUser?.uid;if(!uid)return;
@@ -5868,7 +5866,7 @@ async function initAuth() {
   if (_authUnsubscribe || _authInitPending) return;
   _authInitPending = true;
   try {
-    await _fbAuth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+    await _fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
   } catch(error) {
     _authInitPending = false;
     showLogin('無法建立此分頁的獨立登入狀態，請允許瀏覽器儲存功能後重新整理。');
@@ -5892,7 +5890,7 @@ async function initAuth() {
       } catch(error) {
         if (_fbAuth?.currentUser?.uid !== uid) return;
         accountReady = false; accountLoadError = true;
-        showLogin(error.code === 'permission-denied' ? '帳號資料權限尚未設定。請發布新版 Firebase 規則，再按「重試帳號資料」。' : error.message);
+        showLogin('帳號資料載入失敗，請稍後再試。');
       }
     } else {
       if (publicView && !_loggingOut) { hideLogin(); switchView('viewConsumer'); loadConsumerPublicProfile(); }
@@ -5972,7 +5970,7 @@ async function doLogin() {
       err.style.color = '#278F50';
       err.textContent = '若此信箱已註冊，將收到重設密碼信件，請檢查收件匣及垃圾郵件。';
     } else {
-      await _fbAuth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+      await _fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       if (mode === 'login') await _fbAuth.signInWithEmailAndPassword(email, password);
       else {
         const credential=await _fbAuth.createUserWithEmailAndPassword(email, password);
