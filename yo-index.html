@@ -3442,7 +3442,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 .post-preview button { margin:6px 0; }
 #viewCommunity .social-choice input { width:20px; }
 #viewCommunity [hidden] { display:none !important; }
-</style><style>body:has(#viewCommunity.active) .ticket-fab, body:has(#viewCommunity.active) .settings-fab { display:none; }</style><style>#accountSyncStatus[hidden],#accountRetry[hidden]{display:none!important}</style></head>
+</style><style>body:has(#viewCommunity.active) .ticket-fab, body:has(#viewCommunity.active) .settings-fab { display:none; }</style><style>#accountSyncStatus[hidden],#accountRetry[hidden]{display:none!important}</style><style>#settingsOverlay details{margin:18px 0}#settingsOverlay details label{display:block;margin-top:12px}#settingsOverlay .account-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}#settingsOverlay details button,#settingsOverlay .account-actions button{background:#e5f2e7;color:#235632;border:1px solid #a9cbb0;border-radius:10px;padding:10px;cursor:pointer}#accountStatus{font-size:14px;line-height:1.6}#settingsOverlay button:disabled{opacity:.55}</style></head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
@@ -3991,7 +3991,18 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <div class="settings-divider"></div>
 
     <div class="settings-section">
-      <div class="settings-section-label">帳號</div>
+      <div class="settings-section-label">帳號與安全</div>
+      <p id="accountEmail" style="overflow-wrap:anywhere"></p><p id="accountVerified"></p>
+      <div class="account-actions"><button type="button" data-account-action onclick="verifyAccount()">寄送驗證信</button><button type="button" data-account-action onclick="refreshAccount()">我已完成驗證</button></div>
+      <details><summary>修改密碼或登入信箱</summary>
+      <label for="accountCurrentPassword">目前密碼</label><input class="login-input" id="accountCurrentPassword" type="password" autocomplete="current-password">
+      <label for="accountNewPassword">新密碼（至少 8 字元）</label><input class="login-input" id="accountNewPassword" type="password" autocomplete="new-password">
+      <label for="accountConfirmPassword">再次輸入新密碼</label><input class="login-input" id="accountConfirmPassword" type="password" autocomplete="new-password">
+      <button type="button" data-account-action onclick="changeAccountPassword()">更新密碼</button>
+      <label for="accountNewEmail">新登入信箱</label><input class="login-input" id="accountNewEmail" type="email" autocomplete="email">
+      <button type="button" data-account-action onclick="changeAccountEmail()">寄送新信箱確認信</button></details>
+      <p id="accountStatus" role="status" aria-live="polite"></p>
+      <div class="account-actions"><button type="button" data-account-action onclick="retryAccountSave()">重試儲存</button><button type="button" onclick="exportAccountData()">下載我的資料</button></div>
       <button class="btn-settings-save" onclick="sendResetEmail()" style="margin-bottom:10px;">更改密碼（發送重設信）</button>
       <button class="btn-settings-logout" onclick="doLogout(); closeSettings();">登出帳號</button>
     </div>
@@ -4060,7 +4071,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 const privateKeys = new Set(['puli_dynamic_resume','puli_farm_profile','puli_daily_photos','puli_plant_photo','skysef_exp','skysef_tickets','skysef_gallery','skysef_daily_tasks','skysef_task_history','skysef_ticket_task_date','skysef_ticket_milestones']);
 let accountUid=null,accountReady=false,accountEpoch=0,accountValues={},accountVersions={},accountDirty={},accountFlushTimer=null,accountFlushPromise=null,accountLoadError=false;
 const pendingKey=uid=>'skysef.private.v1.pending.'+uid;
-function accountNotice(message,error=false){const el=document.getElementById('accountSyncStatus');if(el){el.hidden=!error;el.textContent=error?'帳號資料尚未儲存完成。請檢查連線後重試。':'';}const retry=document.getElementById('accountRetry');if(retry)retry.hidden=!error;}
+function accountNotice(message,error=false){const el=document.getElementById('accountSyncStatus');if(el){el.hidden=!message;el.textContent=message;el.style.color=error?'#9b3020':'#245936';}const retry=document.getElementById('accountRetry');if(retry)retry.hidden=!error;}
 function privateSessionValid(epoch){return accountReady&&epoch===accountEpoch&&_fbAuth?.currentUser?.uid===accountUid;}
 const accountStorage={
  getItem(key){return accountReady?(accountValues[key]??null):null},
@@ -5717,6 +5728,7 @@ function _tryInitFirebase() {
 
 // ── 設定 ─────────────────────────────────────────────────
 function openSettings() {
+  renderAccount();
   updateProfileDisplay();
   const vol = _musicAudio ? Math.round(_musicAudio.volume * 100) : 60;
   const slider = document.getElementById('settingsVolume');
@@ -5728,6 +5740,7 @@ function openSettings() {
 }
 
 function closeSettings() {
+  for (const id of ['accountCurrentPassword','accountNewPassword','accountConfirmPassword']) document.getElementById(id).value='';
   document.getElementById('settingsOverlay').classList.remove('open');
 }
 
@@ -5772,6 +5785,52 @@ function _syncMuteBtn() {
   }
 }
 // ──────────────────────────────────────────────────────────
+
+let accountBusy=false;
+async function accountAction(action) {
+  if(accountBusy) return;
+  const user=_fbAuth?.currentUser;
+  if(!user) return showLogin('請先登入');
+  const box=document.getElementById('accountStatus');
+  accountBusy=true;
+  document.querySelectorAll('[data-account-action]').forEach(b=>b.disabled=true);
+  box.textContent='處理中…';
+  try { await action(user); }
+  catch(e) { box.textContent=e.code ? _authErrMsg(e.code) : e.message; }
+  finally { accountBusy=false; document.querySelectorAll('[data-account-action]').forEach(b=>b.disabled=false); document.getElementById('accountCurrentPassword').value=''; document.getElementById('accountNewPassword').value=''; document.getElementById('accountConfirmPassword').value=''; }
+}
+function accountMessage(text) { document.getElementById('accountStatus').textContent=text; }
+function renderAccount() {
+  const user=_fbAuth?.currentUser;
+  document.getElementById('accountEmail').textContent=user?.email || '';
+  document.getElementById('accountVerified').textContent=user?.emailVerified?'信箱已驗證':'信箱尚未驗證';
+}
+function verifyAccount() { return accountAction(async user=>{ await user.sendEmailVerification(); accountMessage('驗證信已寄出，請查看收件匣與垃圾郵件。'); }); }
+function refreshAccount() { return accountAction(async user=>{ await user.reload(); await user.getIdToken(true); renderAccount(); accountMessage(user.emailVerified?'信箱驗證成功。':'尚未完成驗證，請先點選信中的連結。'); }); }
+async function reauthenticateAccount(user) {
+  const password=document.getElementById('accountCurrentPassword').value;
+  if(!password) throw new Error('請先輸入目前密碼。');
+  await user.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(user.email,password));
+  if(_fbAuth.currentUser?.uid!==user.uid) throw new Error('帳號已變更，請重試。');
+}
+function changeAccountPassword() { return accountAction(async user=>{
+  const password=document.getElementById('accountNewPassword').value;
+  if(password.length<8) throw new Error('新密碼至少需要 8 個字元。');
+  if(password!==document.getElementById('accountConfirmPassword').value) throw new Error('兩次新密碼不相符。');
+  await reauthenticateAccount(user); await user.updatePassword(password); accountMessage('密碼已更新。');
+}); }
+function changeAccountEmail() { return accountAction(async user=>{
+  const input=document.getElementById('accountNewEmail'), email=input.value.trim();
+  if(!email || !input.checkValidity()) throw new Error('請輸入有效的新信箱。');
+  if(email===user.email) throw new Error('請輸入不同的新信箱。');
+  await reauthenticateAccount(user); await user.verifyBeforeUpdateEmail(email);
+  accountMessage('確認信已寄到新信箱，點選連結後才會變更登入信箱。');
+}); }
+function retryAccountSave() { return accountAction(async()=>{ await flushAccount(); accountMessage('資料已儲存。'); }); }
+function exportAccountData() {
+  const url=URL.createObjectURL(new Blob([JSON.stringify({exportedAt:new Date().toISOString(),values:accountValues},null,2)],{type:'application/json'}));
+  const a=document.createElement('a'); a.href=url; a.download='formoya-backup.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 
 // ── Firebase Auth ─────────────────────────────────────────
 let _loginMode = 'login'; // 'login' | 'register' | 'forgot'
@@ -5828,7 +5887,7 @@ async function initAuth() {
       document.getElementById('loginConfirm').value = '';
       try {
         if (await loadAccount(uid)) {
-          _authStartedUid = uid; hideLogin(); startApp(); renderMePage();
+          _authStartedUid = uid; hideLogin(); startApp(); renderMePage(); maybeShowProfileSetup();
         }
       } catch(error) {
         if (_fbAuth?.currentUser?.uid !== uid) return;
@@ -5915,7 +5974,11 @@ async function doLogin() {
     } else {
       await _fbAuth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
       if (mode === 'login') await _fbAuth.signInWithEmailAndPassword(email, password);
-      else await _fbAuth.createUserWithEmailAndPassword(email, password);
+      else {
+        const credential=await _fbAuth.createUserWithEmailAndPassword(email, password);
+        try { await credential.user.sendEmailVerification(); accountMessage('帳號已建立，驗證信已寄出。'); }
+        catch(e) { accountMessage('帳號已建立，但驗證信未寄出。請在設定重新寄送。'); }
+      }
     }
   } catch (e) { err.textContent = _authErrMsg(e.code); }
   finally { clearTimeout(timer); _authBusy = false; btn.disabled = false; btn.textContent = _loginMode === 'login' ? '登入' : _loginMode === 'register' ? '建立帳號' : '發送重設連結'; }
@@ -5923,10 +5986,13 @@ async function doLogin() {
 
 function _authErrMsg(code) {
   const m = {
-    'auth/user-not-found':        '找不到此帳號，請先註冊',
+    'auth/requires-recent-login': '請輸入目前密碼重新確認身分，再重試。',
+    'auth/expired-action-code': '連結已過期，請重新寄送。',
+    'auth/invalid-action-code': '連結已失效或使用過，請重新寄送。',
+    'auth/user-not-found':        '帳號或密碼錯誤',
     'auth/invalid-login-credentials': '帳號或密碼錯誤',
     'auth/user-disabled': '此帳號已停用，請聯絡管理員',
-    'auth/wrong-password':        '密碼錯誤',
+    'auth/wrong-password':        '帳號或密碼錯誤',
     'auth/invalid-credential':    '帳號或密碼錯誤',
     'auth/invalid-email':         '電子郵件格式錯誤',
     'auth/email-already-in-use':  '此信箱已被使用，請直接登入',
@@ -5945,7 +6011,7 @@ async function doLogout() {
   _loggingOut = true;
   try {
     if (!_fbAuth) throw new Error('登入服務尚未連線，請重新整理後再試。');
-    if (isGachaSpinning || postUploading || postPublishing) throw new Error('操作處理中，請完成後再登出。');
+    if (accountBusy || isGachaSpinning || postUploading || postPublishing) throw new Error('操作處理中，請完成後再登出。');
     await flushAccount();
     await _fbAuth.signOut();
     resetCommunity();
