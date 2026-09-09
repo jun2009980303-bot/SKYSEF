@@ -3550,7 +3550,12 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
 .post-preview button { margin:6px 0; }
 #viewCommunity .social-choice input { width:20px; }
 #viewCommunity [hidden] { display:none !important; }
-</style><style>body:has(#viewCommunity.active) .ticket-fab, body:has(#viewCommunity.active) .settings-fab { display:none; }</style><style>#accountSyncStatus[hidden],#accountRetry[hidden]{display:none!important}</style><style>#settingsOverlay details{margin:18px 0}#settingsOverlay details label{display:block;margin-top:12px}#settingsOverlay .account-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}#settingsOverlay details button,#settingsOverlay .account-actions button{background:#e5f2e7;color:#235632;border:1px solid #a9cbb0;border-radius:10px;padding:10px;cursor:pointer}#accountStatus{font-size:14px;line-height:1.6}#settingsOverlay button:disabled{opacity:.55}</style></head>
+</style><style>body:has(#viewCommunity.active) .ticket-fab, body:has(#viewCommunity.active) .settings-fab { display:none; }</style><style>#accountSyncStatus[hidden],#accountRetry[hidden]{display:none!important}</style><style>#settingsOverlay details{margin:18px 0}#settingsOverlay details label{display:block;margin-top:12px}#settingsOverlay .account-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}#settingsOverlay details button,#settingsOverlay .account-actions button{background:#e5f2e7;color:#235632;border:1px solid #a9cbb0;border-radius:10px;padding:10px;cursor:pointer}#accountStatus{font-size:14px;line-height:1.6}#settingsOverlay button:disabled{opacity:.55}</style><style id="farmer-cutout-fix">
+#viewVeggieGame .veggie-farm-farmer{right:2%;bottom:5%;width:24%;height:65%;object-fit:contain;object-position:center bottom;mix-blend-mode:normal;opacity:1}
+#viewVeggieGame .consumer-game-kicker,#viewVeggieGame #veggieGameTarget{color:#245b38!important;text-shadow:none}
+@media(max-width:560px){#viewVeggieGame .veggie-farm-farmer{right:2%;bottom:6%;width:27%;height:55%}}
+</style>
+</head>
 <body>
 
 <div class="ticket-fab" title="抽獎券">🎟 <span class="ticket-count-bubble" id="ticketBadge">0</span></div>
@@ -3913,7 +3918,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <div class="consumer-games-list">
       <article class="consumer-game-tile consumer-game-tile-feature" id="veggieGameTile">
         <button class="consumer-game-tile-cover" type="button" onclick="switchView('viewVeggieGame')">
-          <img class="consumer-game-cover-bg" src="assets/images/farm-landscape.jpg" alt="可愛農場風景"><img class="consumer-game-cover-farmer" src="assets/images/farmer-produce.png" alt="可愛農夫抱著蔬果">
+          <img class="consumer-game-cover-bg" src="assets/images/farm-landscape.jpg" alt="可愛農場風景"><img class="consumer-game-cover-farmer" src="assets/images/farmer-cutout-v2.png" alt="可愛農夫抱著蔬果">
           <span class="consumer-game-tile-copy"><b>蔬果接接樂</b><small>跟農夫一起接住指定蔬果來得分</small></span>
           <span class="consumer-game-tile-score">最高分 <strong id="veggieTileHighScore">0</strong></span><span class="consumer-game-tile-arrow" aria-hidden="true">›</span>
         </button>
@@ -3932,7 +3937,7 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <section class="consumer-game-card consumer-game-play-card" aria-labelledby="veggieGameTitle">
       <h2 id="veggieGameTitle" class="visually-hidden">蔬果接接樂遊戲區</h2>
       <div id="veggieGameBoard" class="consumer-game-board" tabindex="0" aria-label="蔬果接接樂遊戲區">
-        <div class="veggie-farm-backdrop" aria-hidden="true"><img class="veggie-farm-landscape" src="assets/images/farm-landscape.jpg" alt=""><img class="veggie-farm-farmer" src="assets/images/farmer-produce.png" alt=""></div>
+        <div class="veggie-farm-backdrop" aria-hidden="true"><img class="veggie-farm-landscape" src="assets/images/farm-landscape.jpg" alt=""><img class="veggie-farm-farmer" src="assets/images/farmer-cutout-v2.png" alt=""></div>
         <div id="veggieGameAnnouncement" class="veggie-game-announcement" hidden><strong id="veggieGameAnnouncementTitle">接住葉菜類</strong><small id="veggieGameAnnouncementHint">準備好了嗎？</small><b id="veggieGameCountdown" class="veggie-game-countdown"></b></div>
         <div class="veggie-game-idle"><span>🥕 🥬 🍎</span><div class="veggie-game-intro"><b>蔬果接接樂</b><small>先記住中央出現的分類，倒數 3、2、1 後移動菜籃接住它們。</small><small>接對指定分類 +2 分，接到其他蔬果 −1 分。</small></div><strong>按下開始，看看這局要接哪一類</strong></div><div id="veggieBasket" class="veggie-basket" aria-hidden="true">🧺</div>
       </div>
