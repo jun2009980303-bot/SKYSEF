@@ -1510,6 +1510,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewMe .me-card { box-sizing:border-box; background:rgba(255,255,255,0.78); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.65); border-radius:22px; padding:22px 18px; box-shadow:0 6px 24px rgba(30,60,40,0.08); margin-bottom:14px; }
 #viewMe .me-avatar { width:84px; height:84px; border-radius:50%; object-fit:cover; background:rgba(30,50,40,0.1); border:3px solid #7fd8a2; display:block; margin:0 auto 12px; }
 .me-avatar-picker{display:block;width:max-content;margin:0 auto 12px;cursor:pointer;text-align:center}.me-avatar-picker span{display:block;color:#2d7650;font-size:12px;font-weight:700}.me-avatar-picker:focus-within .me-avatar,.me-avatar-picker:hover .me-avatar{filter:brightness(.9)}
+.login-role-label{font-size:13px;color:#52695a;font-weight:700;margin:14px 0 7px}.login-role-picker{display:flex;gap:8px}.login-role{flex:1;border:1px solid #cfe2d1;background:#f7fbf7;color:#52695a;border-radius:12px;padding:10px;font:inherit;cursor:pointer}.login-role.active{background:#dff3e2;border-color:#42a95d;color:#236337;font-weight:700}
 #viewMe .me-name { text-align:center; font-size:19px; font-weight:800; color:#1c2b22; }
 #viewMe .me-mail { text-align:center; font-size:12px; color:rgba(30,50,40,0.5); margin-top:3px; }
 #viewMe .me-row { display:flex; align-items:center; justify-content:space-between; padding:14px 4px; border-bottom:1px solid rgba(30,50,40,0.07); font-size:14px; font-weight:700; color:#233b2d; cursor:pointer; }
@@ -4056,6 +4057,11 @@ button.login-link { font:inherit; font-size:13px; border:0; background:none; cur
     <div class="login-row2">
       <button type="button" id="loginForgotLink" class="login-link" onclick="setLoginMode('forgot')">忘記密碼？</button>
     </div>
+    <div class="login-role-label">登入身份</div>
+    <div class="login-role-picker" role="group" aria-label="選擇登入身份">
+      <button type="button" class="login-role active" id="roleFarmer" onclick="selectLoginRole('farmer')">🌱 農夫</button>
+      <button type="button" class="login-role" id="roleConsumer" onclick="selectLoginRole('consumer')">🛒 消費者</button>
+    </div>
     <div class="login-err" id="loginErr" role="status" aria-live="polite" style="color:#D9534F;"></div>
     <button type="submit" class="login-btn" id="loginBtn">登入</button>
     <div class="login-links">
@@ -5840,6 +5846,8 @@ function exportAccountData() {
 }
 
 // ── Firebase Auth ─────────────────────────────────────────
+let _entryRole = localStorage.getItem('skysef_login_role') || 'farmer';
+function selectLoginRole(role){_entryRole=role;localStorage.setItem('skysef_login_role',role);document.querySelectorAll('.login-role').forEach(b=>b.classList.toggle('active',b.id===('role'+role[0].toUpperCase()+role.slice(1))));}
 let _loginMode = 'login'; // 'login' | 'register' | 'forgot'
 
 let _authUnsubscribe = null;
@@ -5857,6 +5865,7 @@ function hideLogin() {
   document.querySelectorAll('.view-screen, #bottomTabbar').forEach(el => el.inert = false);
 }
 async function initAuth() {
+  selectLoginRole(_entryRole);
   const publicView = new URLSearchParams(location.search).get('view') === 'consumer' || location.hash === '#consumer';
   showLogin();
   if (publicView) {
@@ -5894,7 +5903,7 @@ async function initAuth() {
       document.getElementById('loginConfirm').value = '';
       try {
         if (await loadAccount(uid)) {
-          _authStartedUid = uid; hideLogin(); startApp(); renderMePage(); maybeShowProfileSetup();
+          _authStartedUid = uid; hideLogin(); startApp(); renderMePage(); if(_entryRole==='consumer'){switchView('viewConsumer');loadConsumerPublicProfile();}else{maybeShowProfileSetup();}
         }
       } catch(error) {
         if (_fbAuth?.currentUser?.uid !== uid) return;
