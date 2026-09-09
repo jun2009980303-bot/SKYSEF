@@ -214,12 +214,13 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask .task-two-col { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; margin-bottom:12px; align-items:start; }
 #viewTask #dailyTaskPanel, #viewTask #achievementPanel { width:100%; min-width:0; box-sizing:border-box; }
 #viewTask #achievementPanel { display:flex; flex-direction:column; }
-#viewTask #achievementList { flex:1; min-height:0; max-height:300px; overflow-y:auto; scrollbar-width:thin; padding-right:2px; }
+#viewTask #achievementList { flex:1; min-height:0; max-height:338px; overflow-y:auto; scrollbar-width:thin; padding-right:2px; }
 #viewTask #achievementList::-webkit-scrollbar { width:6px; }
 #viewTask #achievementList::-webkit-scrollbar-thumb { background:rgba(120,170,120,0.4); border-radius:6px; }
 #viewTask.task-light .container { gap:12px; padding-bottom:0; }
-/* 本頁已無音樂播放器；底部僅保留剛好蓋過固定導覽列的最小距離 */
-#viewTask.task-light.view-screen { padding-bottom:96px; }
+/* 本頁高度改為「內容驅動」：不再固定 100vh，避免內容較短時在稱號下方
+   出現大片背景空白；底部僅保留剛好蓋過固定導覽列的最小距離 */
+#viewTask.task-light.view-screen { height:auto; min-height:0; overflow:visible; padding-bottom:92px; }
 #viewTask.task-light .container > .tk-card:last-child { margin-bottom:0; }
 @media (max-width:340px) {
   #viewTask .task-two-col { grid-template-columns:1fr; }
@@ -317,7 +318,7 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   #viewTask .tk-exp-tag { font-size:11px; padding:3px 8px; }
   #viewTask .tk-footnote { font-size:10px; margin-top:6px; }
   /* 成就：更緊湊 */
-  #viewTask #achievementList { max-height:284px; }
+  #viewTask #achievementList { max-height:300px; }
   #viewTask .tk-ach { padding:6px 0; gap:8px; }
   #viewTask .tk-ach-icon { width:36px; height:36px; border-radius:11px; font-size:19px; }
   #viewTask .tk-ach-name { font-size:12px; }
