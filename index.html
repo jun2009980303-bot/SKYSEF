@@ -295,47 +295,50 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask .tk-chip-req { position:relative; font-size:13px; font-weight:700; z-index:1; }
 
 @media (max-width:600px) {
-  /* 手機版：單欄、緊湊但可讀（卡片全寬、文字不截斷） */
-  #viewTask.task-light.view-screen { padding-left:14px; padding-right:14px; }
-  #viewTask.task-light .container { gap:12px; }
-  #viewTask .tk-header { padding:30px 2px 6px; }
-  #viewTask .tk-h2 { font-size:23px; }
-  #viewTask .tk-sub { font-size:12px; margin-top:2px; }
-  #viewTask .tk-card { padding:13px 15px 11px; border-radius:22px; }
-  #viewTask .tk-card-head { font-size:17px; margin-bottom:7px; gap:8px; }
-  #viewTask .tk-head-emoji { font-size:19px; }
-  #viewTask .tk-card-count { font-size:12px; }
-  #viewTask .task-two-col { gap:12px; margin-bottom:12px; }
-  /* EXP 卡片 */
-  #viewTask .tk-exp-sprout { top:-30px; font-size:42px; }
-  #viewTask .tk-exp-row1 { gap:11px; margin-bottom:6px; }
-  #viewTask .tk-exp-badge { width:42px; height:42px; border-radius:12px; font-size:22px; }
-  #viewTask .tk-exp-title { font-size:20px; }
-  #viewTask .tk-exp-total { font-size:15px; }
-  #viewTask .tk-exp-row2 { font-size:12px; margin-bottom:6px; }
-  #viewTask .tk-exp-bar { height:10px; }
-  /* 今日任務：單行、微降列高 */
-  #viewTask .tk-hint { font-size:12px; margin:-3px 0 8px; }
-  #viewTask .tk-task { padding:8px 0; gap:9px; }
-  #viewTask .tk-check { width:27px; height:27px; border-radius:8px; }
+  /* 手機版：整頁壓縮到單一 390×844 畫面內，無需垂直捲動 */
+  #viewTask.task-light.view-screen { padding-left:14px; padding-right:14px; padding-bottom:40px; }
+  #viewTask.task-light .container { gap:7px; }
+  #viewTask .tk-header { padding:32px 2px 3px; }
+  #viewTask .tk-h2 { font-size:20px; }
+  #viewTask .tk-sub { font-size:11px; margin-top:1px; }
+  #viewTask .tk-card { padding:9px 13px 6px; border-radius:19px; }
+  #viewTask .tk-card-head { font-size:15px; margin-bottom:4px; gap:7px; }
+  #viewTask .tk-head-emoji { font-size:16px; }
+  #viewTask .tk-card-count { font-size:11px; }
+  #viewTask .task-two-col { gap:7px; margin-bottom:7px; }
+  /* EXP 卡片：更矮 */
+  #viewTask .tk-exp-sprout { top:-22px; font-size:32px; }
+  #viewTask .tk-exp-row1 { gap:10px; margin-bottom:3px; }
+  #viewTask .tk-exp-badge { width:36px; height:36px; border-radius:10px; font-size:19px; }
+  #viewTask .tk-exp-title { font-size:18px; }
+  #viewTask .tk-exp-total { font-size:14px; }
+  #viewTask .tk-exp-row2 { font-size:11px; margin-bottom:3px; }
+  #viewTask .tk-exp-bar { height:8px; }
+  /* 今日任務：單行、緊縮列高（6 列全顯示） */
+  #viewTask .tk-hint { font-size:11px; margin:-1px 0 3px; }
+  #viewTask .tk-task { padding:3px 0; gap:8px; }
+  #viewTask .tk-check { width:23px; height:23px; border-radius:7px; }
+  #viewTask .tk-check svg { width:13px; height:10px; }
   #viewTask .tk-task-name { font-size:14px; }
-  #viewTask .tk-tag { font-size:10px; padding:2px 9px; }
-  #viewTask .tk-exp-tag { font-size:13px; padding:5px 12px; }
-  #viewTask .tk-footnote { font-size:11px; margin-top:8px; }
-  /* 成就：全寬、精簡（限制高度可內部捲動） */
-  #viewTask #achievementList { max-height:214px; }
-  #viewTask .tk-ach { padding:7px 0; gap:10px; }
-  #viewTask .tk-ach-icon { width:42px; height:42px; border-radius:11px; font-size:22px; }
-  #viewTask .tk-ach-name { font-size:14px; }
-  #viewTask .tk-ach-desc { font-size:11px; }
-  #viewTask .tk-ach-right { font-size:13px; }
-  #viewTask .tk-ach-pill { font-size:12px; padding:5px 12px; }
+  #viewTask .tk-tag { font-size:10px; padding:2px 8px; }
+  #viewTask .tk-exp-tag { font-size:12px; padding:4px 11px; }
+  #viewTask .tk-footnote { font-size:9px; margin-top:3px; }
+  /* 成就：只顯示精簡摘要（限制高度＋內部捲動保留全部資料） */
+  #viewTask #achievementList { max-height:98px; }
+  #viewTask .tk-ach { padding:5px 0; gap:9px; }
+  #viewTask .tk-ach-icon { width:34px; height:34px; border-radius:10px; font-size:18px; }
+  #viewTask .tk-ach-name { font-size:13px; }
+  #viewTask .tk-ach-desc { font-size:10px; }
+  #viewTask .tk-ach-bar { height:6px; }
+  #viewTask .tk-ach-right { font-size:12px; }
+  #viewTask .tk-ach-pill { font-size:11px; padding:3px 10px; }
   /* 稱號：手機恰好顯示 3 張、等寬；其餘左右滑動 */
-  #viewTask .tk-title-row { gap:10px; }
-  #viewTask .tk-chip { flex:0 0 calc((100% - 20px) / 3); width:auto; padding:12px 8px 10px; border-radius:16px; }
-  #viewTask .tk-chip-icon { font-size:30px; margin-bottom:5px; }
-  #viewTask .tk-chip-name { font-size:14px; }
-  #viewTask .tk-chip-req { font-size:12px; }
+  #viewTask .tk-title-row { gap:10px; padding:1px 2px 1px; }
+  #viewTask .tk-chip { flex:0 0 calc((100% - 20px) / 3); width:auto; padding:8px 7px 7px; border-radius:14px; }
+  #viewTask .tk-chip-icon { font-size:25px; margin-bottom:2px; }
+  #viewTask .tk-chip-name { font-size:13px; margin-bottom:1px; }
+  #viewTask .tk-chip-req { font-size:11px; }
+  #viewTask .tk-chip-spark { display:none; }
 }
 /* ── 首頁：2026 單畫面精簡版（真實 PNG 素材） ───────────── */
 :root { --brand:#37B24D; --bg-app:#F7FBF6; }
