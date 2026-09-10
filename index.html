@@ -282,14 +282,17 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 /* 稱號：橫向輪播（一次看 3 張、其餘可左右滑動；不讓整頁橫向溢出） */
 #viewTask .tk-title-row { display:flex; gap:11px; overflow-x:auto; max-width:100%; padding:2px 2px 4px; scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; overscroll-behavior-x:contain; }
 #viewTask .tk-title-row::-webkit-scrollbar { display:none; }
-#viewTask .tk-chip { position:relative; box-sizing:border-box; overflow:hidden; flex:0 0 auto; width:150px; scroll-snap-align:start; border-radius:18px; padding:14px 10px 12px; text-align:center; background:#f2f5f0; border:2px solid rgba(30,50,40,0.06); }
+#viewTask .tk-chip { position:relative; box-sizing:border-box; overflow:hidden; flex:0 0 auto; width:150px; aspect-ratio:1.25 / 1; scroll-snap-align:start; border-radius:18px; padding:8px; display:flex; flex-direction:column; justify-content:center; text-align:center; background:#f2f5f0; border:2px solid rgba(30,50,40,0.06); }
 #viewTask .tk-chip.current { box-shadow:0 8px 20px rgba(70,170,100,0.22); }
-#viewTask .tk-chip.locked { }
-#viewTask .tk-chip.locked .tk-chip-icon { filter:grayscale(0.15); }
-#viewTask .tk-chip-lock { position:absolute; top:11px; right:11px; font-size:15px; z-index:2; }
-#viewTask .tk-chip-spark { position:absolute; font-size:14px; opacity:0.85; pointer-events:none; }
-#viewTask .tk-chip-spark.s1 { top:14px; left:13px; }
-#viewTask .tk-chip-spark.s2 { bottom:16px; right:15px; font-size:11px; }
+/* 上傳的稱號卡圖：鋪滿整張卡（載入失敗則自動隱藏，露出下方文字退回卡） */
+#viewTask .tk-chip-art { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:inherit; z-index:1; display:block; }
+#viewTask .tk-chip-art.tk-art-off { display:none; }
+#viewTask .tk-chip.locked .tk-chip-art { filter:grayscale(0.25) brightness(0.97); }
+/* 文字退回卡（沒有圖時顯示） */
+#viewTask .tk-chip-fallback { position:relative; z-index:0; }
+#viewTask .tk-chip.locked .tk-chip-fallback { filter:saturate(0.7); }
+/* 鎖：獨立 UI 疊層，位於卡圖之上，只有未解鎖才渲染 */
+#viewTask .tk-chip-lock { position:absolute; top:6px; right:6px; z-index:3; width:22px; height:22px; border-radius:7px; background:#f6c945; box-shadow:0 2px 6px rgba(60,50,0,0.28); display:flex; align-items:center; justify-content:center; font-size:12px; line-height:1; }
 #viewTask .tk-chip-icon { position:relative; font-size:34px; line-height:1; margin-bottom:6px; z-index:1; }
 #viewTask .tk-chip-name { position:relative; font-size:15px; font-weight:800; color:#233b2d; margin-bottom:3px; z-index:1; }
 #viewTask .tk-chip-req { position:relative; font-size:13px; font-weight:700; z-index:1; }
@@ -4938,14 +4941,15 @@ const ACHIEVEMENTS = [
 ];
 
 // ── 經驗值 & 稱號系統 ────────────────────────────────────
+// 稱號進度（7 階）：img 為上傳的稱號卡圖（不含鎖，鎖由狀態控制的 UI 疊層繪製）
 const TITLES = [
-  { name:'農場新人',   req:0,    icon:'🌱' },
-  { name:'農事學徒',   req:100,  icon:'🌿' },
-  { name:'農場助手',   req:300,  icon:'🍃' },
-  { name:'農事達人',   req:600,  icon:'🌾' },
-  { name:'農場老手',   req:1000, icon:'🏡' },
-  { name:'農業先鋒',   req:2000, icon:'🏅' },
-  { name:'傳說農夫',   req:5000, icon:'👑' },
+  { name:'農場新人',   req:0,    icon:'🌱', img:'assets/images/titles/title1.png' },
+  { name:'農事學徒',   req:100,  icon:'🌿', img:'assets/images/titles/title2.png' },
+  { name:'豐收先鋒',   req:300,  icon:'🌾', img:'assets/images/titles/title3.png' },
+  { name:'田野守護者', req:600,  icon:'🛡️', img:'assets/images/titles/title4.png' },
+  { name:'生態巡察使', req:1000, icon:'🧭', img:'assets/images/titles/title5.png' },
+  { name:'智慧耕作師', req:1600, icon:'🧑‍🌾', img:'assets/images/titles/title6.png' },
+  { name:'傳奇農王',   req:2500, icon:'👑', img:'assets/images/titles/title7.png' },
 ];
 
 const EXP_REWARDS = {
@@ -5019,17 +5023,20 @@ function renderTitles() {
   ];
   let unlocked = 0;
   el.innerHTML = TITLES.map((t, i) => {
-    const isUnlocked = _exp >= t.req;
+    const isUnlocked = _exp >= t.req;          // 解鎖狀態：由目前 EXP 決定
     if (isUnlocked) unlocked++;
     const isCur = cur.name === t.name;
     const theme = TITLE_THEMES[i % TITLE_THEMES.length];
-    const style = `background:${theme.bg}; border-color:${theme.border};` + (isUnlocked ? '' : 'filter:saturate(0.7);');
-    return `<div class="tk-chip ${isCur ? 'current' : ''} ${isUnlocked ? '' : 'locked'}" style="${style}">
-      <span class="tk-chip-spark s1">✨</span><span class="tk-chip-spark s2">✨</span>
-      ${isUnlocked ? '' : '<span class="tk-chip-lock">🔒</span>'}
-      <div class="tk-chip-icon">${t.icon}</div>
-      <div class="tk-chip-name">${t.name}</div>
-      <div class="tk-chip-req" style="color:${theme.req}">${t.req} EXP</div>
+    const style = `background:${theme.bg}; border-color:${theme.border};`;
+    // 卡面使用上傳的稱號圖（若尚未提供則自動退回文字卡）；鎖為獨立 UI 疊層，只有未解鎖才顯示
+    return `<div class="tk-chip ${isCur ? 'current' : ''} ${isUnlocked ? '' : 'locked'}" style="${style}" title="${t.name}（${t.req} EXP）">
+      ${t.img ? `<img class="tk-chip-art" src="${t.img}" alt="${t.name}" loading="lazy" onerror="this.classList.add('tk-art-off')">` : ''}
+      <div class="tk-chip-fallback">
+        <div class="tk-chip-icon">${t.icon}</div>
+        <div class="tk-chip-name">${t.name}</div>
+        <div class="tk-chip-req" style="color:${theme.req}">${t.req} EXP</div>
+      </div>
+      ${isUnlocked ? '' : '<span class="tk-chip-lock" aria-label="未解鎖">🔒</span>'}
     </div>`;
   }).join('');
   if (countEl) countEl.textContent = `${unlocked}/${TITLES.length} 已解鎖`;
