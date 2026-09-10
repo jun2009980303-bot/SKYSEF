@@ -210,21 +210,27 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask .tk-head-emoji { font-size:23px; line-height:1; }
 #viewTask .tk-card-count { margin-left:auto; font-size:13px; font-weight:600; color:rgba(30,50,40,0.42); }
 #viewTask .tk-footnote { font-size:12px; color:rgba(30,50,40,0.4); margin-top:12px; text-align:center; }
-/* 今日任務 + 成就 永遠並排（含手機 390/430）；只有極窄畫面才堆疊 */
-#viewTask .task-two-col { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; margin-bottom:12px; align-items:start; }
+/* 手機／平板：單欄（今日任務在上、成就在下、全寬）；只有寬螢幕(桌機)才並排 */
+#viewTask .task-two-col { display:grid; grid-template-columns:1fr; gap:14px; margin-bottom:14px; align-items:start; }
 #viewTask #dailyTaskPanel, #viewTask #achievementPanel { width:100%; min-width:0; box-sizing:border-box; }
 #viewTask #achievementPanel { display:flex; flex-direction:column; }
-#viewTask #achievementList { flex:1; min-height:0; max-height:338px; overflow-y:auto; scrollbar-width:thin; padding-right:2px; }
+/* 成就清單：限制高度、內部捲動，讓卡片比例貼近參考圖（今日任務較高、成就較精簡） */
+#viewTask #achievementList { flex:1; min-height:0; max-height:214px; overflow-y:auto; scrollbar-width:thin; padding-right:2px; }
 #viewTask #achievementList::-webkit-scrollbar { width:6px; }
 #viewTask #achievementList::-webkit-scrollbar-thumb { background:rgba(120,170,120,0.4); border-radius:6px; }
-#viewTask.task-light .container { gap:12px; padding-bottom:0; }
-/* 本頁高度改為「內容驅動」：不再固定 100vh，避免內容較短時在稱號下方
-   出現大片背景空白；底部僅保留剛好蓋過固定導覽列的最小距離 */
-#viewTask.task-light.view-screen { height:auto; min-height:0; overflow:visible; padding-bottom:92px; }
-#viewTask.task-light .container > .tk-card:last-child { margin-bottom:0; }
-@media (max-width:340px) {
-  #viewTask .task-two-col { grid-template-columns:1fr; }
-  #viewTask #achievementList { max-height:none; overflow:visible; }
+/* 音樂播放器：位於「稱號」之下、導覽列之上，一般流排（沿用既有真實播放功能） */
+#viewTask #musicPlayer { display:block !important; position:static; transform:none; width:100%; margin-top:2px; }
+#viewTask #musicPlayer .music-player-bar { max-width:none; width:100%; box-sizing:border-box; }
+#viewTask #musicPlayer .music-progress { display:block; }
+#viewTask.task-light .container { gap:14px; padding-bottom:0; }
+/* 單欄內容高於一個畫面：沿用標準的視窗內捲動（height:100vh overflow-y:auto）；
+   底部保留剛好蓋過固定導覽列所需的距離，避免導覽列蓋住音樂播放器 */
+#viewTask.task-light.view-screen { padding-bottom:100px; }
+#viewTask.task-light .container > *:last-child { margin-bottom:0; }
+/* 桌機／大畫面：今日任務 + 成就 並排 */
+@media (min-width:900px) {
+  #viewTask .task-two-col { grid-template-columns:1fr 1fr; gap:16px; }
+  #viewTask #achievementList { max-height:360px; }
 }
 
 /* EXP 面板 */
@@ -242,37 +248,39 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 /* 今日任務 */
 #viewTask #dailyTaskPanel { border:2px solid #9adf9a; box-shadow:0 10px 30px rgba(90,180,90,0.16); position:relative; }
 #viewTask .tk-hint { font-size:13px; font-weight:700; color:#2e9e5b; margin:-6px 0 12px; }
-#viewTask .tk-task { position:relative; z-index:1; display:grid; grid-template-columns:26px 1fr auto; column-gap:9px; row-gap:2px; align-items:center; padding:8px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
+/* 任務列：單行（勾選框 + 名稱 + 標籤 + 經驗值靠右） */
+#viewTask .tk-task { position:relative; z-index:1; display:flex; align-items:center; gap:10px; padding:9px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
 #viewTask .tk-task:last-of-type { border-bottom:none; }
-#viewTask .tk-check { width:26px; height:26px; border-radius:8px; border:2.5px solid #cdd6cd; background:#fff; grid-column:1; grid-row:1 / span 2; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.15s; flex-shrink:0; }
-#viewTask .tk-check svg { width:14px; height:11px; }
+#viewTask .tk-check { width:28px; height:28px; border-radius:8px; border:2.5px solid #cdd6cd; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.15s; flex-shrink:0; }
+#viewTask .tk-check svg { width:15px; height:12px; }
 #viewTask .tk-check.done { background:#33bf6b; border-color:#33bf6b; box-shadow:0 3px 8px rgba(51,191,107,0.35); }
 #viewTask .tk-check.auto { cursor:default; }
 #viewTask .tk-check:not(.auto):hover { border-color:#33bf6b; }
-#viewTask .tk-task-name { grid-column:2 / 4; grid-row:1; font-size:14px; font-weight:800; color:#1e3325; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#viewTask .tk-task-name { flex-shrink:0; font-size:15px; font-weight:800; color:#1e3325; white-space:nowrap; }
 #viewTask .tk-task-name.done { color:rgba(30,50,40,0.4); }
-#viewTask .tk-tag { grid-column:2; grid-row:2; justify-self:start; font-size:11px; font-weight:700; padding:2px 9px; border-radius:20px; }
+#viewTask .tk-tag { flex-shrink:0; font-size:11px; font-weight:700; padding:3px 11px; border-radius:20px; }
 #viewTask .tk-tag.auto { background:#e0ecff; color:#3f7bf0; }
 #viewTask .tk-tag.manual { background:#dff3e4; color:#2fa25c; }
-#viewTask .tk-exp-tag { grid-column:3; grid-row:2; justify-self:end; align-self:center; font-size:12px; font-weight:800; color:#e08a12; background:#fff0d0; border-radius:9px; padding:3px 9px; }
+#viewTask .tk-exp-tag { margin-left:auto; flex-shrink:0; font-size:14px; font-weight:800; color:#e08a12; background:#fff0d0; border-radius:11px; padding:6px 14px; }
 
 /* 成就 */
-#viewTask .tk-ach { display:flex; align-items:center; gap:9px; padding:7px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
+#viewTask .tk-ach { display:flex; align-items:center; gap:11px; padding:8px 2px; border-bottom:1px solid rgba(30,50,40,0.07); }
 #viewTask .tk-ach:last-of-type { border-bottom:none; }
-#viewTask .tk-ach-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:21px; flex-shrink:0; background:#e4f6e7; }
+#viewTask .tk-ach-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:23px; flex-shrink:0; background:#e4f6e7; }
 #viewTask .tk-ach:nth-child(7n+2) .tk-ach-icon { background:#fff1cc; }
 #viewTask .tk-ach:nth-child(7n+3) .tk-ach-icon { background:#e0ecff; }
 #viewTask .tk-ach:nth-child(7n+4) .tk-ach-icon { background:#fce7d6; }
 #viewTask .tk-ach:nth-child(7n+5) .tk-ach-icon { background:#e4f6e7; }
 #viewTask .tk-ach:nth-child(7n+6) .tk-ach-icon { background:#efe4ff; }
 #viewTask .tk-ach:nth-child(7n)   .tk-ach-icon { background:#e0f5f1; }
-#viewTask .tk-ach-body { flex:1; min-width:0; }
-#viewTask .tk-ach-name { font-size:13px; font-weight:800; color:#182a20; margin-bottom:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-#viewTask .tk-ach-desc { font-size:11px; color:rgba(30,50,40,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-#viewTask .tk-ach-bar { height:6px; border-radius:6px; background:#eaeee8; overflow:hidden; margin-top:5px; }
-#viewTask .tk-ach-fill { height:100%; border-radius:6px; background:linear-gradient(90deg,#3f8bf0,#6aa9ff); transition:width 0.6s ease; }
-#viewTask .tk-ach-right { flex-shrink:0; font-size:12px; font-weight:800; color:rgba(30,50,40,0.5); }
-#viewTask .tk-ach-pill { background:#2fb367; color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; box-shadow:0 3px 8px rgba(47,179,103,0.28); white-space:nowrap; }
+/* 成就內容：名稱一行；說明與進度條同一行（省高度、不截斷） */
+#viewTask .tk-ach-body { flex:1; min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; column-gap:9px; row-gap:2px; }
+#viewTask .tk-ach-name { grid-column:1 / -1; grid-row:1; font-size:14px; font-weight:800; color:#182a20; }
+#viewTask .tk-ach-desc { grid-column:1; grid-row:2; font-size:12px; color:rgba(30,50,40,0.5); white-space:nowrap; }
+#viewTask .tk-ach-bar { grid-column:2; grid-row:2; height:7px; border-radius:7px; background:#eaeee8; overflow:hidden; margin-top:0; align-self:center; }
+#viewTask .tk-ach-fill { height:100%; border-radius:7px; background:linear-gradient(90deg,#3f8bf0,#6aa9ff); transition:width 0.6s ease; }
+#viewTask .tk-ach-right { flex-shrink:0; align-self:center; font-size:14px; font-weight:800; color:rgba(30,50,40,0.5); }
+#viewTask .tk-ach-pill { background:#2fb367; color:#fff; font-size:13px; font-weight:800; padding:6px 14px; border-radius:20px; box-shadow:0 3px 8px rgba(47,179,103,0.28); white-space:nowrap; }
 
 /* 稱號 */
 #viewTask .tk-title-row { display:flex; gap:11px; overflow-x:auto; padding:2px 2px 4px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
@@ -290,47 +298,46 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask .tk-chip-req { position:relative; font-size:13px; font-weight:700; z-index:1; }
 
 @media (max-width:600px) {
-  /* 手機版：維持 今日任務 + 成就 並排的緊湊儀表板（不堆疊） */
-  #viewTask.task-light.view-screen { padding-left:13px; padding-right:13px; }
-  #viewTask.task-light .container { gap:9px; }
+  /* 手機版：單欄、緊湊但可讀（卡片全寬、文字不截斷） */
+  #viewTask.task-light.view-screen { padding-left:14px; padding-right:14px; }
+  #viewTask.task-light .container { gap:12px; }
   #viewTask .tk-header { padding:30px 2px 6px; }
-  #viewTask .tk-h2 { font-size:22px; }
+  #viewTask .tk-h2 { font-size:23px; }
   #viewTask .tk-sub { font-size:12px; margin-top:2px; }
-  #viewTask .tk-card { padding:10px 10px 9px; border-radius:20px; }
-  #viewTask .tk-card-head { font-size:15px; margin-bottom:6px; gap:6px; }
-  #viewTask .tk-head-emoji { font-size:17px; }
-  #viewTask .tk-card-count { font-size:10px; }
-  #viewTask .task-two-col { gap:10px; margin-bottom:9px; }
-  /* EXP 卡片：更矮更精簡 */
-  #viewTask .tk-exp-sprout { top:-28px; font-size:38px; }
-  #viewTask .tk-exp-row1 { gap:10px; margin-bottom:5px; }
-  #viewTask .tk-exp-badge { width:38px; height:38px; border-radius:11px; font-size:20px; }
-  #viewTask .tk-exp-title { font-size:18px; }
-  #viewTask .tk-exp-total { font-size:14px; }
-  #viewTask .tk-exp-row2 { font-size:11px; margin-bottom:5px; }
-  #viewTask .tk-exp-bar { height:9px; }
-  /* 今日任務：名稱一行、標籤＋經驗第二行 */
-  #viewTask .tk-hint { font-size:11px; margin:-2px 0 6px; }
-  #viewTask .tk-task { padding:6px 0; column-gap:7px; }
-  #viewTask .tk-check { width:24px; height:24px; border-radius:7px; }
-  #viewTask .tk-task-name { font-size:13px; }
-  #viewTask .tk-tag { font-size:10px; padding:2px 8px; }
-  #viewTask .tk-exp-tag { font-size:11px; padding:3px 8px; }
-  #viewTask .tk-footnote { font-size:10px; margin-top:6px; }
-  /* 成就：更緊湊 */
-  #viewTask #achievementList { max-height:300px; }
-  #viewTask .tk-ach { padding:6px 0; gap:8px; }
-  #viewTask .tk-ach-icon { width:36px; height:36px; border-radius:11px; font-size:19px; }
-  #viewTask .tk-ach-name { font-size:12px; }
-  #viewTask .tk-ach-desc { font-size:10px; }
-  #viewTask .tk-ach-bar { margin-top:4px; height:5px; }
-  #viewTask .tk-ach-right { font-size:11px; }
-  #viewTask .tk-ach-pill { font-size:10px; padding:3px 8px; }
+  #viewTask .tk-card { padding:13px 15px 11px; border-radius:22px; }
+  #viewTask .tk-card-head { font-size:17px; margin-bottom:7px; gap:8px; }
+  #viewTask .tk-head-emoji { font-size:19px; }
+  #viewTask .tk-card-count { font-size:12px; }
+  #viewTask .task-two-col { gap:12px; margin-bottom:12px; }
+  /* EXP 卡片 */
+  #viewTask .tk-exp-sprout { top:-30px; font-size:42px; }
+  #viewTask .tk-exp-row1 { gap:11px; margin-bottom:6px; }
+  #viewTask .tk-exp-badge { width:42px; height:42px; border-radius:12px; font-size:22px; }
+  #viewTask .tk-exp-title { font-size:20px; }
+  #viewTask .tk-exp-total { font-size:15px; }
+  #viewTask .tk-exp-row2 { font-size:12px; margin-bottom:6px; }
+  #viewTask .tk-exp-bar { height:10px; }
+  /* 今日任務：單行、微降列高 */
+  #viewTask .tk-hint { font-size:12px; margin:-3px 0 8px; }
+  #viewTask .tk-task { padding:8px 0; gap:9px; }
+  #viewTask .tk-check { width:27px; height:27px; border-radius:8px; }
+  #viewTask .tk-task-name { font-size:14px; }
+  #viewTask .tk-tag { font-size:10px; padding:2px 9px; }
+  #viewTask .tk-exp-tag { font-size:13px; padding:5px 12px; }
+  #viewTask .tk-footnote { font-size:11px; margin-top:8px; }
+  /* 成就：全寬、精簡（限制高度可內部捲動） */
+  #viewTask #achievementList { max-height:214px; }
+  #viewTask .tk-ach { padding:7px 0; gap:10px; }
+  #viewTask .tk-ach-icon { width:42px; height:42px; border-radius:11px; font-size:22px; }
+  #viewTask .tk-ach-name { font-size:14px; }
+  #viewTask .tk-ach-desc { font-size:11px; }
+  #viewTask .tk-ach-right { font-size:13px; }
+  #viewTask .tk-ach-pill { font-size:12px; padding:5px 12px; }
   /* 稱號：橫向卡片，一次約看到 3 張 */
-  #viewTask .tk-chip { width:112px; padding:11px 8px 9px; border-radius:15px; }
-  #viewTask .tk-chip-icon { font-size:28px; margin-bottom:4px; }
-  #viewTask .tk-chip-name { font-size:13px; }
-  #viewTask .tk-chip-req { font-size:11px; }
+  #viewTask .tk-chip { width:118px; padding:12px 9px 10px; border-radius:16px; }
+  #viewTask .tk-chip-icon { font-size:30px; margin-bottom:5px; }
+  #viewTask .tk-chip-name { font-size:14px; }
+  #viewTask .tk-chip-req { font-size:12px; }
 }
 /* ── 首頁：2026 單畫面精簡版（真實 PNG 素材） ───────────── */
 :root { --brand:#37B24D; --bg-app:#F7FBF6; }
@@ -4141,25 +4148,7 @@ body:has(#viewConsumer.active) #loginOverlay { display: none; }
 
 <button class="settings-fab" onclick="openSettings()" title="設定"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 
-<!-- 音樂播放器（全域，預設隱藏；任務頁不顯示） -->
-<div class="music-player" id="musicPlayer">
-  <div class="music-player-bar" id="musicBar">
-    <div class="music-cover" onclick="toggleMusicPlayer()" title="收合"><img src="assets/images/music-cover.png" alt=""></div>
-    <div class="music-track-info" id="musicTrackInfo">
-      <div class="music-track-name" id="musicTrackName">載入中...</div>
-      <div class="music-track-sub" id="musicTrackSub">背景音樂</div>
-    </div>
-    <div class="music-controls">
-      <button class="music-ctrl-btn" onclick="musicPrev()" title="上一首">⏮</button>
-      <button class="music-ctrl-btn play" id="musicPlayBtn" onclick="togglePlay()">▶</button>
-      <button class="music-ctrl-btn" onclick="musicNext()" title="下一首">⏭</button>
-      <button class="music-ctrl-btn music-ctrl-list" title="播放清單（開發中）">☰</button>
-    </div>
-  </div>
-  <div class="music-progress" id="musicProgress" onclick="seekMusic(event)">
-    <div class="music-progress-fill" id="musicProgressFill"></div>
-  </div>
-</div>
+<!-- 音樂播放器已移入任務頁（在「稱號」之下）以符合頁面結構 -->
 
 
 <div id="viewFarmer" class="view-screen home-v2">
@@ -4436,6 +4425,26 @@ body:has(#viewConsumer.active) #loginOverlay { display: none; }
 <div class="tk-card" id="titlePanel">
   <div class="tk-card-head"><span class="tk-head-emoji">👑</span>稱號 <span id="titleCount" class="tk-card-count"></span></div>
   <div id="titleList" class="tk-title-row"></div>
+</div>
+
+<!-- 音樂播放器：位於「稱號」之下，使用既有真實播放功能 -->
+<div class="music-player" id="musicPlayer">
+  <div class="music-player-bar" id="musicBar">
+    <div class="music-cover" onclick="toggleMusicPlayer()" title="收合"><img src="assets/images/music-cover.png" alt=""></div>
+    <div class="music-track-info" id="musicTrackInfo">
+      <div class="music-track-name" id="musicTrackName">載入中...</div>
+      <div class="music-track-sub" id="musicTrackSub">背景音樂</div>
+    </div>
+    <div class="music-controls">
+      <button class="music-ctrl-btn" onclick="musicPrev()" title="上一首">⏮</button>
+      <button class="music-ctrl-btn play" id="musicPlayBtn" onclick="togglePlay()">▶</button>
+      <button class="music-ctrl-btn" onclick="musicNext()" title="下一首">⏭</button>
+      <button class="music-ctrl-btn music-ctrl-list" title="播放清單（開發中）">☰</button>
+    </div>
+  </div>
+  <div class="music-progress" id="musicProgress" onclick="seekMusic(event)">
+    <div class="music-progress-fill" id="musicProgressFill"></div>
+  </div>
 </div>
 
 </div>
