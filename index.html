@@ -282,8 +282,9 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 /* 稱號：橫向輪播（一次看 3 張、其餘可左右滑動；不讓整頁橫向溢出） */
 #viewTask .tk-title-row { display:flex; gap:11px; overflow-x:auto; max-width:100%; padding:2px 2px 4px; scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; overscroll-behavior-x:contain; }
 #viewTask .tk-title-row::-webkit-scrollbar { display:none; }
-/* 外層包裝：作為排版單位，維持三張卡等寬等高、間距一致 */
-#viewTask .tk-chip-wrap { position:relative; box-sizing:border-box; flex:0 0 auto; width:150px; scroll-snap-align:start; }
+/* 外層包裝：作為排版單位，維持三張卡等寬等高、間距一致；裁切任何超出卡片的內容 */
+#viewTask .tk-chip-wrap { position:relative; box-sizing:border-box; flex:0 0 auto; width:150px; scroll-snap-align:start; overflow:hidden; border-radius:16px; }
+/* 卡片本體：任何卡面裝飾都必須裁切在卡片邊界內 */
 #viewTask .tk-chip { position:relative; box-sizing:border-box; overflow:hidden; width:100%; aspect-ratio:4 / 3; border-radius:16px; text-align:center; background:transparent; border:none; z-index:1; }
 #viewTask .tk-chip.current { box-shadow:0 6px 16px rgba(70,170,100,0.28); }
 /* 上傳的稱號卡圖：鋪滿整張卡（載入失敗則自動隱藏，露出下方文字退回卡） */
