@@ -4096,7 +4096,7 @@ html:has(#viewPestGame.active),body:has(#viewPestGame.active),html:has(#viewFarm
       <div class="consumer-brand"><img src="https://jun2009980303-bot.github.io/SKYSEF/assets/images/logo.png" alt=""><div><strong>福萌芽</strong><span>安心選擇每一份農產</span></div></div>
       <button class="consumer-profile-btn" onclick="switchView('viewMe')" aria-label="我的帳號">♙</button>
     </div>
-    
+
 
     <section class="sprout-hero"><div class="sprout-hero-copy"><h1 id="consumerGreeting">你好，消費者</h1><p>掃描農夫提供的 QR Code，<br>看看作物從播種到採收的足跡。</p></div></section><div class="consumer-section-title"><h2>今天想做什麼？</h2><span>探索安心食材</span></div>
     <div class="consumer-action-grid">
@@ -4198,19 +4198,6 @@ html:has(#viewPestGame.active),body:has(#viewPestGame.active),html:has(#viewFarm
 </div>
 
 <div class="container">
-
-<!-- 今日小知識 -->
-<div class="daily-card">
-<div class="cs-daily-heading">
-  <img class="cs-daily-icon" src="https://jun2009980303-bot.github.io/SKYSEF/assets/images/data/sun.png" alt="">
-  <span>今日小知識</span>
-  <span class="daily-badge">每日更新</span>
-</div>
-<h3 id="wikiTitle">載入中...</h3>
-<div id="wikiText">正在為您挑選植物知識...</div>
-<button class="cs-wiki-btn" onclick="generateRandomWiki()">↻ 換一個知識</button>
-<img class="cs-wiki-art" id="wikiImage" src="https://jun2009980303-bot.github.io/SKYSEF/assets/images/knowledge/knowledge-corn.png" alt="可愛玉米插圖">
-</div>
 
 <!-- 環境數據 -->
 <div class="panel cs-monitor-card">
@@ -4683,7 +4670,7 @@ function renderConsumerTraceData(data, uid) {
   if (intro) intro.hidden = true;
   if (profile) {
     profile.hidden = false;
-    profile.innerHTML = `<div class="trace-profile-card"><div class="trace-profile-main"><img src="${consumerEscape(data.photo || 'https://jun2009980303-bot.github.io/SKYSEF/assets/images/icons/user.png')}" alt="農夫頭像" onerror="this.src='https://jun2009980303-bot.github.io/SKYSEF/assets/images/icons/user.png'"><div><h2>${consumerEscape(data.farmer || '在地小農')}</h2><p>📍 ${consumerEscape(data.location || '台灣在地')}</p></div></div><div class="trace-stats"><span><b>${records.length}</b> 筆紀錄</span><span><b>${consumerTracePhotos.length}</b> 張照片</span><span>已更新履歷</span></div></div>`;
+    profile.innerHTML = `<div class="trace-profile-card"><div class="trace-profile-main"><img id="traceFarmerAvatar" src="${consumerEscape(data.photo || 'https://jun2009980303-bot.github.io/SKYSEF/assets/images/icons/user.png')}" alt="農夫頭像" onerror="this.src='https://jun2009980303-bot.github.io/SKYSEF/assets/images/icons/user.png'"><div><h2 id="traceFarmerName">${consumerEscape(data.farmer || '在地小農')}</h2><p id="traceFarmerLocation">📍 ${consumerEscape(data.location || '台灣在地')}</p><p id="traceFarmerTitle" class="trace-farmer-title">${consumerEscape(data.currentTitle || '用心耕作的農友')}</p></div></div><div class="trace-stats"><span><b>${records.length}</b> 筆農事紀錄</span><span><b>${consumerTracePhotos.length}</b> 張農場照片</span><span><b>✓</b> 履歷已更新</span></div></div>`;
   }
   const hint = document.getElementById('consumerLastTraceHint');
   if (hint) hint.textContent = `${data.farmer || '農場'} · ${data.location || '台灣在地'}`;
@@ -6877,6 +6864,18 @@ async function loadConsumerPublicProfile() {
     const profileSnap = await _fbDb.collection('public_profiles').doc(uid).get();
     if (profileSnap.exists) {
       const p = profileSnap.data();
+      const traceProfile = document.getElementById('consumerTraceProfile');
+      if (traceProfile && traceProfile.hidden) {
+        renderConsumerTraceData({...p, logs: [], photos: []}, uid);
+      }
+      const traceName = document.getElementById('traceFarmerName');
+      const traceLocation = document.getElementById('traceFarmerLocation');
+      const traceTitle = document.getElementById('traceFarmerTitle');
+      const traceAvatar = document.getElementById('traceFarmerAvatar');
+      if (traceName && p.farmer) traceName.textContent = p.farmer;
+      if (traceLocation && p.location) traceLocation.textContent = '📍 ' + p.location;
+      if (traceTitle && p.currentTitle) traceTitle.textContent = p.currentTitle;
+      if (traceAvatar && p.photo) traceAvatar.src = p.photo;
       if (nameEl && p.farmer)   nameEl.textContent  = p.farmer;
       if (locEl  && p.location) locEl.textContent   = '📍 ' + p.location;
       if (titleEl && p.currentTitle) titleEl.textContent = p.currentTitle;
