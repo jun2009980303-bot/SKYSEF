@@ -282,15 +282,10 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 /* 稱號：橫向輪播（一次看 3 張、其餘可左右滑動；不讓整頁橫向溢出） */
 #viewTask .tk-title-row { display:flex; gap:11px; overflow-x:auto; max-width:100%; padding:2px 2px 4px; scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; overscroll-behavior-x:contain; }
 #viewTask .tk-title-row::-webkit-scrollbar { display:none; }
-/* 外層包裝：作為排版單位，讓裝飾葉片可以露出卡片邊緣而不被卡片本身裁切 */
+/* 外層包裝：作為排版單位，維持三張卡等寬等高、間距一致 */
 #viewTask .tk-chip-wrap { position:relative; box-sizing:border-box; flex:0 0 auto; width:150px; scroll-snap-align:start; }
 #viewTask .tk-chip { position:relative; box-sizing:border-box; overflow:hidden; width:100%; aspect-ratio:4 / 3; border-radius:16px; text-align:center; background:transparent; border:none; z-index:1; }
 #viewTask .tk-chip.current { box-shadow:0 6px 16px rgba(70,170,100,0.28); }
-/* 裝飾葉片：位於卡片後方（z-index:0），從卡緣稍微探出的層次點綴，不遮擋文字與徽章 */
-#viewTask .tk-leaf { position:absolute; z-index:0; line-height:1; font-size:17px; pointer-events:none; opacity:0.92; filter:drop-shadow(0 1px 1px rgba(40,70,40,0.25)); }
-#viewTask .tk-leaf-a { top:16%; left:-9px; transform:rotate(-42deg); }
-#viewTask .tk-leaf-b { bottom:14%; right:-9px; transform:rotate(150deg); }
-#viewTask .tk-leaf-c { top:7%; right:-7px; font-size:13px; transform:rotate(52deg); }
 /* 上傳的稱號卡圖：鋪滿整張卡（載入失敗則自動隱藏，露出下方文字退回卡） */
 #viewTask .tk-chip-art { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; display:block; }
 #viewTask .tk-chip-art.tk-art-off { display:none; }
@@ -351,8 +346,6 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
   #viewTask .tk-chip-name { font-size:13px; margin-bottom:1px; }
   #viewTask .tk-chip-name.long { font-size:11.5px; }
   #viewTask .tk-chip-req { font-size:11px; }
-  #viewTask .tk-leaf { font-size:15px; }
-  #viewTask .tk-leaf-c { font-size:12px; }
   #viewTask .tk-chip-spark { display:none; }
 }
 /* ── 首頁：2026 單畫面精簡版（真實 PNG 素材） ───────────── */
@@ -5040,11 +5033,8 @@ function renderTitles() {
     const isCur = cur.name === t.name;
     const theme = TITLE_THEMES[i % TITLE_THEMES.length];
     const longName = t.name.length >= 5 ? ' long' : '';   // 較長的稱號自動縮字級，避免擁擠
-    // 裝飾葉片：後方層次點綴，每張都有兩片、單數卡多一片小葉以增添變化（風格一致）
-    const leaves = `<span class="tk-leaf tk-leaf-a">🍃</span><span class="tk-leaf tk-leaf-b">🍃</span>${i % 2 === 1 ? '<span class="tk-leaf tk-leaf-c">🌿</span>' : ''}`;
     // 卡面直接使用上傳的稱號圖；沒有圖時才顯示帶配色的文字退回卡。鎖為獨立 UI 疊層，只有未解鎖才顯示
     return `<div class="tk-chip-wrap">
-      ${leaves}
       <div class="tk-chip ${isCur ? 'current' : ''} ${isUnlocked ? '' : 'locked'}" title="${t.name}（${t.req} EXP）">
       ${t.img ? `<img class="tk-chip-art" src="${t.img}" alt="${t.name}" loading="lazy" onerror="this.classList.add('tk-art-off')">` : ''}
       <div class="tk-chip-fallback" style="background:${theme.bg}; border-color:${theme.border};">
