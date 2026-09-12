@@ -279,6 +279,9 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask .tk-ach-right { flex-shrink:0; align-self:center; font-size:14px; font-weight:800; color:rgba(30,50,40,0.5); }
 #viewTask .tk-ach-pill { background:#2fb367; color:#fff; font-size:13px; font-weight:800; padding:6px 14px; border-radius:20px; box-shadow:0 3px 8px rgba(47,179,103,0.28); white-space:nowrap; }
 
+/* 稱號區塊背景：純淨、無任何裝飾底圖（純淺奶油色，完全不透明，卡片後方一律乾淨） */
+#viewTask #titlePanel { background:#fdfaf3; background-image:none; }
+#viewTask #titlePanel .tk-title-row { background:transparent; background-image:none; }
 /* 稱號：橫向輪播（一次看 3 張、其餘可左右滑動；不讓整頁橫向溢出） */
 #viewTask .tk-title-row { display:flex; gap:11px; overflow-x:auto; max-width:100%; padding:2px 2px 4px; scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; overscroll-behavior-x:contain; }
 #viewTask .tk-title-row::-webkit-scrollbar { display:none; }
