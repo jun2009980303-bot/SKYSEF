@@ -292,6 +292,8 @@ input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-rad
 #viewTask .tk-chip.current { box-shadow:0 6px 16px rgba(70,170,100,0.28); }
 /* 上傳的稱號卡圖：鋪滿整張卡（載入失敗則自動隱藏，露出下方文字退回卡） */
 #viewTask .tk-chip-art { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; display:block; }
+/* 容納層：把每張卡上緣微微超出卡身的小葉尖裁切掉，讓卡片後方與四周維持乾淨（不修改任何 PNG 檔） */
+#viewTask #titleList .tk-chip-art { clip-path: inset(7% 0 0 0 round 15px); }
 #viewTask .tk-chip-art.tk-art-off { display:none; }
 #viewTask .tk-chip.locked .tk-chip-art { filter:grayscale(0.28) brightness(0.96); }
 /* 文字退回卡（沒有圖時顯示，填滿整張卡） */
