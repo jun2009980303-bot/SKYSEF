@@ -4732,6 +4732,37 @@ const consumerWikiImages = {
 "地瓜葉": "assets/images/knowledge/knowledge-sweet-potato-leaf.png"
 };
 
+// ── 使用者資料隔離 ────────────────────────────────────────
+// 每位登入者的 localStorage 一律以其 Firebase UID 命名空間化，
+// 讓不同帳號在同一裝置上完全獨立、互不繼承（EXP／抽獎券／扭蛋收藏／任務／成就／稱號／個人檔案…）。
+let _activeUid = null;
+(function () {
+  if (window.__lsScoped) return; window.__lsScoped = true;
+  const ls = window.localStorage;
+  const getRaw = ls.getItem.bind(ls), setRaw = ls.setItem.bind(ls), remRaw = ls.removeItem.bind(ls);
+  window._rawLS = { get: getRaw, set: setRaw, remove: remRaw };
+  // 只有應用程式的使用者資料 key 會被命名空間化；Firebase 自身的 key（firebase:*）不受影響。
+  const isUserKey = k => typeof k === 'string' && (k.indexOf('skysef_') === 0 || k.indexOf('puli_') === 0 || k.indexOf('liked_') === 0);
+  const scope = k => (_activeUid && isUserKey(k)) ? ('u:' + _activeUid + '::' + k) : k;
+  ls.getItem    = k => getRaw(scope(k));
+  ls.setItem    = (k, v) => setRaw(scope(k), v);
+  ls.removeItem = k => remRaw(scope(k));
+})();
+
+// 切換帳號時：先把記憶體內的狀態清成預設，避免短暫顯示上一位使用者的資料
+function _resetUserStateInMemory() {
+  _exp = 0; _tickets = 0; gallery = []; logs = []; farmProfile = { location: '', farmer: '' };
+  window._lastGachaChar = null;
+}
+// 登入後：只從「目前這位使用者」的命名空間載入資料
+function _loadUserStateFromStorage() {
+  _exp     = parseInt(localStorage.getItem('skysef_exp') || '0', 10);
+  _tickets = parseInt(localStorage.getItem('skysef_tickets') || '0', 10);
+  try { gallery = JSON.parse(localStorage.getItem('skysef_gallery') || '[]') || []; } catch (e) { gallery = []; }
+  try { logs = JSON.parse(localStorage.getItem('puli_dynamic_resume') || '[]') || []; } catch (e) { logs = []; }
+  try { farmProfile = JSON.parse(localStorage.getItem('puli_farm_profile') || 'null') || { location: '', farmer: '' }; } catch (e) { farmProfile = { location: '', farmer: '' }; }
+}
+
 let logs = JSON.parse(localStorage.getItem('puli_dynamic_resume')) || [];
 let farmProfile = JSON.parse(localStorage.getItem('puli_farm_profile')) || { location: '', farmer: '' };
 let lineChart;
@@ -5134,8 +5165,12 @@ function toggleManualTask(name) {
   const state = _getDailyTaskState();
   const wasUndone = !state.manual[name];
   state.manual[name] = !state.manual[name];
+  if (!state.awarded) state.awarded = {};
+  // 每個任務每天最多獎勵一次 EXP：即使反覆勾選／取消也不會重複加經驗
+  const shouldAward = wasUndone && !state.awarded[name];
+  if (shouldAward) state.awarded[name] = true;
   _saveDailyTaskState(state);
-  if (wasUndone) addExp(EXP_REWARDS.manualTask, `完成任務：${name}`);
+  if (shouldAward) addExp(EXP_REWARDS.manualTask, `完成任務：${name}`);
   renderTaskView();
   _tryAwardDailyTaskTicket();
 }
@@ -6389,9 +6424,13 @@ function _tryInitFirebase() {
 
 async function loadFarmDataFromFirebase() {
   if (!_fbDb) return;
+  // 只讀取「目前登入者」的後端資料，避免跨帳號共用（改為 users/{uid}/... 命名空間）
+  const _u = _fbAuth && _fbAuth.currentUser;
+  if (!_u) return;
+  const _userDoc = _fbDb.collection('users').doc(_u.uid);
   try {
     // Load farm profile
-    const profileSnap = await _fbDb.collection('settings').doc('profile').get();
+    const profileSnap = await _userDoc.collection('settings').doc('profile').get();
     if (profileSnap.exists) {
       const p = profileSnap.data();
       if (p.location) { farmProfile.location = p.location; }
@@ -6399,7 +6438,7 @@ async function loadFarmDataFromFirebase() {
       updateProfileDisplay();
     }
     // Load farm logs
-    const logsSnap = await _fbDb.collection('logs').orderBy('timestamp', 'desc').limit(20).get();
+    const logsSnap = await _userDoc.collection('logs').orderBy('timestamp', 'desc').limit(20).get();
     if (!logsSnap.empty) {
       logs = logsSnap.docs.map(d => {
         const data = d.data();
@@ -6417,7 +6456,7 @@ async function loadFarmDataFromFirebase() {
       initChart();
     }
     // Load plant photo
-    const photoSnap = await _fbDb.collection('settings').doc('photo').get();
+    const photoSnap = await _userDoc.collection('settings').doc('photo').get();
     if (photoSnap.exists && photoSnap.data().url) {
       const url = photoSnap.data().url;
       document.getElementById('photoDisplayConsumer').innerHTML = `<img src="${url}" style="max-width:100%;max-height:180px;border-radius:15px;">`;
@@ -6516,10 +6555,17 @@ function initAuth() {
   _fbAuth.onAuthStateChanged(user => {
     const overlay = document.getElementById('loginOverlay');
     if (user) {
+      // 綁定目前登入者 → 重置記憶體狀態 → 只載入此使用者命名空間的資料 → 才渲染
+      _activeUid = user.uid;
+      _resetUserStateInMemory();
+      _loadUserStateFromStorage();
       overlay.classList.add('hidden');
       startApp();
       maybeShowProfileSetup();
     } else {
+      // 登出：清除此 UI 工作階段的記憶體狀態，避免下一位使用者繼承；但不刪除該帳號已保存的資料
+      _activeUid = null;
+      _resetUserStateInMemory();
       overlay.classList.remove('hidden');
     }
   });
@@ -6966,7 +7012,7 @@ async function syncPublicProfile() {
   const user = _fbAuth && _fbAuth.currentUser;
   if (!user || !_fbDb) return;
   try {
-    const photoSnap = await _fbDb.collection('settings').doc('photo').get();
+    const photoSnap = await _fbDb.collection('users').doc(user.uid).collection('settings').doc('photo').get();
     const photo = photoSnap.exists ? (photoSnap.data().url || '') : '';
     const curTitle = _getCurrentTitle ? _getCurrentTitle().name : '農場新人';
     await _fbDb.collection('public_profiles').doc(user.uid).set({
